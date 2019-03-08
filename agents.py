@@ -32,7 +32,7 @@ class RandomAgent():
 
     for e in range(self.max_episodes): # iterate over episodes
       observation = self.env.reset() # reset the state of the env to the starting state     
-      print("observation: ", observation)
+      #print("observation: ", observation)
       np.random.seed(e)
 
       for iter in range(self.max_iter_per_episode):

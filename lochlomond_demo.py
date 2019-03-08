@@ -27,7 +27,7 @@ from search import *
 
 from agents import RandomAgent
 
-agent = RandomAgent(problem_id=1, max_episodes=20, max_iter_per_episode=500, reward_hole=0.0, is_stochastic=True)
+agent = RandomAgent(problem_id=1, max_episodes=500, max_iter_per_episode=500, reward_hole=0.0, is_stochastic=True)
 print(agent.solve())
 print("total rewards: ", agent.total_rewards, " in ", agent.max_episodes)
 
