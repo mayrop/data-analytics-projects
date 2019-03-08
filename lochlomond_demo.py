@@ -20,44 +20,27 @@ from helpers import *
 from uofgsocsai import LochLomondEnv # load the class defining the custom Open AI Gym problem
 import matplotlib.pyplot as plt
 from pprint import pprint
-
-AIMA_TOOLBOX_ROOT="aima-python"
-sys.path.append(AIMA_TOOLBOX_ROOT)
-from search import *
-
 from agents import RandomAgent
 
-agent = RandomAgent(problem_id=1, max_episodes=500, max_iter_per_episode=500, reward_hole=0.0, is_stochastic=True)
-print(agent.solve())
-print("total rewards: ", agent.total_rewards, " in ", agent.max_episodes)
+lines = []
+for i in range(8):
+  for base_map in [4, 8]:
+    if i >= base_map:
+      continue
 
-# # Let's visualize the problem/env
+    map_name_base = str(base_map) + "x" + str(base_map) + "-base"
+    agent = RandomAgent(problem_id=i, max_episodes=1000, max_iter_per_episode=100, map_name_base=map_name_base)
+    agent.solve()
+    for line in agent.lines:
+      lines.append(line)
 
-# # # Create a representation of the state space for use with AIMA A-star
-# # state_space_locations, state_space_actions, state_initial_id, state_goal_id = env2statespace(env)
+    print("total rewards: ", agent.total_rewards, " in ", agent.max_episodes)
+    np.savetxt("data/random_agent_problem_id_" + str(i) + "_map_" + str(base_map) + ".csv", agent.lines, delimiter=",", fmt='%s')  
 
-# Reset the random generator to a known state (for reproducability)
-
-# ####
-total_rewards = 0
-
-np.savetxt("random.csv", agent.lines, delimiter=",", fmt='%s')
-problem_id = 0        # problem_id \in [0:7] generates 8 diffrent problems on which you can train/fine-tune your agent 
-reward_hole = 0.0     # should be less than or equal to 0.0 (you can fine tune this  depending on you RL agent choice)
-is_stochastic = True  # should be False for A-star (deterministic search) and True for the RL agent
-
-max_episodes = 50   # you can decide you rerun the problem many times thus generating many episodes... you can learn from them all!
-max_iter_per_episode = 1000 # you decide how many iterations/actions can be executed per episode
-
-# # Generate the specific problem 
-env = LochLomondEnv(problem_id=problem_id, is_stochastic=False, reward_hole=reward_hole)
-# Reset the random generator to a known state (for reproducability)
-np.random.seed()
-
-# ####
-#total_rewards = 0
-#lines = []
-#lines.append(["Run", "Episode", "Iteration", "PrevLocationX", "PrevLocationY", "NewLocationX", "NewLocationY", "Action", "Done", "Reward", "CumulativeReward"])
+np.savetxt("data/random_all.csv", lines, delimiter=",", fmt='%s')  
+  
+  #print(lines)
+#np.savetxt("data/all_problems.csv", lines, delimiter=",", fmt='%s')  
 
 #locations, actions, state_initial_id, state_goal_id, my_map = env2statespace(env)
 
@@ -75,90 +58,63 @@ np.random.seed()
 #print(pprint(maze_map.__dict__))
 #print(pprint(maze_problem.__dict__))
 
-def my_best_first_graph_search(problem, f):
-    """Search the nodes with the lowest f scores first.
-    You specify the function f(node) that you want to minimize; for example,
-    if f is a heuristic estimate to the goal, then we have greedy best
-    first search; if f is node.depth then we have breadth-first search.
-    There is a subtlety: the line "f = memoize(f, 'f')" means that the f
-    values will be cached on the nodes as they are computed. So after doing
-    a best first search you can examine the f values of the path returned."""
+# def my_best_first_graph_search(problem, f):
+#     """Search the nodes with the lowest f scores first.
+#     You specify the function f(node) that you want to minimize; for example,
+#     if f is a heuristic estimate to the goal, then we have greedy best
+#     first search; if f is node.depth then we have breadth-first search.
+#     There is a subtlety: the line "f = memoize(f, 'f')" means that the f
+#     values will be cached on the nodes as they are computed. So after doing
+#     a best first search you can examine the f values of the path returned."""
 
-    iterations = 0
+#     iterations = 0
    
-    f = memoize(f, 'f')
-    node = Node(problem.initial)
+#     f = memoize(f, 'f')
+#     node = Node(problem.initial)
 
-    iterations += 1
+#     iterations += 1
 
-    if problem.goal_test(node.state):
-      iterations += 1
-      return(iterations, node)
+#     if problem.goal_test(node.state):
+#       iterations += 1
+#       return(iterations, node)
     
-    frontier = PriorityQueue('min', f)
-    frontier.append(node)
+#     frontier = PriorityQueue('min', f)
+#     frontier.append(node)
    
-    iterations += 1    
+#     iterations += 1    
 
-    explored = set()
+#     explored = set()
 
-    while frontier:
-      node = frontier.pop() 
-      iterations += 1
+#     while frontier:
+#       node = frontier.pop() 
+#       iterations += 1
       
-      if problem.goal_test(node.state):
-        iterations += 1
-        return(iterations, node)
+#       if problem.goal_test(node.state):
+#         iterations += 1
+#         return(iterations, node)
 
-      explored.add(node.state)
+#       explored.add(node.state)
       
-      for child in node.expand(problem):
-        if child.state not in explored and child not in frontier:
-          frontier.append(child)
-          iterations += 1
+#       for child in node.expand(problem):
+#         if child.state not in explored and child not in frontier:
+#           frontier.append(child)
+#           iterations += 1
 
-        elif child in frontier:
-          incumbent = frontier[child]
-          if f(child) < f(incumbent):
-            del frontier[incumbent]
-            frontier.append(child)
-            iterations += 1
+#         elif child in frontier:
+#           incumbent = frontier[child]
+#           if f(child) < f(incumbent):
+#             del frontier[incumbent]
+#             frontier.append(child)
+#             iterations += 1
 
-      iterations += 1
-    #return None
+#       iterations += 1
+#     #return None
 
-def my_astar_search(problem, h=None):
-    """A* search is best-first graph search with f(n) = g(n)+h(n).
-    You need to specify the h function when you call astar_search, or
-    else in your Problem subclass."""
-    h = memoize(h or problem.h, 'h') # define the heuristic function
-    return my_best_first_graph_search(problem, lambda n: n.path_cost + h(n))
+# def my_astar_search(problem, h=None):
+#     """A* search is best-first graph search with f(n) = g(n)+h(n).
+#     You need to specify the h function when you call astar_search, or
+#     else in your Problem subclass."""
+#     h = memoize(h or problem.h, 'h') # define the heuristic function
+#     return my_best_first_graph_search(problem, lambda n: n.path_cost + h(n))
         
-my_astar_search(problem=maze_problem, h=None)
-# for r in range(5):
-#   for e in range(max_episodes): # iterate over episodes
-#     observation = env.reset() # reset the state of the env to the starting state     
-#     print("Episode", e)
-
-#     for iter in range(max_iter_per_episode):
-#       #print("Iteration: ", iter)
-#       #env.render() # for debugging/develeopment you may want to visualize the individual steps by uncommenting this line      
-#       action = env.action_space.sample() # your agent goes here (the current agent takes random actions)
-#       prev_location = coordinates[observation]
-#       observation, reward, done, info = env.step(action) # observe what happends when you take the action
-
-#       lines.append([r+1, e+1, iter+1, prev_location[0], prev_location[1], coordinates[observation][0], coordinates[observation][1], get_action(action), done, reward, total_rewards])
-
-#       if (done and reward == reward_hole): 
-#         #env.render()     
-#         print("We have reached a hole :-( [we can't move so stop trying; just give up]")
-
-#         break
-#       if (done and reward == +1.0):
-#         #env.render()     
-#         total_rewards += 1 
-#         print("We have reached the goal :-) [stop trying to move; we can't]. That's ok we have achived the goal]")
-        
-#         break
-
-# #np.savetxt('values.csv',np.asarray(lines), delimiter=",", )
+# my_astar_search(problem=maze_problem, h=None)

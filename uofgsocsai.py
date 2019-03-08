@@ -5,6 +5,7 @@ from six import StringIO, b
 from gym import utils
 from gym.envs.toy_text import discrete
 from pandas import *
+import copy
 
 LEFT = 0
 DOWN = 1
@@ -13,7 +14,7 @@ UP = 3
 
 MAPS_BASE = {
     "4x4-base": [
-        "SFFF",
+        "FFFF",
         "FHFH",
         "FFFH",
         "HFFF"
@@ -86,14 +87,15 @@ class LochLomondEnv(discrete.DiscreteEnv):
 
     metadata = {'render.modes': ['human', 'ansi']}
 
-    def __init__(self, problem_id=0, is_stochastic=True, reward_hole = 0.0):
+    def __init__(self, problem_id=0, is_stochastic=True, reward_hole = 0.0, map_name_base="4x4-base"):
         if reward_hole > 0.0:
             raise ValueError('reward_hole must be equal to 0 or smaller')
     
+        MY_MAP_BASE = copy.deepcopy(MAPS_BASE)
+
+        # print(copy.copy())
         # Fetch the base problem (without S and G)
-        map_name_base="8x8-base" # for the final submission in AI (H) this should be 8x8-base but you may want to start out with 4x4-base!        
-        map_name_base="4x4-base"
-        desc = MAPS_BASE[map_name_base]
+        desc = MY_MAP_BASE[map_name_base]
         self.nrow, self.ncol = nrow, ncol = np.asarray(desc,dtype='c').shape
 
         # Check probelm_id value
@@ -106,6 +108,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
         # Set the Start state for this variant of the problem     
         row_s = 0
         col_s = problem_id 
+
         desc[row_s] = desc[row_s][:col_s] + 'S' + desc[row_s][col_s+1:]
         
         # Set the Goal state for this variant of the problem     
@@ -115,6 +118,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
 
         self.desc = desc = np.asarray(desc, dtype='c')        
         self.reward_range = (0, 1)
+        self.is_stochastic = is_stochastic
 
         nA = 4
         nS = nrow * ncol
@@ -185,8 +189,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
 
         desc = [[c.decode('utf-8') for c in line] for line in desc]
         desc[row][col] = "X"
-
-        #desc[row][col] = utils.colorize(desc[row][col], "red", highlight=True) # note: this does not work on all setups you can try to uncomment asnd see what happends (if it does work you'll see weird symbols)
+        desc[row][col] = utils.colorize(desc[row][col], "red", highlight=True) # note: this does not work on all setups you can try to uncomment asnd see what happends (if it does work you'll see weird symbols)
         
         if self.lastaction is not None:
             outfile.write("  ({})\n".format(["Left","Down","Right","Up"][self.lastaction]))
