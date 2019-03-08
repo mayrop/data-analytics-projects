@@ -1,7 +1,10 @@
 import unittest
-from agents import RandomAgent
+from agents import RandomAgent, SimpleAgent
 
 class TestRandomAgent(unittest.TestCase):
+
+    def test_4_by_4_simple_agent(self):
+        agent = SimpleAgent(problem_id=1, max_episodes=500, max_iter_per_episode=500, map_name_base="4x4-base")
 
     def test_4_by_4_random_agent(self):
         agent = RandomAgent(problem_id=1, max_episodes=500, max_iter_per_episode=500, map_name_base="4x4-base")

@@ -20,7 +20,24 @@ from helpers import *
 from uofgsocsai import LochLomondEnv # load the class defining the custom Open AI Gym problem
 import matplotlib.pyplot as plt
 from pprint import pprint
-from agents import RandomAgent
+from agents import RandomAgent, SimpleAgent
+
+# lines = []
+# for i in range(8):
+#   for base_map in [4, 8]:
+#     if i >= base_map:
+#       continue
+
+#     map_name_base = str(base_map) + "x" + str(base_map) + "-base"
+#     agent = RandomAgent(problem_id=i, max_episodes=1000, max_iter_per_episode=100, map_name_base=map_name_base)
+#     agent.solve()
+#     for line in agent.lines:
+#       lines.append(line)
+
+#     print("total rewards: ", agent.total_rewards, " in ", agent.max_episodes)
+#     np.savetxt("data/random_agent_problem_id_" + str(i) + "_map_" + str(base_map) + ".csv", agent.lines, delimiter=",", fmt='%s')  
+
+# np.savetxt("data/random_all.csv", lines, delimiter=",", fmt='%s')  
 
 lines = []
 for i in range(8):
@@ -29,18 +46,15 @@ for i in range(8):
       continue
 
     map_name_base = str(base_map) + "x" + str(base_map) + "-base"
-    agent = RandomAgent(problem_id=i, max_episodes=1000, max_iter_per_episode=100, map_name_base=map_name_base)
+    agent = SimpleAgent(problem_id=i, max_episodes=1000, max_iter_per_episode=100, map_name_base=map_name_base)
     agent.solve()
     for line in agent.lines:
       lines.append(line)
 
     print("total rewards: ", agent.total_rewards, " in ", agent.max_episodes)
-    np.savetxt("data/random_agent_problem_id_" + str(i) + "_map_" + str(base_map) + ".csv", agent.lines, delimiter=",", fmt='%s')  
+    np.savetxt("data/simple_agent_problem_id_" + str(i) + "_map_" + str(base_map) + ".csv", agent.lines, delimiter=",", fmt='%s')  
 
-np.savetxt("data/random_all.csv", lines, delimiter=",", fmt='%s')  
-  
-  #print(lines)
-#np.savetxt("data/all_problems.csv", lines, delimiter=",", fmt='%s')  
+np.savetxt("data/simple_all.csv", lines, delimiter=",", fmt='%s')  
 
 #locations, actions, state_initial_id, state_goal_id, my_map = env2statespace(env)
 

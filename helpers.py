@@ -27,11 +27,16 @@ def env2statespace(env):
     cont = 0
     for i in range(env.desc.shape[0]):
         for j in range(env.desc.shape[1]):  
+            #temp = i
+            #i = j
+            #j = temp
+            #print(env.desc[0,1])
+            #print(env.desc)
             states_indexes[cont] = (int(i), int(j))
             cont += 1 
             if not (b'H' in env.desc[i,j]):
-                state_id = "S_"+str(int(i))+"_"+str(int(j) )
-                state_space_locations[state_id] = (int(i),int(j))
+                state_id = "S_"+str(int(j))+"_"+str(int(i) )
+                state_space_locations[state_id] = (int(j),int(i))
                 if env.desc[i,j] == b'S':
                     state_initial_id = state_id                                                 
                 elif env.desc[i,j] == b'G':
