@@ -164,10 +164,12 @@ class SimpleAgent(MyAbstractAIAgent):
       map_name_base=map_name_base
     )
     locations, actions, state_initial_id, state_goal_id, my_map = self.env_mapping
+    print("problem ID", problem_id)
     self.maze_map = UndirectedGraph(actions)
     self.maze_map.locations = locations
     self.maze_problem = GraphProblem(state_initial_id, state_goal_id, self.maze_map)
     self.locations = locations
+    print(self.env.render())
 
   def solve(self):
     self.reset_lines()
@@ -175,8 +177,18 @@ class SimpleAgent(MyAbstractAIAgent):
 
     for e in range(self.max_episodes): # iterate over episodes
       node = self.perform_a_star_search(problem=self.maze_problem, h=None)
-      solution = node.solution()
+      # cnode = node.parent
+      # solution_path.append(cnode)
+      # while cnode.state != "S_00_00":    
+      #     cnode = cnode.parent  
+      #     solution_path.append(cnode)
+
+      solution = [self.maze_problem.initial] + node.solution()
+      #solution  node.solution()
       len_solution = len(solution)
+      # print("len_solution", len_solution)
+      # print("INITIAL", self.maze_problem.initial)
+      # print("solution", solution)
 
       # ProblemId,Map,Episode,Iteration,Action,Done,Reward,CumulativeReward,PrevLocationX,PrevLocationY,NewLocationX,NewLocationY
       for i in range(1, min(len_solution, self.max_iter_per_episode)):

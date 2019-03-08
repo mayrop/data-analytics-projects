@@ -51,7 +51,7 @@ for i in range(8):
     for line in agent.lines:
       lines.append(line)
 
-    print("total rewards: ", agent.total_rewards, " in ", agent.max_episodes)
+    #print("total rewards: ", agent.total_rewards, " in ", agent.max_episodes)
     np.savetxt("data/simple_agent_problem_id_" + str(i) + "_map_" + str(base_map) + ".csv", agent.lines, delimiter=",", fmt='%s')  
 
 np.savetxt("data/simple_all.csv", lines, delimiter=",", fmt='%s')  
