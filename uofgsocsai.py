@@ -6,7 +6,6 @@ from gym import utils
 from gym.envs.toy_text import discrete
 from pandas import *
 
-
 LEFT = 0
 DOWN = 1
 RIGHT = 2
@@ -31,14 +30,16 @@ MAPS_BASE = {
     ],
 }
 
-#.....XX.....
-#.....XX.....
-#.....XX.....
-#.....XX.....
-#.....XX.....
-#.....XX.....
-#..XXXXXXXX..
-#..XXXXXXXX..
+def categorical_sample(prob_n, np_random):
+    """
+    Sample from categorical distribution
+    Each row specifies class probabilities
+    """
+    prob_n = np.asarray(prob_n)
+    csprob_n = np.cumsum(prob_n)
+    myrand = np_random.rand()
+    # first element where the cuulative prob is > random number
+    return (csprob_n > myrand).argmax()
 
 class LochLomondEnv(discrete.DiscreteEnv):
     """
@@ -112,7 +113,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
         col_g = np.random.randint(0, high=ncol)
         desc[row_g] = desc[row_g][:col_g] + 'G' + desc[row_g][col_g+1:]
 
-        self.desc = desc = np.asarray(desc,dtype='c')        
+        self.desc = desc = np.asarray(desc, dtype='c')        
         self.reward_range = (0, 1)
 
         nA = 4
@@ -137,42 +138,22 @@ class LochLomondEnv(discrete.DiscreteEnv):
                 row = max(row-1,0)
             return (row, col)
 
-        print("P", P)
-        print("nrow: ", nrow, "ncol: ", ncol)
-        print("desc", desc)
-
         for row in range(nrow):
             for col in range(ncol):
                 s = to_s(row, col)
-                print("s", s)
 
                 for a in range(4):
                     li = P[s][a]
-                    print("a: ", a)
-                    print("li: ", li)
-                    print(P)
-
                     letter = desc[row, col]
-                    print("letter: ", letter)
 
                     if letter in b'GH':
                         li.append((1.0, s, 0, True))
                     else:
                         if is_stochastic:
-                            print("stochastic array", [(a-1)%4, a, (a+1)%4])
-
                             for b in [(a-1)%4, a, (a+1)%4]:
-                                print("b: ", b)
-
                                 newrow, newcol = inc(row, col, b)
-                                print("newrow: ", newrow)
-                                print("newcol: ", newcol)
-
                                 newstate = to_s(newrow, newcol)
-                                print("newstate: ", newstate)
-
                                 newletter = desc[newrow, newcol]
-                                print("newstate: ", newstate)
 
                                 done = bytes(newletter) in b'GH'
                                 rew = 0.0
@@ -180,7 +161,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
                                     rew = 1.0
                                 elif(newletter == b'H'):
                                     rew = reward_hole
-                                print("appending: ", [1.0/3.0, newstate, rew, done])
+
                                 li.append((1.0/3.0, newstate, rew, done))
                         else:
                             newrow, newcol = inc(row, col, a)
@@ -215,3 +196,19 @@ class LochLomondEnv(discrete.DiscreteEnv):
 
         if mode != 'human':
             return outfile
+
+#    def step(self, a):
+#        transitions = self.P[self.s][a]
+#        print(transitions)
+#        i = categorical_sample([t[0] for t in transitions], self.np_random)
+#
+#        p, s, r, d = transitions[i]
+#        self.s = s
+#        self.lastaction = a
+#        return (s, r, d, {"prob" : p})
+
+    # def reset(self):
+    #     print(self.isd)
+    #     self.s = categorical_sample(self.isd, self.np_random)
+    #     self.lastaction = None
+    #     return self.s

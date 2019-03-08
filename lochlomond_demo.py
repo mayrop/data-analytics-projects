@@ -25,78 +25,23 @@ AIMA_TOOLBOX_ROOT="aima-python"
 sys.path.append(AIMA_TOOLBOX_ROOT)
 from search import *
 
-#from agents import RandomAgent
+from agents import RandomAgent
 
-# agent = RandomAgent(problem_id=1)
-# print(agent.solve())
-
-# Setup the parameters for the specific problem (you can change all of these if you want to) 
-problem_id = 0        # problem_id \in [0:7] generates 8 diffrent problems on which you can train/fine-tune your agent 
-reward_hole = 0.0     # should be less than or equal to 0.0 (you can fine tune this  depending on you RL agent choice)
-is_stochastic = True  # should be False for A-star (deterministic search) and True for the RL agent
-
-max_episodes = 1   # you can decide you rerun the problem many times thus generating many episodes... you can learn from them all!
-max_iter_per_episode = 1 # you decide how many iterations/actions can be executed per episode
-
-# # Generate the specific problem 
-env = LochLomondEnv(problem_id=problem_id, is_stochastic=True, reward_hole=reward_hole)
+agent = RandomAgent(problem_id=1, max_episodes=20, max_iter_per_episode=500, reward_hole=0.0, is_stochastic=True)
+print(agent.solve())
+print("total rewards: ", agent.total_rewards, " in ", agent.max_episodes)
 
 # # Let's visualize the problem/env
-print(env.desc)
 
 # # # Create a representation of the state space for use with AIMA A-star
 # # state_space_locations, state_space_actions, state_initial_id, state_goal_id = env2statespace(env)
 
 # Reset the random generator to a known state (for reproducability)
-np.random.seed()
 
 # ####
 total_rewards = 0
-my_list = []
-my_list.append(["Run", "Episode", "Iteration", "PrevLocationX", "PrevLocationY", "NewLocationX", "NewLocationY", "Action", "Done", "Reward", "CumulativeReward"])
-coordinates = env2statespace(env)[4]
 
-def get_action(action):
-  if action == 0:
-    return "left"
-  elif action == 1:
-    return "down"
-  elif action == 2:
-    return "right"
-  elif action == 3:
-    return "up"
-  return "unkown"
-
-for r in range(5):
-  for e in range(max_episodes): # iterate over episodes
-    observation = env.reset() # reset the state of the env to the starting state     
-    # print("Episode", e)
-
-    for iter in range(max_iter_per_episode):
-      #print("Iteration: ", iter)
-      #env.render() # for debugging/develeopment you may want to visualize the individual steps by uncommenting this line      
-      action = env.action_space.sample() # your agent goes here (the current agent takes random actions)
-      prev_location = coordinates[observation]
-      observation, reward, done, info = env.step(action) # observe what happends when you take the action
-
-      #print(info)
-
-      my_list.append([r+1, e+1, iter+1, prev_location[0], prev_location[1], coordinates[observation][0], coordinates[observation][1], get_action(action), done, reward, total_rewards])
-
-      if (done and reward == reward_hole): 
-        #env.render()     
-        #print("We have reached a hole :-( [we can't move so stop trying; just give up]")
-
-        break
-      if (done and reward == +1.0):
-        #env.render()     
-        total_rewards += 1 
-        #print("We have reached the goal :-) [stop trying to move; we can't]. That's ok we have achived the goal]")
-        
-        break
-
-print("total rewards: ", total_rewards, " in ", max_episodes)
-np.savetxt("foo.csv", my_list, delimiter=",", fmt='%s')
+np.savetxt("random.csv", agent.lines, delimiter=",", fmt='%s')
 problem_id = 0        # problem_id \in [0:7] generates 8 diffrent problems on which you can train/fine-tune your agent 
 reward_hole = 0.0     # should be less than or equal to 0.0 (you can fine tune this  depending on you RL agent choice)
 is_stochastic = True  # should be False for A-star (deterministic search) and True for the RL agent
@@ -110,25 +55,25 @@ env = LochLomondEnv(problem_id=problem_id, is_stochastic=False, reward_hole=rewa
 np.random.seed()
 
 # ####
-total_rewards = 0
-my_list = []
-my_list.append(["Run", "Episode", "Iteration", "PrevLocationX", "PrevLocationY", "NewLocationX", "NewLocationY", "Action", "Done", "Reward", "CumulativeReward"])
+#total_rewards = 0
+#lines = []
+#lines.append(["Run", "Episode", "Iteration", "PrevLocationX", "PrevLocationY", "NewLocationX", "NewLocationY", "Action", "Done", "Reward", "CumulativeReward"])
 
-locations, actions, state_initial_id, state_goal_id, my_map = env2statespace(env)
+#locations, actions, state_initial_id, state_goal_id, my_map = env2statespace(env)
 
-maze_map = UndirectedGraph(actions)
-maze_map.locations = locations
+#maze_map = UndirectedGraph(actions)
+#maze_map.locations = locations
 
-maze_problem = GraphProblem(state_initial_id, state_goal_id, maze_map)
+#maze_problem = GraphProblem(state_initial_id, state_goal_id, maze_map)
 
-print(type(maze_problem))
+#print(type(maze_problem))
 #print("state_initial_id", state_initial_id)
 #print("state_goal_id", state_goal_id)
-print("Initial state: " + maze_problem.initial)
-print("Goal state: "    + maze_problem.goal)
+#print("Initial state: " + maze_problem.initial)
+#print("Goal state: "    + maze_problem.goal)
 
-print(pprint(maze_map.__dict__))
-print(pprint(maze_problem.__dict__))
+#print(pprint(maze_map.__dict__))
+#print(pprint(maze_problem.__dict__))
 
 def my_best_first_graph_search(problem, f):
     """Search the nodes with the lowest f scores first.
@@ -189,7 +134,6 @@ def my_astar_search(problem, h=None):
     h = memoize(h or problem.h, 'h') # define the heuristic function
     return my_best_first_graph_search(problem, lambda n: n.path_cost + h(n))
         
-all_node_colors=[]
 my_astar_search(problem=maze_problem, h=None)
 # for r in range(5):
 #   for e in range(max_episodes): # iterate over episodes
@@ -203,7 +147,7 @@ my_astar_search(problem=maze_problem, h=None)
 #       prev_location = coordinates[observation]
 #       observation, reward, done, info = env.step(action) # observe what happends when you take the action
 
-#       my_list.append([r+1, e+1, iter+1, prev_location[0], prev_location[1], coordinates[observation][0], coordinates[observation][1], get_action(action), done, reward, total_rewards])
+#       lines.append([r+1, e+1, iter+1, prev_location[0], prev_location[1], coordinates[observation][0], coordinates[observation][1], get_action(action), done, reward, total_rewards])
 
 #       if (done and reward == reward_hole): 
 #         #env.render()     
