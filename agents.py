@@ -75,6 +75,34 @@ class MyAbstractAIAgent():
   def reset_rewards(self):
     self.total_rewards = 0
 
+  def set_episode_seed(self, seed):
+    # by default no seed for abstract agent
+    return None
+
+################################
+################################
+
+class RandomAgent(MyAbstractAIAgent):
+
+  """
+  TODO
+
+
+  """  
+  def __init__(self, problem_id=0, max_episodes=200, max_iter_per_episode=500, map_name_base="8x8-base", skip_header=False):
+    super(RandomAgent, self).__init__(
+      problem_id=problem_id, 
+      max_episodes=max_episodes, 
+      max_iter_per_episode=max_iter_per_episode, 
+      reward_hole=0.0, 
+      is_stochastic=True,
+      map_name_base=map_name_base,
+      skip_header=skip_header
+    )
+
+  def action(self):
+    return self.env.action_space.sample()
+
   def solve(self):
     self.reset_lines()
     self.reset_rewards()
@@ -113,34 +141,6 @@ class MyAbstractAIAgent():
     return self.total_rewards
 
   def set_episode_seed(self, seed):
-    # by default no seed for abstract agent
-    return None
-
-################################
-################################
-
-class RandomAgent(MyAbstractAIAgent):
-
-  """
-  TODO
-
-
-  """  
-  def __init__(self, problem_id=0, max_episodes=200, max_iter_per_episode=500, map_name_base="8x8-base", skip_header=False):
-    super(RandomAgent, self).__init__(
-      problem_id=problem_id, 
-      max_episodes=max_episodes, 
-      max_iter_per_episode=max_iter_per_episode, 
-      reward_hole=0.0, 
-      is_stochastic=True,
-      map_name_base=map_name_base,
-      skip_header=skip_header
-    )
-
-  def action(self):
-    return self.env.action_space.sample()
-
-  def set_episode_seed(self, seed):
     np.random.seed(seed)
     return None
 
@@ -163,43 +163,71 @@ class SimpleAgent(MyAbstractAIAgent):
       is_stochastic=False,
       map_name_base=map_name_base
     )
-
-  def solve(self):
     locations, actions, state_initial_id, state_goal_id, my_map = self.env_mapping
     self.maze_map = UndirectedGraph(actions)
     self.maze_map.locations = locations
-
-    self.node_colors = dict()
-
-    print(locations)
-    print(self.env.render())
-    print(state_initial_id)
-    print(actions)
-    # initialise a graph
-    for n, p in locations.items():   
-      self.node_colors[n] = "white" # node_colors to color nodes while exploring the map    
-
-    #print(self.maze_map.__dict__)
     self.maze_problem = GraphProblem(state_initial_id, state_goal_id, self.maze_map)
-    #print(self.maze_problem.__dict__)
-    # print(self.maze_problem.h)
-    iterations, all_node_colors, node = self.my_astar_search(problem=self.maze_problem, h=None)
-    print(iterations)
-    print(all_node_colors)
-    print(node.solution())
+    self.locations = locations
 
-  def action(self):
-    return "TODO"
-    #return self.env.action_space.sample()
+  def solve(self):
+    self.reset_lines()
+    self.reset_rewards()
+
+    for e in range(self.max_episodes): # iterate over episodes
+      node = self.perform_a_star_search(problem=self.maze_problem, h=None)
+      solution = node.solution()
+      len_solution = len(solution)
+
+      # ProblemId,Map,Episode,Iteration,Action,Done,Reward,CumulativeReward,PrevLocationX,PrevLocationY,NewLocationX,NewLocationY
+      for i in range(1, min(len_solution, self.max_iter_per_episode)):
+        prev = self.locations[solution[i - 1]]
+        curr = self.locations[solution[i]]
+
+        action = self.map_action_from_states(x1=prev[0], x2=curr[0], y1=prev[1], y2=curr[1])
+
+        done = solution[i] == self.maze_problem.goal
+        reward = 0
+
+        if done:
+          self.total_rewards += 1
+          reward = 1
+
+        self.lines.append([
+          self.problem_id,
+          self.map_name_base,
+          e+1, 
+          i, 
+          action, 
+          done, 
+          reward, 
+          self.total_rewards, 
+          prev[0], 
+          prev[1], 
+          curr[0], 
+          curr[1]
+        ])
+
+    return self.total_rewards
+
+  def map_action_from_states(self, x1, x2, y1, y2):
+    if x2 > x1:
+      return "right"
+    if x2 < x1:
+      return "left"
+    if y2 > y1:
+      return "down"
+    if y2 < y1:
+      return "up"
+    #TODO ADD EXCEPTOIN HERE
   
-  def my_astar_search(self, problem, h=None):
+  def perform_a_star_search(self, problem, h=None):
       """A* search is best-first graph search with f(n) = g(n)+h(n).
       You need to specify the h function when you call astar_search, or
       else in your Problem subclass."""
       h = memoize(h or problem.h, 'h') # define the heuristic function
-      return self.my_best_first_graph_search(problem, lambda n: n.path_cost + h(n))    
+      return self.perform_first_graph_search(problem, lambda n: n.path_cost + h(n))    
 
-  def my_best_first_graph_search(self, problem, f):
+  def perform_first_graph_search(self, problem, f):
       """Search the nodes with the lowest f scores first.
       You specify the function f(node) that you want to minimize; for example,
       if f is a heuristic estimate to the goal, then we have greedy best
@@ -208,77 +236,31 @@ class SimpleAgent(MyAbstractAIAgent):
       values will be cached on the nodes as they are computed. So after doing
       a best first search you can examine the f values of the path returned."""
 
-      ## we use these two variables at the time of visualisations
-      iterations = 0
-      all_node_colors = []
-      node_colors = dict(self.node_colors)
-     
-      #print(f)
       f = memoize(f, 'f')
       node = Node(problem.initial)
-      #print(node)
-      #print(node.state)
-
-      node_colors[node.state] = "red"
-      iterations += 1
-      print(iterations)
-
-      all_node_colors.append(dict(node_colors))
 
       if problem.goal_test(node.state):
-          node_colors[node.state] = "green"
-          iterations += 1
-          all_node_colors.append(dict(node_colors))
-          return(iterations, all_node_colors, node)
+          return(node)
       
       frontier = PriorityQueue('min', f)
       frontier.append(node)
      
-      node_colors[node.state] = "orange"
-      iterations += 1    
-      all_node_colors.append(dict(node_colors))
-
       explored = set()
-      frontier_iteration = 0
       
       while frontier:
-        frontier_iteration += 1
-        print("Iteration: ", frontier_iteration, "- Length: ", len(frontier))
-
         node = frontier.pop()
-        print("Exploring: ", node)
-        print("Explored: ", explored)
-                
-        node_colors[node.state] = "red"
-        iterations += 1
-        all_node_colors.append(dict(node_colors))
         
         if problem.goal_test(node.state):
-          node_colors[node.state] = "green"
-          iterations += 1
-          print("GOAL REACHED")
-          all_node_colors.append(dict(node_colors))
-          return(iterations, all_node_colors, node)
+          return(node)
 
         explored.add(node.state)
         
         for child in node.expand(problem):
           if child.state not in explored and child not in frontier:
-              print("child: ", child)
               frontier.append(child)
-              node_colors[child.state] = "orange"
-              iterations += 1
-              all_node_colors.append(dict(node_colors))
           elif child in frontier:
               incumbent = frontier[child]
               if f(child) < f(incumbent):
                   del frontier[incumbent]
                   frontier.append(child)
-                  node_colors[child.state] = "orange"
-                  iterations += 1
-                  all_node_colors.append(dict(node_colors))
-
-        node_colors[node.state] = "gray"
-        iterations += 1
-        all_node_colors.append(dict(node_colors))
       return None
