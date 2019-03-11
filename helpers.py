@@ -1,3 +1,5 @@
+import numpy as np
+
 def to_human(action):
     if action == 0:
         return "left"
@@ -64,6 +66,7 @@ def perform_best_first_graph_search(problem, f):
                     del frontier[incumbent]
                     frontier.append(child)
     return None
+
 
 def perform_a_star_search(problem, h=None):
     """A* search is best-first graph search with f(n) = g(n)+h(n).
@@ -137,7 +140,7 @@ def env2statespace(env):
                         state_loc_post_action = [state_loc[0]+delta[0],state_loc[1]+delta[1]]
 
                         #-- Check if the new possible state is in the state_space, i.e., is accessible --#
-                        state_id_post_action = "S_"+str(state_loc_post_action[0])+"_"+str(state_loc_post_action[1])                        
+                        state_id_post_action = "S_" + str(state_loc_post_action[0]) + "_" + str(state_loc_post_action[1])                        
                         if state_space_locations.get(state_id_post_action) != None:
                             possible_states[state_id_post_action] = 1 
                         
@@ -145,5 +148,66 @@ def env2statespace(env):
                     state_space_actions[state_id] = possible_states
 
     return state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes, rewards
+
+
+def env2grid(env):
+    """ 
+    This simple parser maps the state space from the Open AI env to a simple grid
+
+    We *assume* full observability, i.e., we can directly ignore Hole states. Alternatively, 
+    we could place a very high step cost to a Hole state or use a directed representation 
+    (i.e., you can go to a Hole state but never return). Feel free to experiment with both if time permits.
+
+    Input:
+        env: an Open AI Env follwing the std in the FrozenLake-v0 env
+
+    Output:
+        a grid with the reward values for each state with shape (env.nrow * env.ncol)
+
+    """    
+    matrix = env.desc.reshape(env.nrow * env.ncol)
+
+    def state_default_value(x):
+        if b'H' in x:
+            return env.reward_hole
+        if b'G' in x:
+            return env.reward
+        return env.path_cost
+
+    grid = [state_default_value(x) for x in matrix]
+    return np.array(grid).reshape((env.nrow, env.ncol))
+
+
+def position_to_coordinates(pos, ncol):
+    return (pos // ncol, pos % ncol)
+
+
+def env_to_terminals(env):
+    """ 
+    This simple parser maps the state space from the Open AI env to a simple grid
+
+    We *assume* full observability, i.e., we can directly ignore Hole states. Alternatively, 
+    we could place a very high step cost to a Hole state or use a directed representation 
+    (i.e., you can go to a Hole state but never return). Feel free to experiment with both if time permits.
+
+    Input:
+        env: an Open AI Env follwing the std in the FrozenLake-v0 env
+
+    Output:
+        array with the positions of terminals
+
+    """
+#    def coordinates(state):
+    grid = env.desc.reshape(env.nrow * env.ncol)
+    terminals = []
+
+    for key, val in enumerate(grid):
+        if b'H' in val or b'G' in val:
+            terminals.append(position_to_coordinates(key, env.ncol))
+
+    return terminals
+
+
+# ______________________________________________________________________________
 
 

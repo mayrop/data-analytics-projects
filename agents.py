@@ -183,7 +183,7 @@ class QLearningAgent(MyAbstractAIAgent):
     """
     def __init__(self, problem_id, map_name_base="8x8-base"):
         super(QLearningAgent, self).__init__(problem_id=problem_id, 
-                                             reward_hole=-0.15, 
+                                             reward_hole=-0.2, 
                                              is_stochastic=True,
                                              map_name_base=map_name_base)
 
@@ -233,8 +233,60 @@ class QLearningAgent(MyAbstractAIAgent):
 
         return U
 
+    def solve(self, max_episodes=1000, max_iter_per_episode=100):
+        self.reset_lines()
+        self.reset_rewards()
 
-    def solve(self, max_episodes=3, max_iter_per_episode=100):
+        # Hyperparameters
+        alpha = 0.1
+        gamma = 0.6
+        Q = np.zeros([self.env.observation_space.n, self.env.action_space.n])
+
+        for i in range(1, max_episodes):
+            state = self.env.reset()
+
+            reward = 0
+            done = False
+            
+            while not done:
+                if random.uniform(0, 1) < 0.1:
+                    action = self.env.action_space.sample() # Explore action space
+                else:
+                    action = np.argmax(Q[state]) # Exploit learned values
+
+                next_state, reward, done, info = self.env.step(action) 
+
+                if (reward == 1):
+                    print("IVE WON!!!!")
+                    print(next_state)
+                    print(Q[state, action])
+                
+                old_value = Q[state, action]
+                next_max = np.max(Q[next_state])
+                
+                new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
+                Q[state, action] = new_value
+
+                if (reward == 1):
+                    print(Q[state, action])
+
+                if reward == -0.1:
+                    penalties += 1
+
+                state = next_state
+                
+            if i % 100 == 0:
+                clear_output(wait=True)
+                print(f"Episode: {i}")
+
+        print("Training finished.\n")
+        print(Q)
+
+        for row_number, value in enumerate(Q):
+            print(row_number, value)
+
+
+    def solve2(self, max_episodes=3, max_iter_per_episode=100):
         self.reset_lines()
         self.reset_rewards()
 

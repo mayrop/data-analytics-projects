@@ -2,11 +2,58 @@ import unittest
 from agents import RandomAgent, SimpleAgent, QLearningAgent
 import random
 import numpy as np
-from helpers import to_human_arrow
+from helpers import *
+from uofgsocsai import LochLomondEnv
 
 # python test.py TestRandomAgent.test_4_by_4_q_learning_agent
 
 class TestRandomAgent(unittest.TestCase):
+
+    def test_position_to_coordinates(self):
+        self.assertEqual((0, 1), position_to_coordinates(1, 3))
+        self.assertEqual((0, 2), position_to_coordinates(2, 3))
+        self.assertEqual((2, 2), position_to_coordinates(8, 3))
+        self.assertEqual((3, 0), position_to_coordinates(9, 3))
+        self.assertEqual((3, 1), position_to_coordinates(10, 3))
+        self.assertEqual((3, 2), position_to_coordinates(11, 3))
+
+    def test_env(self):
+        env = LochLomondEnv(problem_id=0, 
+                            is_stochastic=True, 
+                            reward_hole=-0.02, 
+                            map_name_base="4x4-base")
+
+        self.assertEqual(b'S', env.desc[0,0])
+        self.assertEqual(b'F', env.desc[0,1])
+        self.assertEqual(b'H', env.desc[1,1])
+        self.assertEqual(b'G', env.desc[3,0])
+
+
+    def test_env_2_grid(self):
+        env = LochLomondEnv(problem_id=0, 
+                            is_stochastic=True, 
+                            reward_hole=-0.2, 
+                            map_name_base="4x4-base")
+
+        grid = env2grid(env)
+        self.assertEqual(0, grid[0,0])
+        self.assertEqual(0, grid[0,1])
+        self.assertEqual(-0.2, grid[1,1])
+        self.assertEqual(env.reward, grid[3,0])
+
+
+    def test_env_2_terminals(self):
+        env = LochLomondEnv(problem_id=0, 
+                            is_stochastic=True, 
+                            reward_hole=-0.2, 
+                            map_name_base="4x4-base")
+
+        terminals = env_to_terminals(env)
+        self.assertEqual((1, 1), terminals[0])
+        self.assertEqual((1, 3), terminals[1])
+        self.assertEqual((2, 3), terminals[2])
+        self.assertEqual((3, 0), terminals[3])
+
 
     def test_4_by_4_q_learning_agent(self):
         print("Running test_4_by_4_q_learning_agent")
@@ -26,31 +73,36 @@ class TestRandomAgent(unittest.TestCase):
         self.assertEqual(agent.get_learning_rate(), 0.25)
         #agent.solve(max_episodes=1,max_iter_per_episode=1)
 
+
     def test_4_by_4_q_learning_agent_solve(self):
         print("Running test_4_by_4_q_learning_agent_solve")
-        agent = QLearningAgent(problem_id=1, map_name_base="8x8-base")
-        print(agent.env.render())
-        print(agent.env.terminals)
+        agent = QLearningAgent(problem_id=1, map_name_base="4x4-base")
 
-        policy = agent.policy_iteration()
-        policy_list = (list(policy.values()))
+#        print(agent.env.desc)
 
-        for k in agent.env.terminals:
-            policy_list[k] = -1
+        #print(position_to_coordinates(agent.env))
+#         print(agent.env.render())
+#         print(agent.env.terminals)
 
-        #policy_list[np.argmax(agent.env.isd)] = None
-        print(agent.env_mapping)
+#         policy = agent.policy_iteration()
+#         policy_list = (list(policy.values()))
 
-        print(policy)
-        print(agent.env.terminals)
+#         for k in agent.env.terminals:
+#             policy_list[k] = -1
 
-#        agent.solve(max_episodes=1000, max_iter_per_episode=100)
+#         #policy_list[np.argmax(agent.env.isd)] = None
+#         print(agent.env_mapping)
 
-        human = [to_human_arrow(k) for k in policy_list]
+#         print(policy)
+#         print(agent.env.terminals)
+
+# #        agent.solve(max_episodes=1000, max_iter_per_episode=100)
+
+#         human = [to_human_arrow(k) for k in policy_list]
         
-        print(np.array(human).reshape(8, 8))
-        #agent.graph_utility_estimates_q()
-        agent.solve()
+#         print(np.array(human).reshape(4, 4))
+#         #agent.graph_utility_estimates_q()
+#         agent.solve()
 
 
         #print(agent.actions_in_state(0).keys().tolist())
