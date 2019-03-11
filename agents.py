@@ -5,6 +5,7 @@ from helpers import *
 AIMA_TOOLBOX_ROOT="aima-python"
 sys.path.append(AIMA_TOOLBOX_ROOT)
 from search import *
+from IPython.display import clear_output
 import matplotlib.pyplot as plt
 import random
 
@@ -174,89 +175,19 @@ class SimpleAgent(MyAbstractAIAgent):
 ################################
 ################################
 
-class QLearningAgentUofG:
-
-    def __init__(self, terminals, gamma, actlist, Ne, Rplus, alpha=None):
-
-        self.gamma = gamma
-        self.terminals = terminals
-        self.all_act = actlist
-        self.Ne = Ne  # iteration limit in exploration function
-        self.Rplus = Rplus  # large value to assign before iteration limit
-        self.Q = defaultdict(float)
-        self.Nsa = defaultdict(float)
-        self.s = None
-        self.a = None
-        self.r = None
-
-        if alpha:
-            self.alpha = alpha
-        else:
-            self.alpha = lambda n: 1./(1+n)  # udacity video
-
-    def f(self, u, n):
-        """ Exploration function. Returns fixed Rplus until
-        agent has visited state, action a Ne number of times.
-        Same as ADP agent in book."""
-        if n < self.Ne:
-            return self.Rplus
-        else:
-            return u
-
-    def actions_in_state(self, state):
-        """ Return actions possible in given state.
-            Useful for max and argmax. """
-        if state in self.terminals:
-            return [None]
-        else:
-            return self.all_act
-
-    def __call__(self, percept):
-        alpha, gamma, terminals = self.alpha, self.gamma, self.terminals
-        Q, Nsa = self.Q, self.Nsa
-        actions_in_state = self.actions_in_state
-
-        s, a, r = self.s, self.a, self.r
-        s1, r1 = self.update_state(percept) # current state and reward;  s' and r'
-        
-        if s in terminals: # if prev state was a terminal state it should be updated to the reward
-            Q[s, None] = r  
-        
-        if a is not None: # corrected from the book, we check if the last action was none i.e. no prev state or a terminal state, the book says to check for s
-            Nsa[s, a] += 1
-            Q[s, a] += alpha(Nsa[s, a]) * (r + gamma * max(Q[s1, a1] for a1 in actions_in_state(s1)) - Q[s, a])
-        
-        # Update for next iteration
-        if s in terminals:
-            self.s = self.a = self.r = None
-        else:
-            self.s, self.r = s1, r1
-            self.a = argmax(actions_in_state(s1), key=lambda a1: self.f(Q[s1, a1], Nsa[s1, a1]))
-        
-        return self.a
-
-    def update_state(self, percept):
-        """To be overridden in most cases. The default case
-        assumes the percept to be of type (state, reward)."""
-        return percept
-
 
 class QLearningAgent(MyAbstractAIAgent):
     """ An exploratory Q-learning agent. It avoids having to learn the transition
         model because the Q-value of a state can be related directly to those of
         its neighbors. [Figure 21.8]
     """
-    def __init__(self, problem_id, Rplus=10, Ne=30, gamma=0.99, alpha=None, map_name_base="8x8-base"):
+    def __init__(self, problem_id, map_name_base="8x8-base"):
         super(QLearningAgent, self).__init__(problem_id=problem_id, 
-                                          reward_hole=-1, 
-                                          is_stochastic=True,
-                                          map_name_base=map_name_base)
+                                             reward_hole=-0.15, 
+                                             is_stochastic=True,
+                                             map_name_base=map_name_base)
 
         self.terminals = self.env.terminals
-        self._agent = QLearningAgentUofG(terminals=self.env.terminals, gamma=gamma,
-                                    Ne=Ne, Rplus=Rplus, alpha=alpha,
-                                    actlist=list(range(self.env.action_space.n)))
-
 
     def expected_utility(self, a, s, U):
         return sum([p * U[s1] for (p, s1, r, done) in self.env.P[s][a]])
@@ -303,29 +234,54 @@ class QLearningAgent(MyAbstractAIAgent):
         return U
 
 
-    def solve(self, max_episodes=200, max_iter_per_episode=100):
+    def solve(self, max_episodes=3, max_iter_per_episode=100):
         self.reset_lines()
         self.reset_rewards()
 
-        random.seed(123)
-        for e in range(max_episodes): # iterate over episodes
-            current_state = self.env.reset() # reset the state of the env to the starting state     
-            current_reward = 0.0
-            i = 0
+        # Hyperparameters
+        alpha = 0.1
+        gamma = 0.6
+        epsilon = 0.1
+        Q = np.zeros([self.env.observation_space.n, self.env.action_space.n])
 
-            while True and i < max_iter_per_episode: # TODO - add max iterations
-                percept = (current_state, current_reward)        
-                next_action = self._agent(percept)
+        for i in range(1, max_episodes):
+            state = self.env.reset()
 
-                if next_action is None:
-                    break
+            epochs, penalties, reward, = 0, 0, 0
+            done = False
+            
+            while not done:
+                if random.uniform(0, 1) < epsilon:
+                    action = self.env.action_space.sample() # Explore action space
+                else:
+                    action = np.argmax(Q[state]) # Exploit learned values
 
-                current_state, current_reward, done, info = self.env.step(next_action)
-                i += 1
+                next_state, reward, done, info = self.env.step(action) 
+                
+                old_value = Q[state, action]
+                next_max = np.max(Q[next_state])
+                
+                new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
+                Q[state, action] = new_value
+
+                if reward == -1:
+                    penalties += 1
+
+                state = next_state
+                epochs += 1
+                
+            if i % 100 == 0:
+                clear_output(wait=True)
+                print(f"Episode: {i}")
+
+        print("Training finished.\n")
+        print(Q)
+
+        for row_number, value in enumerate(Q):
+            print(row_number, value)
 
     def get_u(self):
         U = defaultdict(lambda: -1000.) 
-        
 
         for state_action, value in self._agent.Q.items():
             state, action = state_action
@@ -335,7 +291,7 @@ class QLearningAgent(MyAbstractAIAgent):
         return U
 
     def graph_utility_estimates_q(self, no_of_iterations=5000):
-        states_to_graph = range(16)
+        states_to_graph = [54, 62, 46, 10]
         graphs = {state:[] for state in states_to_graph}
 
         plt.figure(0)

@@ -28,10 +28,9 @@ class TestRandomAgent(unittest.TestCase):
 
     def test_4_by_4_q_learning_agent_solve(self):
         print("Running test_4_by_4_q_learning_agent_solve")
-        agent = QLearningAgent(problem_id=1, map_name_base="4x4-base")
+        agent = QLearningAgent(problem_id=1, map_name_base="8x8-base")
         print(agent.env.render())
         print(agent.env.terminals)
-        print(agent._agent.__dict__)
 
         policy = agent.policy_iteration()
         policy_list = (list(policy.values()))
@@ -49,8 +48,9 @@ class TestRandomAgent(unittest.TestCase):
 
         human = [to_human_arrow(k) for k in policy_list]
         
-        print(np.array(human).reshape(4, 4))
-        agent.graph_utility_estimates_q()
+        print(np.array(human).reshape(8, 8))
+        #agent.graph_utility_estimates_q()
+        agent.solve()
 
 
         #print(agent.actions_in_state(0).keys().tolist())
