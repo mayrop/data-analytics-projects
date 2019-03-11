@@ -31,17 +31,6 @@ MAPS_BASE = {
     ],
 }
 
-def categorical_sample(prob_n, np_random):
-    """
-    Sample from categorical distribution
-    Each row specifies class probabilities
-    """
-    prob_n = np.asarray(prob_n)
-    csprob_n = np.cumsum(prob_n)
-    myrand = np_random.rand()
-    # first element where the cuulative prob is > random number
-    return (csprob_n > myrand).argmax()
-
 class LochLomondEnv(discrete.DiscreteEnv):
     """
     This environment is derived from the FrozenLake from https://gym.openai.com/envs/#toy_text
@@ -97,6 +86,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
         # Fetch the base problem (without S and G)
         desc = MY_MAP_BASE[map_name_base]
         self.nrow, self.ncol = nrow, ncol = np.asarray(desc,dtype='c').shape
+        self.terminals = []
 
         # Check probelm_id value
         if problem_id > ncol-1:
@@ -127,7 +117,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
         isd /= isd.sum()
 
         P = {s : {a : [] for a in range(nA)} for s in range(nS)}
-
+        
         def to_s(row, col):
             return row*ncol + col
         
@@ -163,8 +153,12 @@ class LochLomondEnv(discrete.DiscreteEnv):
                                 rew = 0.0
                                 if(newletter == b'G'):
                                     rew = 1.0
+                                    if newstate not in self.terminals:
+                                        self.terminals.append(newstate)
                                 elif(newletter == b'H'):
                                     rew = reward_hole
+                                    if newstate not in self.terminals:
+                                        self.terminals.append(newstate)
 
                                 li.append((1.0/3.0, newstate, rew, done))
                         else:
@@ -174,9 +168,13 @@ class LochLomondEnv(discrete.DiscreteEnv):
                             done = bytes(newletter) in b'GH'
                             rew = 0.0
                             if(newletter == b'G'):
-                                rew = 1.0       
+                                rew = 1.0
+                                if newstate not in self.terminals:
+                                    self.terminals.append(newstate)
                             elif(newletter == b'H'):
-                                rew = reward_hole                     
+                                rew = reward_hole
+                                if newstate not in self.terminals:
+                                    self.terminals.append(newstate)
                             li.append((1.0, newstate, rew, done))
 
         super(LochLomondEnv, self).__init__(nS, nA, P, isd)
@@ -192,7 +190,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
         desc[row][col] = utils.colorize(desc[row][col], "red", highlight=True) # note: this does not work on all setups you can try to uncomment asnd see what happends (if it does work you'll see weird symbols)
         
         if self.lastaction is not None:
-            outfile.write("  ({})\n".format(["Left","Down","Right","Up"][self.lastaction]))
+            outfile.write("  ({})\n".format(["Left", "Down", "Right", "Up"][self.lastaction]))
         else:
             outfile.write("\n")
         outfile.write("\n".join(''.join(line) for line in desc)+"\n")

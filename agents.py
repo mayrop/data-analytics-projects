@@ -8,65 +8,6 @@ from search import *
 import matplotlib.pyplot as plt
 import random
 
-def to_human(action):
-    if action == 0:
-        return "left"
-    elif action == 1:
-        return "down"
-    elif action == 2:
-        return "right"
-    elif action == 3:
-        return "up"
-    return "unkown"
-
-
-def perform_best_first_graph_search(problem, f):
-    """Search the nodes with the lowest f scores first.
-    You specify the function f(node) that you want to minimize; for example,
-    if f is a heuristic estimate to the goal, then we have greedy best
-    first search; if f is node.depth then we have breadth-first search.
-    There is a subtlety: the line "f = memoize(f, 'f')" means that the f
-    values will be cached on the nodes as they are computed. So after doing
-    a best first search you can examine the f values of the path returned."""
-
-    f = memoize(f, 'f')
-    node = Node(problem.initial)
-
-    if problem.goal_test(node.state):
-        return(node)
-    
-    frontier = PriorityQueue('min', f)
-    frontier.append(node)
-   
-    explored = set()
-    
-    while frontier:
-        node = frontier.pop()
-      
-        if problem.goal_test(node.state):
-            return(node)
-
-        explored.add(node.state)
-      
-        for child in node.expand(problem):
-            if child.state not in explored and child not in frontier:
-                frontier.append(child)
-            elif child in frontier:
-                incumbent = frontier[child]
-                if f(child) < f(incumbent):
-                    del frontier[incumbent]
-                    frontier.append(child)
-    return None
-
-def perform_a_star_search(problem, h=None):
-    """A* search is best-first graph search with f(n) = g(n)+h(n).
-    You need to specify the h function when you call astar_search, or
-    else in your Problem subclass."""
-    h = memoize(h or problem.h, 'h') # define the heuristic function
-    return perform_best_first_graph_search(problem, lambda n: n.path_cost + h(n))    
-
-
-
 class MyAbstractAIAgent():
     """
     TODO
@@ -311,9 +252,55 @@ class QLearningAgent(MyAbstractAIAgent):
                                           is_stochastic=True,
                                           map_name_base=map_name_base)
 
+        self.terminals = self.env.terminals
         self._agent = QLearningAgentUofG(terminals=self.env.terminals, gamma=gamma,
                                     Ne=Ne, Rplus=Rplus, alpha=alpha,
                                     actlist=list(range(self.env.action_space.n)))
+
+
+    def expected_utility(self, a, s, U):
+        return sum([p * U[s1] for (p, s1, r, done) in self.env.P[s][a]])
+
+
+    def random_action_for_s(self, state):
+        if state in self.terminals:
+            return None
+
+        return self.env.action_space.sample()
+
+    def policy_iteration(self):
+        U = {s: 0 for s in self.env.P}
+        #pi = {s: self.env.P[a] for s in self.env.P}
+        pi = {s: self.random_action_for_s(s) for s in self.env.P}
+  
+        while True:
+            U = self.policy_evaluation(pi, U)
+            unchanged = True
+            for s in self.env.P:
+                a = argmax(self.env.P[s], key=lambda a: self.expected_utility(a, s, U))
+                if a != pi[s]:
+                    pi[s] = a
+                    unchanged = False
+            
+            if unchanged:
+                return pi
+
+    def T(self, state, action):
+        if action is None:
+            return [(0.0, state, self.env_mapping[5][state], True)]
+
+        return self.env.P[state][action]
+
+    def policy_evaluation(self, pi, U, k=20):
+        """Return an updated utility mapping U from each state in the MDP to its
+        utility, using an approximation (modified policy iteration)."""
+        R, gamma = self.env_mapping[5], 0.999
+
+        for i in range(k):
+            for s in self.env.P:
+                U[s] = R[s] + gamma * sum([p * U[s1] for (p, s1, r, done) in self.T(s, pi[s])])
+
+        return U
 
 
     def solve(self, max_episodes=200, max_iter_per_episode=100):
@@ -347,8 +334,8 @@ class QLearningAgent(MyAbstractAIAgent):
 
         return U
 
-    def graph_utility_estimates_q(self, no_of_iterations=50000):
-        states_to_graph = [0, 4, 5, 19, 29, 35, 41, 42, 46, 52, 49, 59, 60, 59, 61, 54, 55, 62, 63]
+    def graph_utility_estimates_q(self, no_of_iterations=5000):
+        states_to_graph = range(16)
         graphs = {state:[] for state in states_to_graph}
 
         plt.figure(0)
@@ -372,7 +359,7 @@ class QLearningAgent(MyAbstractAIAgent):
         
         print(self._agent.Q.items())
 
-        plt.ylim([-10,1.2])
+        plt.ylim([-1.2,1.2])
         plt.legend(loc='lower right')
         plt.xlabel('Iterations')
         plt.ylabel('U')
