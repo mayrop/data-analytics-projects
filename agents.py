@@ -5,9 +5,10 @@ from helpers import *
 AIMA_TOOLBOX_ROOT="aima-python"
 sys.path.append(AIMA_TOOLBOX_ROOT)
 from search import *
+import matplotlib.pyplot as plt
+import random
 
-
-def map_action(action):
+def to_human(action):
     if action == 0:
         return "left"
     elif action == 1:
@@ -17,6 +18,53 @@ def map_action(action):
     elif action == 3:
         return "up"
     return "unkown"
+
+
+def perform_best_first_graph_search(problem, f):
+    """Search the nodes with the lowest f scores first.
+    You specify the function f(node) that you want to minimize; for example,
+    if f is a heuristic estimate to the goal, then we have greedy best
+    first search; if f is node.depth then we have breadth-first search.
+    There is a subtlety: the line "f = memoize(f, 'f')" means that the f
+    values will be cached on the nodes as they are computed. So after doing
+    a best first search you can examine the f values of the path returned."""
+
+    f = memoize(f, 'f')
+    node = Node(problem.initial)
+
+    if problem.goal_test(node.state):
+        return(node)
+    
+    frontier = PriorityQueue('min', f)
+    frontier.append(node)
+   
+    explored = set()
+    
+    while frontier:
+        node = frontier.pop()
+      
+        if problem.goal_test(node.state):
+            return(node)
+
+        explored.add(node.state)
+      
+        for child in node.expand(problem):
+            if child.state not in explored and child not in frontier:
+                frontier.append(child)
+            elif child in frontier:
+                incumbent = frontier[child]
+                if f(child) < f(incumbent):
+                    del frontier[incumbent]
+                    frontier.append(child)
+    return None
+
+def perform_a_star_search(problem, h=None):
+    """A* search is best-first graph search with f(n) = g(n)+h(n).
+    You need to specify the h function when you call astar_search, or
+    else in your Problem subclass."""
+    h = memoize(h or problem.h, 'h') # define the heuristic function
+    return perform_best_first_graph_search(problem, lambda n: n.path_cost + h(n))    
+
 
 
 class MyAbstractAIAgent():
@@ -61,6 +109,40 @@ class MyAbstractAIAgent():
             "NewLocationY"
         ]
 
+    def solve(self, max_episodes=200, max_iter_per_episode=10):
+        self.reset_lines()
+        self.reset_rewards()
+
+        for e in range(max_episodes): # iterate over episodes
+            observation = self.env.reset()
+            done = False
+            i = 0
+            self.set_episode_seed(e)
+
+            while not done and i < max_iter_per_episode:
+                i += 1
+
+                action = self.action(i) # your agent goes here (the current agent takes random actions)
+                prev_location = self.coordinates[observation]
+
+                observation, reward, done, info = self.env.step(action) 
+                # observe what happends when you take the action
+                self.total_rewards += int(reward)
+
+                self.lines.append([self.problem_id, self.map_name_base,
+                    e+1, i, to_human(action), done, int(reward), 
+                    self.total_rewards, prev_location[0], prev_location[1], 
+                    self.coordinates[observation][0], self.coordinates[observation][1]
+                ])
+
+        return self.total_rewards
+
+    def set_episode_seed(self, seed):
+        return None
+
+    def action(self, i):
+        raise NotImplementedError
+
     def env(self):
         return self.env
 
@@ -91,40 +173,13 @@ class RandomAgent(MyAbstractAIAgent):
                                           is_stochastic=True,
                                           map_name_base=map_name_base)
 
-    def action(self):
-        return self.env.action_space.sample()
-
-    def solve(self, max_episodes=200, max_iter_per_episode=500):
-        self.reset_lines()
-        self.reset_rewards()
-
-        for e in range(max_episodes): # iterate over episodes
-            observation = self.env.reset() # reset the state of the env to the starting state     
-            self.set_episode_seed(e)
-
-            for iter in range(max_iter_per_episode):
-                action = self.env.action_space.sample() # your agent goes here (the current agent takes random actions)
-                prev_location = self.coordinates[observation]
-
-                observation, reward, done, info = self.env.step(action) # observe what happends when you take the action
-                self.lines.append([self.problem_id, self.map_name_base,
-                    e+1, iter+1, map_action(action), done, reward, 
-                    self.total_rewards, prev_locationv_location[0], prev_location[1], 
-                    self.coordinates[observation][0], self.coordinates[observation][1]
-                ])
-
-                if (done and reward == self.reward_hole): 
-                    break
-
-                if (done and reward == +1.0):
-                    self.total_rewards += 1 
-                    break
-
-        return self.total_rewards
-
     def set_episode_seed(self, seed):
-        np.random.seed(seed)
-        return None
+        return
+        self.env.seed(seed)
+        self.env.action_space.seed(seed)
+
+    def action(self, i):
+        return self.env.action_space.sample()
 
 ################################
 ################################
@@ -141,109 +196,39 @@ class SimpleAgent(MyAbstractAIAgent):
                                           reward_hole=0.0, 
                                           is_stochastic=False,
                                           map_name_base=map_name_base)
+        self._init_actions(self)
+
+    def action(self, i):
+        return self._actions[i]
+
+    def _init_actions(self):
+        # locations, actions, state_initial_id, state_goal_id, my_map
+        graph = UndirectedGraph(self.env_mapping[1])
+        graph.locations = self.env_mapping[0]
+        problem = GraphProblem(self.env_mapping[2], 
+                               self.env_mapping[3], graph)
+
+        node = perform_a_star_search(problem=problem, h=None)
+        solution = [self.env_mapping[2]] + node.solution()
         
-        locations, actions, state_initial_id, state_goal_id, my_map = self.env_mapping
+        def map_from_states(x1, x2, y1, y2):
+            if x2 > x1:
+                return 2 #"right"
+            if x2 < x1:
+                return 0 # "left"
+            if y2 > y1:
+                return 1 # "down"
+            if y2 < y1:
+                return 3 # "up"
 
-        self.maze_map = UndirectedGraph(actions)
-        self.maze_map.locations = locations
-        self.maze_problem = GraphProblem(state_initial_id, state_goal_id, self.maze_map)
-        self.locations = locations
+        self._actions = []
 
-    def solve(self, max_episodes=200, max_iter_per_episode=500):
-        self.reset_lines()
-        self.reset_rewards()
-
-        for e in range(max_episodes): # iterate over episodes
-            node = self.perform_a_star_search(problem=self.maze_problem, h=None)
-            # cnode = node.parent
-            # solution_path.append(cnode)
-            # while cnode.state != "S_00_00":    
-            #     cnode = cnode.parent  
-            #     solution_path.append(cnode)
-
-            #solution = [self.maze_problem.initial] + node.solution()
-            #solution  node.solution()
-            len_solution = len(solution)
-            # print("len_solution", len_solution)
-            # print("INITIAL", self.maze_problem.initial)
-            # print("solution", solution)
-
-            # ProblemId,Map,Episode,Iteration,Action,Done,Reward,CumulativeReward,PrevLocationX,PrevLocationY,NewLocationX,NewLocationY
-            for i in range(1, min(len_solution, max_iter_per_episode)):
-                prev = self.locations[solution[i - 1]]
-                curr = self.locations[solution[i]]
-
-                action = self.map_action_from_states(x1=prev[0], x2=curr[0], y1=prev[1], y2=curr[1])
-
-                done = solution[i] == self.maze_problem.goal
-                reward = 0
-
-                if done:
-                    self.total_rewards += 1
-                    reward = 1
-
-                self.lines.append([self.problem_id, self.map_name_base, e+1, i, 
-                    action, done, reward, self.total_rewards, prev[0], prev[1], 
-                    curr[0], curr[1]
-                ])
-
-        return self.total_rewards
-
-    def map_action_from_states(self, x1, x2, y1, y2):
-        if x2 > x1:
-            return "right"
-        if x2 < x1:
-            return "left"
-        if y2 > y1:
-            return "down"
-        if y2 < y1:
-            return "up"
-        #TODO ADD EXCEPTOIN HERE
-  
-    def perform_a_star_search(self, problem, h=None):
-        """A* search is best-first graph search with f(n) = g(n)+h(n).
-        You need to specify the h function when you call astar_search, or
-        else in your Problem subclass."""
-        h = memoize(h or problem.h, 'h') # define the heuristic function
-        return self.perform_best_first_graph_search(problem, lambda n: n.path_cost + h(n))    
-
-    def perform_best_first_graph_search(self, problem, f):
-        """Search the nodes with the lowest f scores first.
-        You specify the function f(node) that you want to minimize; for example,
-        if f is a heuristic estimate to the goal, then we have greedy best
-        first search; if f is node.depth then we have breadth-first search.
-        There is a subtlety: the line "f = memoize(f, 'f')" means that the f
-        values will be cached on the nodes as they are computed. So after doing
-        a best first search you can examine the f values of the path returned."""
-
-        f = memoize(f, 'f')
-        node = Node(problem.initial)
-
-        if problem.goal_test(node.state):
-            return(node)
-        
-        frontier = PriorityQueue('min', f)
-        frontier.append(node)
-       
-        explored = set()
-        
-        while frontier:
-            node = frontier.pop()
-          
-            if problem.goal_test(node.state):
-                return(node)
-
-            explored.add(node.state)
-          
-            for child in node.expand(problem):
-                if child.state not in explored and child not in frontier:
-                    frontier.append(child)
-                elif child in frontier:
-                    incumbent = frontier[child]
-                    if f(child) < f(incumbent):
-                        del frontier[incumbent]
-                        frontier.append(child)
-        return None
+        for i in range(1, len(solution)):
+            prev = graph.locations[solution[i - 1]]
+            curr = graph.locations[solution[i]]
+            action = map_from_states(x1=prev[0], x2=curr[0], 
+                                     y1=prev[1], y2=curr[1])
+            self._actions.append(action)
 
 ################################
 ################################
@@ -320,9 +305,9 @@ class QLearningAgent(MyAbstractAIAgent):
         model because the Q-value of a state can be related directly to those of
         its neighbors. [Figure 21.8]
     """
-    def __init__(self, problem_id, Rplus=2, Ne=5, gamma=0.99, alpha=None, map_name_base="8x8-base"):
+    def __init__(self, problem_id, Rplus=10, Ne=30, gamma=0.99, alpha=None, map_name_base="8x8-base"):
         super(QLearningAgent, self).__init__(problem_id=problem_id, 
-                                          reward_hole=-10.0, 
+                                          reward_hole=-1, 
                                           is_stochastic=True,
                                           map_name_base=map_name_base)
 
@@ -331,206 +316,64 @@ class QLearningAgent(MyAbstractAIAgent):
                                     actlist=list(range(self.env.action_space.n)))
 
 
-    def solve(self, max_episodes=200, max_iter_per_episode=500):
+    def solve(self, max_episodes=200, max_iter_per_episode=100):
         self.reset_lines()
         self.reset_rewards()
 
+        random.seed(123)
         for e in range(max_episodes): # iterate over episodes
-            observation = self.env.reset() # reset the state of the env to the starting state     
+            current_state = self.env.reset() # reset the state of the env to the starting state     
+            current_reward = 0.0
+            i = 0
 
-            while True: # TODO - add max iterations
-                print("---------------")        
-                current_reward = mdp.R(current_state)
+            while True and i < max_iter_per_episode: # TODO - add max iterations
                 percept = (current_state, current_reward)        
-                next_action = agent_program(percept)
+                next_action = self._agent(percept)
+
                 if next_action is None:
                     break
-                current_state = take_single_action(mdp, current_state, next_action)
-                
-                print("percept:", percept)
-                print("next_action", next_action)
-                print("current_state", current_state)
-                print("---------------")
-            # means it already performed an action
-            for i in range(max_iter_per_episode):
-                print(self.env.render())
-                percept = (state, reward)
-                action = self.learn(percept, done)
-                print("Running iteration: ", i)
-                print("\tPercept: ", percept)
-                print("\tAction: ", map_action(action))
 
-                if action is not None:
-                    state, reward, done, info = self.env.step(action)
-                    print("\tQ: ", Q)
-                    print("\tNsa: ", Nsa)
+                current_state, current_reward, done, info = self.env.step(next_action)
+                i += 1
 
-                    print("\tObservation: ", state)
-                    print("\tCoordinates: ", coordinates[state])
-                    print("\tReward: ", reward)
-                    print("\tDone: ", done)
-                    print("\tInfo: ", info)
-                else:
-                    break
-
-                #print("self.env.action_space", )
-                # print(self.actions(self.s))
-                # print(
-
-                #     argmax(self.actions(self.s), key=lambda a1: self.f(self.Q[self.s, a1], self.Nsa[self.s, a1]))
-                # )
-
-                #observation, reward, done, info = self.env.step(action)
-                # print(learning_rate)
-
-            # if not self.lastaction:
-
-            # print(observation)
-            # # print(self.env.goal)
-            # print(self.env.isd)
-
-        #     for i in range(max_iter_per_episode):
-        #         action = self.env.action_space.sample() # your agent goes here (the current agent takes random actions)
-        #         prev_location = self.coordinates[observation]
-
-        #         observation, reward, done, info = self.env.step(action) # observe what happends when you take the action
-        #         self.lines.append([self.problem_id, self.map_name_base, e+1, iter+1, 
-        #             map_action(action), done, reward, self.total_rewards, 
-        #             prev_locationv_location[0], prev_location[1], 
-        #             self.coordinates[observation][0], self.coordinates[observation][1]
-        #         ])
-
-        #         if (done and reward == self.reward_hole): 
-        #             break
-
-        #         if (done and reward == +1.0):
-        #             self.total_rewards += 1 
-        #             break
-
-        # return self.total_rewards
-    def learn(self, percept, done):
-        Nsa = self.Nsa
-        f, gamma, lr = self.f, self.gamma, self.get_learning_rate()
+    def get_u(self):
+        U = defaultdict(lambda: -1000.) 
         
-        s, action, reward = self.s, self.action, self.reward
-        s1, r1 = self.update_percept(percept)
-        self.update_nsa()
 
-        if done:
-            print("\nI AM DONE!!!...")
-            self.Q[s, None] = reward
+        for state_action, value in self._agent.Q.items():
+            state, action = state_action
+            if U[state] < value:
+                U[state] = value            
 
-        if action is not None:
-            print("Updating Q...")
-            print("\tPrevious S: ", s)
-            print("\tPrevious Action: ", action)
-            self.Q[s, action] += lr * (reward + gamma * max(self.Q[s1, a1] for a1 in self.actions(s1)) - self.Q[s, action])
-            print(self.Q)
+        return U
 
-        if done:
-            print("resetting state reward action")
-            self.s = self.reward = self.action = None
-        
-        if not done:
-            self.s, self.reward = s1, r1
-            self.action = argmax(self.actions(s1), key=lambda a1: f(self.Q[s1, a1], Nsa[s1, a1]))
+    def graph_utility_estimates_q(self, no_of_iterations=50000):
+        states_to_graph = [0, 4, 5, 19, 29, 35, 41, 42, 46, 52, 49, 59, 60, 59, 61, 54, 55, 62, 63]
+        graphs = {state:[] for state in states_to_graph}
 
-        return self.action
+        plt.figure(0)
 
-
-    def update_percept(self, percept):
-        # todo... change here?
-        return percept
-
-    def get_learning_rate(self):
-        if self.action is not None and self.Nsa[self.s, self.action] is not None:
-            return self.alpha(self.Nsa[self.s, self.action])
-
-        return self.alpha(0)
-
-    def update_nsa(self):
-        if self.action is not None:
-            self.Nsa[self.s, self.action] += 1
-
-    # def __call__(self, percept):
-    #     alpha, gamma, terminals = self.alpha, self.gamma, self.terminals
-    #     Q, Nsa = self.Q, self.Nsa
-    #     actions_in_state = self.actions_in_state
-
-    #     s, a, r = self.s, self.a, self.r
-    #     s1, r1 = self.update_state(percept) # current state and reward;  s' and r'
-        
-        #print(s)
-        #print(a)
-        #print(r)
-        #print(s1)
-        #print(r1)
-
-        ## s1, r1 = self.update_state(percept)
-        ## Q, Nsa, s, a, r = self.Q, self.Nsa, self.s, self.a, self.r
-        ## alpha, gamma, terminals = self.alpha, self.gamma, self.terminals,
-        ## actions_in_state = self.actions_in_state
-        ## 
-        ## if s in terminals:
-        ##     Q[s, None] = r1
-        ## if s is not None:
-        ##     Nsa[s, a] += 1
-        ##     Q[s, a] += alpha(Nsa[s, a]) * (r + gamma * max(Q[s1, a1]
-        ##                                    for a1 in actions_in_state(s1)) - Q[s, a])
-        ## if s in terminals:
-        ##     self.s = self.a = self.r = None
-        ## else:
-        ##     self.s, self.r = s1, r1
-        ##     self.a = argmax(actions_in_state(s1), key=lambda a1: self.f(Q[s1, a1], Nsa[s1, a1]))
-        ## return self.a
-
-        # if s in terminals: # if prev state was a terminal state it should be updated to the reward
-        #     Q[s, None] = r  
-
-        # if a is not None: # corrected from the book, we check if the last action was none 
-        #                   # i.e. no prev state or a terminal state, the book says to check for s
-        #     Nsa[s, a] += 1
-        #     Q[s, a] += alpha(Nsa[s, a]) * (r + gamma * max(Q[s1, a1] for a1 in actions_in_state(s1)) - Q[s, a])
-        
-        # # Update for next iteration
-        # if s in terminals:
-        #     self.s = self.a = self.r = None
-        # else:
-        #     self.s, self.r = s1, r1
-        #     self.a = argmax(actions_in_state(s1), key=lambda a1: self.f(Q[s1, a1], Nsa[s1, a1]))
-        
-        # return self.a
-
-
-           # """Execute trial for given agent_program
-    #and mdp. mdp should be an instance of subclass
-    #of mdp.MDP """
-
-    # def take_single_action(mdp, s, a):
-    #     """
-    #     Select outcome of taking action a
-    #     in state s. Weighted Sampling.
-    #     """
-    #     x = random.uniform(0, 1)
-    #     cumulative_probability = 0.0
-    #     for probability_state in mdp.T(s, a):
-    #         probability, state = probability_state
-    #         cumulative_probability += probability
-    #         if x < cumulative_probability:
-    #             break
-    #     return state
-
-        # current_state = mdp.init
-        # while True:
-        #     print("---------------")        
-        #     current_reward = mdp.R(current_state)
-        #     percept = (current_state, current_reward)        
-        #     next_action = agent_program(percept)
-        #     if next_action is None:
-        #         break
-        #     current_state = take_single_action(mdp, current_state, next_action)
+        for iteration in range(1, no_of_iterations+1):
+            self.solve(max_episodes=1)
             
-        #     print("percept:", percept)
-        #     print("next_action", next_action)
-        #     print("current_state", current_state)
-        #     print("---------------")
+            U = defaultdict(lambda: -1000.)
+            for state_action, value in self._agent.Q.items():
+                state, action = state_action
+                if U[state] < value:
+                    U[state] = value            
+
+            for state in states_to_graph:            
+                graphs[state].append((iteration, U[state]))
+        
+        for state, value in graphs.items():
+            state_x, state_y = zip(*value)
+
+            plt.plot(state_x, state_y, label=str(state))
+        
+        print(self._agent.Q.items())
+
+        plt.ylim([-10,1.2])
+        plt.legend(loc='lower right')
+        plt.xlabel('Iterations')
+        plt.ylabel('U')
+        plt.show(block=True)
