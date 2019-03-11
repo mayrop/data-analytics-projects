@@ -18,10 +18,8 @@ class TestRandomAgent(unittest.TestCase):
         self.assertEqual((3, 2), position_to_coordinates(11, 3))
 
     def test_env(self):
-        env = LochLomondEnv(problem_id=0, 
-                            is_stochastic=True, 
-                            reward_hole=-0.02, 
-                            map_name_base="4x4-base")
+        env = LochLomondEnv(problem_id=0, is_stochastic=True, 
+                            reward_hole=-0.02, map_name_base="4x4-base")
 
         self.assertEqual(b'S', env.desc[0,0])
         self.assertEqual(b'F', env.desc[0,1])
@@ -30,12 +28,10 @@ class TestRandomAgent(unittest.TestCase):
 
 
     def test_env_2_grid(self):
-        env = LochLomondEnv(problem_id=0, 
-                            is_stochastic=True, 
-                            reward_hole=-0.2, 
-                            map_name_base="4x4-base")
+        env = LochLomondEnv(problem_id=0, is_stochastic=True, 
+                            reward_hole=-0.2, map_name_base="4x4-base")
 
-        grid = env2grid(env)
+        grid = env_to_grid(env)
         self.assertEqual(0, grid[0,0])
         self.assertEqual(0, grid[0,1])
         self.assertEqual(-0.2, grid[1,1])
@@ -43,39 +39,49 @@ class TestRandomAgent(unittest.TestCase):
 
 
     def test_env_2_terminals(self):
-        env = LochLomondEnv(problem_id=0, 
-                            is_stochastic=True, 
-                            reward_hole=-0.2, 
-                            map_name_base="4x4-base")
+        env = LochLomondEnv(problem_id=1, is_stochastic=True, 
+                            reward_hole=-0.2, map_name_base="4x4-base")
 
-        terminals = env_to_terminals(env)
+        terminals = env_letter_to_position(env, letter=b'GH')
         self.assertEqual((1, 1), terminals[0])
         self.assertEqual((1, 3), terminals[1])
         self.assertEqual((2, 3), terminals[2])
         self.assertEqual((3, 0), terminals[3])
+        self.assertEqual((3, 1), terminals[4])
+
+
+    def test_env_2_init(self):
+        env = LochLomondEnv(problem_id=1, is_stochastic=True, 
+                            reward_hole=-0.2, map_name_base="4x4-base")
+        initial = env_letter_to_position(env, letter=b'S')
+        self.assertEqual((0, 1), initial[0])
+
+
+    def test_env_2_init_02(self):
+        env = LochLomondEnv(problem_id=2, is_stochastic=True, 
+                            reward_hole=-0.2, map_name_base="4x4-base")
+        initial = env_letter_to_position(env, letter=b'S')
+        self.assertEqual((0, 2), initial[0])    
 
 
     def test_4_by_4_q_learning_agent(self):
-        print("Running test_4_by_4_q_learning_agent")
         agent = QLearningAgent(problem_id=0, map_name_base="4x4-base")
-        self.assertEqual(agent.Rplus, 0.04)
-        self.assertEqual(agent.get_learning_rate(), 1.0)
-        self.assertEqual(0, agent.s)
-        agent.last_action = 1
-        agent.update_nsa()
+        # self.assertEqual(agent.get_learning_rate(), 1.0)
+        # self.assertEqual(0, agent.s)
+        # agent.last_action = 1
+        # agent.update_nsa()
 
-        self.assertEqual(agent.get_learning_rate(), 0.5)
-        agent.update_nsa()
+        # self.assertEqual(agent.get_learning_rate(), 0.5)
+        # agent.update_nsa()
 
-        self.assertAlmostEqual(agent.get_learning_rate(), 0.333, places=3)
-        agent.update_nsa()
+        # self.assertAlmostEqual(agent.get_learning_rate(), 0.333, places=3)
+        # agent.update_nsa()
 
-        self.assertEqual(agent.get_learning_rate(), 0.25)
+        # self.assertEqual(agent.get_learning_rate(), 0.25)
         #agent.solve(max_episodes=1,max_iter_per_episode=1)
 
 
     def test_4_by_4_q_learning_agent_solve(self):
-        print("Running test_4_by_4_q_learning_agent_solve")
         agent = QLearningAgent(problem_id=1, map_name_base="4x4-base")
 
 #        print(agent.env.desc)
@@ -108,12 +114,10 @@ class TestRandomAgent(unittest.TestCase):
         #print(agent.actions_in_state(0).keys().tolist())
 
     def test_4_by_4_simple_agent(self):
-        print("Running test_4_by_4_simple_agent")
         agent = SimpleAgent(problem_id=1, map_name_base="8x8-base")
         agent.solve()
 
     def test_4_by_4_random_agent(self):
-        print("Running test_4_by_4_random_agent")
         agent = RandomAgent(problem_id=1, map_name_base="4x4-base")
         self.assertEqual(agent.problem_id, 1)
         self.assertEqual(agent.is_stochastic, True)
@@ -147,27 +151,20 @@ class TestRandomAgent(unittest.TestCase):
         # state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes
         self.assertFalse('S_0_0' in agent.env_mapping[0])
         self.assertTrue('S_0_1' in agent.env_mapping[0])
-        self.assertEqual('S_0_1', agent.env_mapping[2])
+        # self.assertEqual('S_0_1', agent.env_mapping[2])
 
-        agent = RandomAgent(problem_id=2)
-        self.assertEqual(agent.problem_id, 2)
-        self.assertEqual(agent.is_stochastic, True)
-        self.assertEqual(agent.env.ncol, 8)
-        self.assertEqual(agent.env.nrow, 8)
+        # agent = RandomAgent(problem_id=2)
+        # self.assertEqual(agent.problem_id, 2)
+        # self.assertEqual(agent.is_stochastic, True)
+        # self.assertEqual(agent.env.ncol, 8)
+        # self.assertEqual(agent.env.nrow, 8)
 
-        # state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes
-        self.assertFalse('S_0_0' in agent.env_mapping[0])
-        self.assertTrue('S_0_1' in agent.env_mapping[0])
-        self.assertEqual('S_0_2', agent.env_mapping[2])   
+        # # state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes
+        # self.assertFalse('S_0_0' in agent.env_mapping[0])
+        # self.assertTrue('S_0_1' in agent.env_mapping[0])
+        # self.assertEqual('S_0_2', agent.env_mapping[2])   
 
-        # agent.env.render()
-        # print(agent.env.s)
-        # print(agent.env.ncol)
-        # print(agent.env.nrow)
-        # // Floor division - division that results into whole number adjusted to the left in the number line
-        # print(agent.env.s // agent.env.ncol, agent.env.s % agent.env.ncol)
-        # print(agent.env.desc.shape)
-        # print(agent.env.desc.tolist())
+
 
 if __name__ == '__main__':
     unittest.main()

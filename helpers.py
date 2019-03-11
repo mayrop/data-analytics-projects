@@ -1,4 +1,8 @@
 import numpy as np
+import sys
+AIMA_TOOLBOX_ROOT="aima-python"
+sys.path.append(AIMA_TOOLBOX_ROOT)
+from search import *
 
 def to_human(action):
     if action == 0:
@@ -150,7 +154,11 @@ def env2statespace(env):
     return state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes, rewards
 
 
-def env2grid(env):
+def position_to_coordinates(pos, ncol):
+    return (pos // ncol, pos % ncol)
+
+
+def env_to_grid(env):
     """ 
     This simple parser maps the state space from the Open AI env to a simple grid
 
@@ -178,11 +186,7 @@ def env2grid(env):
     return np.array(grid).reshape((env.nrow, env.ncol))
 
 
-def position_to_coordinates(pos, ncol):
-    return (pos // ncol, pos % ncol)
-
-
-def env_to_terminals(env):
+def env_letter_to_position(env, letter=b'S'):
     """ 
     This simple parser maps the state space from the Open AI env to a simple grid
 
@@ -196,16 +200,15 @@ def env_to_terminals(env):
     Output:
         array with the positions of terminals
 
-    """
-#    def coordinates(state):
-    grid = env.desc.reshape(env.nrow * env.ncol)
-    terminals = []
+    """    
+    grid = list(env.desc.reshape(env.nrow * env.ncol))
+    
+    indexes = [i for i, val in enumerate(grid) if bytes(val) in letter]
 
-    for key, val in enumerate(grid):
-        if b'H' in val or b'G' in val:
-            terminals.append(position_to_coordinates(key, env.ncol))
+    if len(indexes):
+        return [position_to_coordinates(pos, env.ncol) for pos in indexes]
 
-    return terminals
+    raise ValueError('Env does not contain position: ' + letter)
 
 
 # ______________________________________________________________________________

@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 import numpy as np
 from uofgsocsai import LochLomondEnv # load the class defining the custom Open AI Gym problem
 from helpers import *
@@ -138,7 +139,7 @@ class SimpleAgent(MyAbstractAIAgent):
                                           reward_hole=0.0, 
                                           is_stochastic=False,
                                           map_name_base=map_name_base)
-        self._init_actions(self)
+        self._init_actions()
 
     def action(self, i):
         return self._actions[i]
