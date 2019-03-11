@@ -4,6 +4,8 @@ from six import StringIO, b
 
 from gym import utils
 from gym.envs.toy_text import discrete
+from pandas import *
+import copy
 
 LEFT = 0
 DOWN = 1
@@ -12,11 +14,11 @@ UP = 3
 
 MAPS_BASE = {
     "4x4-base": [
-        "SFFF",
+        "FFFF",
         "FHFH",
         "FFFH",
         "HFFF"
-    ],  
+    ], 
     "8x8-base": [
         "HFFFFHFF",
         "FFFFFFFF",
@@ -74,13 +76,15 @@ class LochLomondEnv(discrete.DiscreteEnv):
 
     metadata = {'render.modes': ['human', 'ansi']}
 
-    def __init__(self, problem_id=0, is_stochastic=True, reward_hole = 0.0):
+    def __init__(self, problem_id=0, is_stochastic=True, reward_hole = 0.0, map_name_base="4x4-base"):
         if reward_hole > 0.0:
             raise ValueError('reward_hole must be equal to 0 or smaller')
     
+        MY_MAP_BASE = copy.deepcopy(MAPS_BASE)
+
+        # print(copy.copy())
         # Fetch the base problem (without S and G)
-        map_name_base="8x8-base" # for the final submission in AI (H) this should be 8x8-base but you may want to start out with 4x4-base!        
-        desc = MAPS_BASE[map_name_base]
+        desc = MY_MAP_BASE[map_name_base]
         self.nrow, self.ncol = nrow, ncol = np.asarray(desc,dtype='c').shape
 
         # Check probelm_id value
@@ -93,6 +97,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
         # Set the Start state for this variant of the problem     
         row_s = 0
         col_s = problem_id 
+
         desc[row_s] = desc[row_s][:col_s] + 'S' + desc[row_s][col_s+1:]
         
         # Set the Goal state for this variant of the problem     
@@ -100,8 +105,13 @@ class LochLomondEnv(discrete.DiscreteEnv):
         col_g = np.random.randint(0, high=ncol)
         desc[row_g] = desc[row_g][:col_g] + 'G' + desc[row_g][col_g+1:]
 
-        self.desc = desc = np.asarray(desc,dtype='c')        
+        self.desc = desc = np.asarray(desc, dtype='c')        
         self.reward_range = (0, 1)
+        self.is_stochastic = is_stochastic
+        self.terminals = []
+        self.reward_hole = reward_hole
+        self.reward = 1.0
+        self.path_cost = 0
 
         nA = 4
         nS = nrow * ncol
@@ -110,7 +120,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
         isd /= isd.sum()
 
         P = {s : {a : [] for a in range(nA)} for s in range(nS)}
-
+        
         def to_s(row, col):
             return row*ncol + col
         
@@ -128,9 +138,11 @@ class LochLomondEnv(discrete.DiscreteEnv):
         for row in range(nrow):
             for col in range(ncol):
                 s = to_s(row, col)
+
                 for a in range(4):
                     li = P[s][a]
                     letter = desc[row, col]
+
                     if letter in b'GH':
                         li.append((1.0, s, 0, True))
                     else:
@@ -139,23 +151,33 @@ class LochLomondEnv(discrete.DiscreteEnv):
                                 newrow, newcol = inc(row, col, b)
                                 newstate = to_s(newrow, newcol)
                                 newletter = desc[newrow, newcol]
+
                                 done = bytes(newletter) in b'GH'
-                                rew = 0.0
+                                rew = self.path_cost
                                 if(newletter == b'G'):
-                                    rew = 1.0
+                                    rew = self.reward
+                                    if newstate not in self.terminals:
+                                        self.terminals.append(newstate)
                                 elif(newletter == b'H'):
-                                    rew = reward_hole
+                                    rew = self.reward_hole
+                                    if newstate not in self.terminals:
+                                        self.terminals.append(newstate)
+
                                 li.append((1.0/3.0, newstate, rew, done))
                         else:
                             newrow, newcol = inc(row, col, a)
                             newstate = to_s(newrow, newcol)
                             newletter = desc[newrow, newcol]
                             done = bytes(newletter) in b'GH'
-                            rew = 0.0
+                            rew = self.path_cost
                             if(newletter == b'G'):
-                                rew = 1.0       
+                                rew = self.reward
+                                if newstate not in self.terminals:
+                                    self.terminals.append(newstate)
                             elif(newletter == b'H'):
-                                rew = reward_hole                     
+                                rew = self.reward_hole
+                                if newstate not in self.terminals:
+                                    self.terminals.append(newstate)
                             li.append((1.0, newstate, rew, done))
 
         super(LochLomondEnv, self).__init__(nS, nA, P, isd)
@@ -168,14 +190,29 @@ class LochLomondEnv(discrete.DiscreteEnv):
 
         desc = [[c.decode('utf-8') for c in line] for line in desc]
         desc[row][col] = "X"
-
-        #desc[row][col] = utils.colorize(desc[row][col], "red", highlight=True) # note: this does not work on all setups you can try to uncomment asnd see what happends (if it does work you'll see weird symbols)
+        desc[row][col] = utils.colorize(desc[row][col], "red", highlight=True) # note: this does not work on all setups you can try to uncomment asnd see what happends (if it does work you'll see weird symbols)
         
         if self.lastaction is not None:
-            outfile.write("  ({})\n".format(["Left","Down","Right","Up"][self.lastaction]))
+            outfile.write("  ({})\n".format(["Left", "Down", "Right", "Up"][self.lastaction]))
         else:
             outfile.write("\n")
         outfile.write("\n".join(''.join(line) for line in desc)+"\n")
 
         if mode != 'human':
             return outfile
+
+#    def step(self, a):
+#        transitions = self.P[self.s][a]
+#        print(transitions)
+#        i = categorical_sample([t[0] for t in transitions], self.np_random)
+#
+#        p, s, r, d = transitions[i]
+#        self.s = s
+#        self.lastaction = a
+#        return (s, r, d, {"prob" : p})
+
+    # def reset(self):
+    #     print(self.isd)
+    #     self.s = categorical_sample(self.isd, self.np_random)
+    #     self.lastaction = None
+    #     return self.s
