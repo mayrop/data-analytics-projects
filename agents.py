@@ -14,12 +14,14 @@ https://www.google.co.uk/search?biw=1608&bih=937&tbm=isch&sa=1&ei=x5mAXOGvNYC71f
 import os
 import sys
 import numpy as np
-from uofgsocsai import LochLomondEnv # load the class defining the custom Open AI Gym problem
-from helpers import *
-sys.path.append("aimda")
-from search import *
 import matplotlib.pyplot as plt
 import random
+sys.path.append("aima")
+from search import *
+from mdp import policy_iteration
+from mdp import value_iteration
+from uofgsocsai import LochLomondEnv # load the class defining the custom Open AI Gym problem
+from helpers import *
 
 class MyAbstractAIAgent():
     """
@@ -41,20 +43,7 @@ class MyAbstractAIAgent():
         # state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes
         self.env_mapping = env2statespace(self.env)
         self.coordinates = self.env_mapping[4]
-        self.reset_lines()
-        self.reset_rewards()
-
-    def header(self):
-        return [
-            "ProblemId",
-            "Map",
-            "Episode",
-            "Iteration",
-            "Action",
-            "Done",
-            "Reward",
-            "CumulativeReward"
-        ]
+        self.reset()
 
     def is_stochastic(self):
         raise NotImplementedError
@@ -62,33 +51,37 @@ class MyAbstractAIAgent():
     def reward_hole(self):
         raise NotImplementedError
 
-    def solve(self, max_episodes=200, max_iter_per_episode=10):
-        self.reset_lines()
-        self.reset_rewards()
+    def reset(self):
+        self.rewards = 0
+        self.failures = 0
+        self.eval = []
 
-        for e in range(max_episodes): # iterate over episodes
-            observation = self.env.reset()
-            done = False
-            i = 0
-            self.set_episode_seed(e)
+    def solve(self, episodes=200, iterations=200, reset=True, seed=False):
 
-            while not done and i < max_iter_per_episode:
-                i += 1
+        for e in range(1, episodes + 1): # iterate over episodes
+            state = self.env.reset()
+            self.set_episode_seed(e, seed)
 
-                action = self.action(i) # your agent goes here (the current agent takes random actions)
-                prev_location = self.coordinates[observation]
+            for i in range(1, iterations+1):
+                action = self.action(i-1) 
+                new_state, reward, done, info = self.env.step(action) 
 
-                observation, reward, done, info = self.env.step(action) 
-                # observe what happends when you take the action
-                self.total_rewards += int(reward)
+                if done:
+                    if reward == self.reward_hole():
+                        self.failures += 1
+                    else:
+                        self.rewards += int(reward)
 
-                self.lines.append([self.problem_id, self.map_name_base,
-                    e+1, i, to_human(action), done, int(reward), 
-                    self.total_rewards, prev_location[0], prev_location[1], 
-                    self.coordinates[observation][0], self.coordinates[observation][1]
-                ])
+                self.rewards += int(reward)
+                self.eval.append([self.problem_id, e, i, to_human(action), 
+                    done, int(reward), self.failures, self.rewards,
+                    state, new_state])
 
-        return self.total_rewards
+                state = new_state
+
+                if done:
+                    # break the cycle
+                    break;
 
     def action(self, i):
         raise NotImplementedError
@@ -96,16 +89,45 @@ class MyAbstractAIAgent():
     def env(self):
         return self.env
 
-    def reset_lines(self):
-        self.lines = [] # reset
-        self.lines.append(self.header())
-
-    def reset_rewards(self):
-        self.total_rewards = 0
-
-    def set_episode_seed(self, seed):
+    def set_episode_seed(self, seed, force=False):
         # by default no seed for abstract agent
         return None
+
+    def policy(self):
+        raise NotImplementedError
+
+    def alias(self):
+        return 'out_{}_{}_{}_'.format(self.name(), self.problem_id, 
+                                     self.map_name_base)
+
+    def write_eval_files(self):
+        def data_for_file(name):
+            if name == 'policy':
+                return policy_to_list(self.policy())
+            if name == 'u':
+                return u_to_list(self.u())
+            if name == 'eval':
+                return self.eval
+
+            return []
+
+        for file in self.files():
+            filename = '{}_{}.csv'.format(self.alias(), file)
+            data = [self.header(file)] + data_for_file(file)
+            np.savetxt(filename, data, delimiter=",", fmt='%s') 
+
+    def header(self, index):
+        if index == 'eval':
+            return ['id', 'episode', 'iteration', 'action', 'done', 
+                'reward', 'failures', 'rewards', 'old_state', 'new_state']
+
+        if index == 'policy':
+            return ['x', 'y', 'action']
+
+        if index == 'u':
+            return ['x', 'y', 'u'] 
+
+        return []           
 
 ################################
 ################################
@@ -124,16 +146,22 @@ class RandomAgent(MyAbstractAIAgent):
     def reward_hole(self):
         return 0.0
 
-    def set_episode_seed(self, seed):
-        return
-        self.env.seed(seed)
-        self.env.action_space.seed(seed)
+    def set_episode_seed(self, seed, force=False):
+        if force:
+            self.env.seed(seed)
+            self.env.action_space.seed(seed)
 
     def action(self, i):
         return self.env.action_space.sample()
 
     def train(self):
         return
+
+    def files(self):
+        return ['eval']
+
+    def name(self):
+        return 'random'
 
 ################################
 ################################
@@ -181,18 +209,36 @@ class SimpleAgent(MyAbstractAIAgent):
                 return 3 # "up"
 
         self._actions = []
+        self._policy = {}
 
         for i in range(1, len(solution)):
             prev = graph.locations[solution[i - 1]]
             curr = graph.locations[solution[i]]
             action = map_from_states(x1=prev[0], x2=curr[0], 
                                      y1=prev[1], y2=curr[1])
+
             self._actions.append(action)
+            self._policy[(prev[0], prev[1])] = action
+
+    def policy(self):
+        try:
+            return(self._policy)
+        except AttributeError:
+            self.train()
+
+        return(self._policy)
+
+    def files(self):
+        return ['eval', 'policy']
+
+    def name(self):
+        return 'simple'
+
 
 ################################
 ################################
 
-class MyQLearningAgent(MyAbstractAIAgent):
+class UofGPassiveAgent(MyAbstractAIAgent):
     """ An exploratory Q-learning agent. It avoids having to learn the transition
         model because the Q-value of a state can be related directly to those of
         its neighbors. [Figure 21.8]
@@ -202,3 +248,38 @@ class MyQLearningAgent(MyAbstractAIAgent):
 
     def reward_hole(self):
         return -0.04
+
+    def solve(self, episodes=200, iterations=200, reset=True, seed=False):
+        mdp = EnvMDP(self.env)
+        self._policy = policy_iteration(mdp)
+        self._u = value_iteration(mdp, epsilon=0.000000000001)
+
+    def files(self):
+        return ['policy', 'u']
+
+    def policy(self):
+        return self._policy
+
+    def u(self):
+        return self._u
+
+    def name(self):
+        return 'passive'
+
+        
+################################
+################################
+
+class UofGQLearningAgent(MyAbstractAIAgent):
+    """ An exploratory Q-learning agent. It avoids having to learn the transition
+        model because the Q-value of a state can be related directly to those of
+        its neighbors. [Figure 21.8]
+    """
+    def is_stochastic(self):
+        return True
+
+    def reward_hole(self):
+        return -0.04
+
+    #def train(self):
+        

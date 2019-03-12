@@ -1,5 +1,5 @@
 import unittest
-from agents import RandomAgent, SimpleAgent, MyQLearningAgent
+from agents import RandomAgent, SimpleAgent, UofGPassiveAgent, UofGQLearningAgent
 import random
 import numpy as np
 from mdp import policy_iteration
@@ -8,6 +8,7 @@ from helpers import *
 from uofgsocsai import LochLomondEnv
 from rl import PassiveTDAgent
 from rl import run_single_trial
+from utils import argmax, vector_add, print_table
 
 # python test.py TestRandomAgent.test_4_by_4_q_learning_agent
 
@@ -20,6 +21,16 @@ class TestRandomAgent(unittest.TestCase):
         self.assertEqual((0, 3), pos_to_coord(9, 3))
         self.assertEqual((1, 3), pos_to_coord(10, 3))
         self.assertEqual((2, 3), pos_to_coord(11, 3))
+
+    def test_coord_to_pos(self):
+        self.assertEqual(1, coord_to_pos(1, 0, 3))
+        self.assertEqual(2, coord_to_pos(2, 0, 3))
+        self.assertEqual(8, coord_to_pos(2, 2, 3))
+        self.assertEqual(9, coord_to_pos(0, 3, 3))
+        self.assertEqual(10, coord_to_pos(1, 3, 3))
+        self.assertEqual(11, coord_to_pos(2, 3, 3))
+        self.assertEqual(7, coord_to_pos(3, 1, 4))
+        self.assertEqual(5, coord_to_pos(1, 2, 2))
 
     def test_env(self):
         env = LochLomondEnv(problem_id=0, is_stochastic=True, 
@@ -73,40 +84,39 @@ class TestRandomAgent(unittest.TestCase):
     def test_policy_iteration(self):
         reward = -0.04
 
-        for i in range(1):
-            env = LochLomondEnv(problem_id=4, is_stochastic=True, 
-                                reward_hole=reward, map_name_base="8x8-base")
+        env = LochLomondEnv(problem_id=4, is_stochastic=True, 
+                            reward_hole=reward, map_name_base="8x8-base")
 
-            mdp = EnvMDP(env)
-            print(env.render())        
-            policy = policy_iteration(mdp)
-            print(mdp.to_arrows(policy))
-            #states = [(0,0), (0,1), (4,7), (5,7), (6,6), (5,6)]
-            random.seed(1)
-            iterations = 10000
-            print(mdp.grid)
+        mdp = EnvMDP(env)
+        print(env.render())        
+        policy = policy_iteration(mdp)
+        print(mdp.to_arrows(policy))
+        #states = [(0,0), (0,1), (4,7), (5,7), (6,6), (5,6)]
+        random.seed(1)
+        iterations = 10000
+        print(mdp.grid)
 
-            agent = PassiveTDAgent(policy, mdp, alpha=lambda n: 60./(59+n))
-            U_vi = value_iteration(mdp, epsilon=0.000000000001)
+        agent = PassiveTDAgent(policy, mdp, alpha=lambda n: 60./(59+n))
+        U_vi = value_iteration(mdp, epsilon=0.000000000001)
 
-            # agent, graphs = my_graph_utility_estimates(agent, mdp, 1000)
-            # #graph_utility_estimates(agent, mdp, iterations, states)
+        # agent, graphs = my_graph_utility_estimates(agent, mdp, 1000)
+        # #graph_utility_estimates(agent, mdp, iterations, states)
 
-            random.seed(1)
-            q_agent = QLearningAgentUofG(mdp, Ne=5, Rplus=2, 
-                                     alpha=lambda n: 60./(59+n))
+        random.seed(1)
+        q_agent = QLearningAgentUofG(mdp, Ne=5, Rplus=2, 
+                                 alpha=lambda n: 60./(59+n))
 
-            # for i in range(10000):
-            #     q_agent.set_episode(i+1)
-            #     run_single_trial(q_agent, mdp)    
+        # for i in range(10000):
+        #     q_agent.set_episode(i+1)
+        #     run_single_trial(q_agent, mdp)    
 
-            # q_agent.update_u()
-            states = [(0,0), (0,1), (4,7), (5,7), (6,6), (5,6)]
-            graph_utility_estimates(q_agent, mdp, 40000, states)
-            q_agent.update_u()
-            #print(q_agent.Q)
+        # q_agent.update_u()
+        states = [(0,0), (0,1), (4,7), (5,7), (6,6), (5,6)]
+        graph_utility_estimates(q_agent, mdp, 40000, states)
+        q_agent.update_u()
+        #print(q_agent.Q)
 
-            compare_utils(U_vi, q_agent.U, 'Value itr','Q learning')
+        compare_utils(U_vi, q_agent.U, 'Value itr','Q learning')
         # for i in range(7):
         # env = LochLomondEnv(problem_id=2, is_stochastic=True, 
         #                     reward_hole=reward, map_name_base="4x4-base")
@@ -183,57 +193,35 @@ class TestRandomAgent(unittest.TestCase):
 
 
     def test_4_by_4_q_learning_agent(self):
-        agent = MyQLearningAgent(problem_id=0, map_name_base="4x4-base")
-        # self.assertEqual(agent.get_learning_rate(), 1.0)
-        # self.assertEqual(0, agent.s)
-        # agent.last_action = 1
-        # agent.update_nsa()
-
-        # self.assertEqual(agent.get_learning_rate(), 0.5)
-        # agent.update_nsa()
-
-        # self.assertAlmostEqual(agent.get_learning_rate(), 0.333, places=3)
-        # agent.update_nsa()
-
-        # self.assertEqual(agent.get_learning_rate(), 0.25)
-        #agent.solve(max_episodes=1,max_iter_per_episode=1)
+        #agent = MyQLearningAgent(problem_id=0, map_name_base="4x4-base")
+        print("TOOD")
 
 
-    def test_4_by_4_q_learning_agent_solve(self):
-        agent = MyQLearningAgent(problem_id=1, map_name_base="4x4-base")
-
-#        print(agent.env.desc)
-
-        #print(pos_to_coord(agent.env))
-#         print(agent.env.render())
-#         print(agent.env.terminals)
-
-#         policy = agent.policy_iteration()
-#         policy_list = (list(policy.values()))
-
-#         for k in agent.env.terminals:
-#             policy_list[k] = -1
-
-#         #policy_list[np.argmax(agent.env.isd)] = None
-#         print(agent.env_mapping)
-
-#         print(policy)
-#         print(agent.env.terminals)
-
-# #        agent.solve(max_episodes=1000, max_iter_per_episode=100)
-
-#         human = [to_human_arrow(k) for k in policy_list]
-        
-#         print(np.array(human).reshape(4, 4))
-#         #agent.graph_utility_estimates_q()
-#         agent.solve()
-
-
-        #print(agent.actions_in_state(0).keys().tolist())
-
-    def test_4_by_4_simple_agent(self):
+    def test_simple_agent(self):
         agent = SimpleAgent(problem_id=1, map_name_base="8x8-base")
         agent.solve()
+        
+        self.assertEqual([1, 1, 1, 'down', False, 0, 0, 0, 1, 9], agent.eval[0])
+
+        policy = agent.policy()        
+        arrows = policy_to_arrows(policy, 8, 8)
+        self.assertEqual(['', '>', '>', '>', 'v', '', '', ''], arrows[3].tolist())
+
+        policy_list = policy_to_list(policy)
+        self.assertEqual([1, 3, 'right'], policy_list[3])
+
+
+    def test_passive(self):
+        agent = UofGPassiveAgent(problem_id=1, map_name_base="8x8-base")
+        agent.solve()
+        
+        policy = agent.policy()
+        arrows = policy_to_arrows(policy, 8, 8)
+        self.assertEqual(['v', '^', '^', '^', '>', 'v', '>', 'v'], arrows[1].tolist())
+        
+        policy_list = policy_to_list(policy)
+        self.assertEqual([7, 3, 'down'], policy_list[0])
+
 
     def test_4_by_4_random_agent(self):
         agent = RandomAgent(problem_id=1, map_name_base="4x4-base")
@@ -245,6 +233,7 @@ class TestRandomAgent(unittest.TestCase):
         self.assertTrue('S_0_0' in agent.env_mapping[0])
         self.assertTrue('S_0_1' in agent.env_mapping[0])
         self.assertFalse('S_1_1' in agent.env_mapping[0])
+
 
     def test_8_by_8_random_agent(self):
         agent = RandomAgent(problem_id=0)
