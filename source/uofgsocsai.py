@@ -4,7 +4,6 @@ from six import StringIO, b
 
 from gym import utils
 from gym.envs.toy_text import discrete
-from pandas import *
 import copy
 
 LEFT = 0
@@ -18,7 +17,7 @@ MAPS_BASE = {
         "FHFH",
         "FFFH",
         "HFFF"
-    ], 
+    ],  
     "8x8-base": [
         "HFFFFHFF",
         "FFFFFFFF",
@@ -76,16 +75,20 @@ class LochLomondEnv(discrete.DiscreteEnv):
 
     metadata = {'render.modes': ['human', 'ansi']}
 
-    def __init__(self, problem_id=0, is_stochastic=True, reward_hole = 0.0, map_name_base="4x4-base"):
+    def __init__(self, problem_id=0, is_stochastic=True, reward_hole = 0.0, map_name_base="8x8-base"):
         if reward_hole > 0.0:
             raise ValueError('reward_hole must be equal to 0 or smaller')
     
+        # Fetch the base problem (without S and G)
+        # map_name_base="8x8-base" # for the final submission in AI (H) this should be 8x8-base but you may want to start out with 4x4-base!        
         MY_MAP_BASE = copy.deepcopy(MAPS_BASE)
 
-        # print(copy.copy())
-        # Fetch the base problem (without S and G)
         desc = MY_MAP_BASE[map_name_base]
         self.nrow, self.ncol = nrow, ncol = np.asarray(desc,dtype='c').shape
+        self.is_stochastic = is_stochastic
+        self.reward_hole = reward_hole
+        self.reward = 1.0
+        self.path_cost = 0
 
         # Check probelm_id value
         if problem_id > ncol-1:
@@ -97,7 +100,6 @@ class LochLomondEnv(discrete.DiscreteEnv):
         # Set the Start state for this variant of the problem     
         row_s = 0
         col_s = problem_id 
-
         desc[row_s] = desc[row_s][:col_s] + 'S' + desc[row_s][col_s+1:]
         
         # Set the Goal state for this variant of the problem     
@@ -105,13 +107,8 @@ class LochLomondEnv(discrete.DiscreteEnv):
         col_g = np.random.randint(0, high=ncol)
         desc[row_g] = desc[row_g][:col_g] + 'G' + desc[row_g][col_g+1:]
 
-        self.desc = desc = np.asarray(desc, dtype='c')        
+        self.desc = desc = np.asarray(desc,dtype='c')        
         self.reward_range = (0, 1)
-        self.is_stochastic = is_stochastic
-        self.terminals = []
-        self.reward_hole = reward_hole
-        self.reward = 1.0
-        self.path_cost = 0
 
         nA = 4
         nS = nrow * ncol
@@ -120,7 +117,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
         isd /= isd.sum()
 
         P = {s : {a : [] for a in range(nA)} for s in range(nS)}
-        
+
         def to_s(row, col):
             return row*ncol + col
         
@@ -138,11 +135,9 @@ class LochLomondEnv(discrete.DiscreteEnv):
         for row in range(nrow):
             for col in range(ncol):
                 s = to_s(row, col)
-
                 for a in range(4):
                     li = P[s][a]
                     letter = desc[row, col]
-
                     if letter in b'GH':
                         li.append((1.0, s, 0, True))
                     else:
@@ -151,18 +146,12 @@ class LochLomondEnv(discrete.DiscreteEnv):
                                 newrow, newcol = inc(row, col, b)
                                 newstate = to_s(newrow, newcol)
                                 newletter = desc[newrow, newcol]
-
                                 done = bytes(newletter) in b'GH'
                                 rew = self.path_cost
                                 if(newletter == b'G'):
                                     rew = self.reward
-                                    if newstate not in self.terminals:
-                                        self.terminals.append(newstate)
                                 elif(newletter == b'H'):
                                     rew = self.reward_hole
-                                    if newstate not in self.terminals:
-                                        self.terminals.append(newstate)
-
                                 li.append((1.0/3.0, newstate, rew, done))
                         else:
                             newrow, newcol = inc(row, col, a)
@@ -171,13 +160,9 @@ class LochLomondEnv(discrete.DiscreteEnv):
                             done = bytes(newletter) in b'GH'
                             rew = self.path_cost
                             if(newletter == b'G'):
-                                rew = self.reward
-                                if newstate not in self.terminals:
-                                    self.terminals.append(newstate)
+                                rew = self.reward     
                             elif(newletter == b'H'):
-                                rew = self.reward_hole
-                                if newstate not in self.terminals:
-                                    self.terminals.append(newstate)
+                                rew = self.reward_hole                     
                             li.append((1.0, newstate, rew, done))
 
         super(LochLomondEnv, self).__init__(nS, nA, P, isd)
@@ -190,10 +175,11 @@ class LochLomondEnv(discrete.DiscreteEnv):
 
         desc = [[c.decode('utf-8') for c in line] for line in desc]
         desc[row][col] = "X"
-        desc[row][col] = utils.colorize(desc[row][col], "red", highlight=True) # note: this does not work on all setups you can try to uncomment asnd see what happends (if it does work you'll see weird symbols)
+
+        #desc[row][col] = utils.colorize(desc[row][col], "red", highlight=True) # note: this does not work on all setups you can try to uncomment asnd see what happends (if it does work you'll see weird symbols)
         
         if self.lastaction is not None:
-            outfile.write("  ({})\n".format(["Left", "Down", "Right", "Up"][self.lastaction]))
+            outfile.write("  ({})\n".format(["Left","Down","Right","Up"][self.lastaction]))
         else:
             outfile.write("\n")
         outfile.write("\n".join(''.join(line) for line in desc)+"\n")
