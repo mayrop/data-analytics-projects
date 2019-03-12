@@ -200,19 +200,3 @@ class LochLomondEnv(discrete.DiscreteEnv):
 
         if mode != 'human':
             return outfile
-
-#    def step(self, a):
-#        transitions = self.P[self.s][a]
-#        print(transitions)
-#        i = categorical_sample([t[0] for t in transitions], self.np_random)
-#
-#        p, s, r, d = transitions[i]
-#        self.s = s
-#        self.lastaction = a
-#        return (s, r, d, {"prob" : p})
-
-    # def reset(self):
-    #     print(self.isd)
-    #     self.s = categorical_sample(self.isd, self.np_random)
-    #     self.lastaction = None
-    #     return self.s

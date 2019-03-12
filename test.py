@@ -1,11 +1,13 @@
 import unittest
-from agents import RandomAgent, SimpleAgent, QLearningAgent
+from agents import RandomAgent, SimpleAgent, MyQLearningAgent
 import random
 import numpy as np
 from mdp import policy_iteration
+from mdp import value_iteration
 from helpers import *
 from uofgsocsai import LochLomondEnv
 from rl import PassiveTDAgent
+from rl import run_single_trial
 
 # python test.py TestRandomAgent.test_4_by_4_q_learning_agent
 
@@ -69,23 +71,64 @@ class TestRandomAgent(unittest.TestCase):
 
 
     def test_policy_iteration(self):
-        reward = -0.02
+        reward = -0.04
 
-        for i in range(7):
-            env = LochLomondEnv(problem_id=1, is_stochastic=True, 
+        for i in range(1):
+            env = LochLomondEnv(problem_id=4, is_stochastic=True, 
                                 reward_hole=reward, map_name_base="8x8-base")
 
             mdp = EnvMDP(env)
             print(env.render())        
             policy = policy_iteration(mdp)
-
-            states = [(0,0), (0,1), (4,7), (5,7), (6,6), (5,6)]
+            print(mdp.to_arrows(policy))
+            #states = [(0,0), (0,1), (4,7), (5,7), (6,6), (5,6)]
             random.seed(1)
             iterations = 10000
-            agent = PassiveTDAgent(policy, mdp, alpha=lambda n: 60./(59+n))
-            graph_utility_estimates(agent, mdp, iterations, states)
+            print(mdp.grid)
 
-        #print(mdp.to_grid(pi))
+            agent = PassiveTDAgent(policy, mdp, alpha=lambda n: 60./(59+n))
+            U_vi = value_iteration(mdp, epsilon=0.000000000001)
+
+            # agent, graphs = my_graph_utility_estimates(agent, mdp, 1000)
+            # #graph_utility_estimates(agent, mdp, iterations, states)
+
+            random.seed(1)
+            q_agent = QLearningAgentUofG(mdp, Ne=5, Rplus=2, 
+                                     alpha=lambda n: 60./(59+n))
+
+            # for i in range(10000):
+            #     q_agent.set_episode(i+1)
+            #     run_single_trial(q_agent, mdp)    
+
+            # q_agent.update_u()
+            states = [(0,0), (0,1), (4,7), (5,7), (6,6), (5,6)]
+            graph_utility_estimates(q_agent, mdp, 40000, states)
+            q_agent.update_u()
+            #print(q_agent.Q)
+
+            compare_utils(U_vi, q_agent.U, 'Value itr','Q learning')
+        # for i in range(7):
+        # env = LochLomondEnv(problem_id=2, is_stochastic=True, 
+        #                     reward_hole=reward, map_name_base="4x4-base")
+
+        # mdp = EnvMDP(env)
+        # print(env.render())        
+        # policy = policy_iteration(mdp)
+        # print(mdp.to_arrows(policy))
+
+        # # states = [(0,0), (0,1), (4,7), (5,7), (6,6), (5,6)]
+        # # random.seed(1)
+        # # iterations = 10000
+        # agent = PassiveTDAgent(policy, mdp, alpha=lambda n: 60./(59+n))
+        # # 
+
+        # # agent, graphs = my_graph_utility_estimates(agent, mdp, 100000)
+
+        # # compare_utils(U_vi, agent.U, 'Value itr','Passive TD')
+
+        # # agent = PassiveTDAgent(policy, mdp, alpha=lambda n: 60./(59+n))
+        # graph_utility_estimates(agent, mdp, 10000)
+        #print(mdp.to_grid(pi)
 
 
     def test_env_2_transitions(self):
@@ -140,7 +183,7 @@ class TestRandomAgent(unittest.TestCase):
 
 
     def test_4_by_4_q_learning_agent(self):
-        agent = QLearningAgent(problem_id=0, map_name_base="4x4-base")
+        agent = MyQLearningAgent(problem_id=0, map_name_base="4x4-base")
         # self.assertEqual(agent.get_learning_rate(), 1.0)
         # self.assertEqual(0, agent.s)
         # agent.last_action = 1
@@ -157,7 +200,7 @@ class TestRandomAgent(unittest.TestCase):
 
 
     def test_4_by_4_q_learning_agent_solve(self):
-        agent = QLearningAgent(problem_id=1, map_name_base="4x4-base")
+        agent = MyQLearningAgent(problem_id=1, map_name_base="4x4-base")
 
 #        print(agent.env.desc)
 
@@ -195,7 +238,7 @@ class TestRandomAgent(unittest.TestCase):
     def test_4_by_4_random_agent(self):
         agent = RandomAgent(problem_id=1, map_name_base="4x4-base")
         self.assertEqual(agent.problem_id, 1)
-        self.assertEqual(agent.is_stochastic, True)
+        self.assertEqual(agent.is_stochastic(), True)
         self.assertEqual(agent.env.ncol, 4)
         self.assertEqual(agent.env.nrow, 4)
 
@@ -206,7 +249,7 @@ class TestRandomAgent(unittest.TestCase):
     def test_8_by_8_random_agent(self):
         agent = RandomAgent(problem_id=0)
         self.assertEqual(agent.problem_id, 0)
-        self.assertEqual(agent.is_stochastic, True)
+        self.assertEqual(agent.is_stochastic(), True)
         self.assertEqual(agent.env.ncol, 8)
         self.assertEqual(agent.env.nrow, 8)
         # print(agent.env.render())
@@ -219,7 +262,7 @@ class TestRandomAgent(unittest.TestCase):
 
         agent = RandomAgent(problem_id=1)
         self.assertEqual(agent.problem_id, 1)
-        self.assertEqual(agent.is_stochastic, True)
+        self.assertEqual(agent.is_stochastic(), True)
         self.assertEqual(agent.env.ncol, 8)
         self.assertEqual(agent.env.nrow, 8)
 
@@ -230,7 +273,7 @@ class TestRandomAgent(unittest.TestCase):
 
         # agent = RandomAgent(problem_id=2)
         # self.assertEqual(agent.problem_id, 2)
-        # self.assertEqual(agent.is_stochastic, True)
+        # self.assertEqual(agent.is_stochastic(), True)
         # self.assertEqual(agent.env.ncol, 8)
         # self.assertEqual(agent.env.nrow, 8)
 
@@ -238,8 +281,6 @@ class TestRandomAgent(unittest.TestCase):
         # self.assertFalse('S_0_0' in agent.env_mapping[0])
         # self.assertTrue('S_0_1' in agent.env_mapping[0])
         # self.assertEqual('S_0_2', agent.env_mapping[2])   
-
-
 
 if __name__ == '__main__':
     unittest.main()

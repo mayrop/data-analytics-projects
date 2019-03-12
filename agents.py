@@ -1,12 +1,23 @@
+"""
+    University of Glasgow 
+    Artificial Intelligence 2018-2019
+    Assessed Exercise
+
+    Basic demo code for the CUSTOM Open AI Gym problem used in AI (H) '18-'19
+    https://arxiv.org/pdf/1802.05313.pdf
+https://arxiv.org/pdf/1802.05313.pdf
+https://arxiv.org/pdf/1806.04242.pdf
+https://towardsdatascience.com/understanding-learning-rates-and-how-it-improves-performance-in-deep-learning-d0d4059c1c10
+https://www.google.co.uk/search?biw=1608&bih=937&tbm=isch&sa=1&ei=x5mAXOGvNYC71fAP1YingA0&q=performance+measure+in+artificial+intelligence+plots+frozenlake&oq=performance+measure+in+artificial+intelligence+plots+frozenlake&gs_l=img.3...11470.12925..13059...0.0..0.101.559.10j1......1....1..gws-wiz-img.PU8F5GU2FRU#imgrc=_
+
+"""
 import os
 import sys
 import numpy as np
 from uofgsocsai import LochLomondEnv # load the class defining the custom Open AI Gym problem
 from helpers import *
-AIMA_TOOLBOX_ROOT="aima-python"
-sys.path.append(AIMA_TOOLBOX_ROOT)
+sys.path.append("aimda")
 from search import *
-from IPython.display import clear_output
 import matplotlib.pyplot as plt
 import random
 
@@ -16,20 +27,17 @@ class MyAbstractAIAgent():
 
 
     """   
-    def __init__(self, problem_id, reward_hole, is_stochastic, 
-                 map_name_base="8x8-base"):
+    def __init__(self, problem_id, map_name_base="8x8-base"):
         # map_name_base="4x4-base"
         if not (0 <= problem_id <= 7):
             raise ValueError("Problem ID must be 0 <= problem_id <= 7")
 
         self.env = LochLomondEnv(problem_id=problem_id, 
-                                 is_stochastic=is_stochastic, 
-                                 reward_hole=reward_hole, 
+                                 is_stochastic=self.is_stochastic(), 
+                                 reward_hole=self.reward_hole(), 
                                  map_name_base=map_name_base)
         self.map_name_base = map_name_base
         self.problem_id = problem_id
-        self.is_stochastic = is_stochastic
-        self.reward_hole = reward_hole    
         # state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes
         self.env_mapping = env2statespace(self.env)
         self.coordinates = self.env_mapping[4]
@@ -51,6 +59,12 @@ class MyAbstractAIAgent():
             "NewLocationX",
             "NewLocationY"
         ]
+
+    def is_stochastic(self):
+        raise NotImplementedError
+
+    def reward_hole(self):
+        raise NotImplementedError
 
     def solve(self, max_episodes=200, max_iter_per_episode=10):
         self.reset_lines()
@@ -80,9 +94,6 @@ class MyAbstractAIAgent():
 
         return self.total_rewards
 
-    def set_episode_seed(self, seed):
-        return None
-
     def action(self, i):
         raise NotImplementedError
 
@@ -110,11 +121,12 @@ class RandomAgent(MyAbstractAIAgent):
 
 
     """  
-    def __init__(self, problem_id, map_name_base="8x8-base"):
-        super(RandomAgent, self).__init__(problem_id=problem_id,  
-                                          reward_hole=0.0, 
-                                          is_stochastic=True,
-                                          map_name_base=map_name_base)
+
+    def is_stochastic(self):
+        return True
+
+    def reward_hole(self):
+        return 0.0
 
     def set_episode_seed(self, seed):
         return
@@ -123,6 +135,9 @@ class RandomAgent(MyAbstractAIAgent):
 
     def action(self, i):
         return self.env.action_space.sample()
+
+    def train(self):
+        return
 
 ################################
 ################################
@@ -134,24 +149,29 @@ class SimpleAgent(MyAbstractAIAgent):
 
 
     """   
-    def __init__(self, problem_id, map_name_base="8x8-base"):
-        super(SimpleAgent, self).__init__(problem_id=problem_id, 
-                                          reward_hole=0.0, 
-                                          is_stochastic=False,
-                                          map_name_base=map_name_base)
-        self._init_actions()
+
+    def is_stochastic(self):
+        return False
+
+    def reward_hole(self):
+        return 0.0
 
     def action(self, i):
+        try:
+            self._actions
+        except AttributeError:
+            self.train()
+
         return self._actions[i]
 
-    def _init_actions(self):
+    def train(self):
         # locations, actions, state_initial_id, state_goal_id, my_map
         graph = UndirectedGraph(self.env_mapping[1])
         graph.locations = self.env_mapping[0]
         problem = GraphProblem(self.env_mapping[2], 
                                self.env_mapping[3], graph)
 
-        node = perform_a_star_search(problem=problem, h=None)
+        node = astar_search(problem=problem, h=None)
         solution = [self.env_mapping[2]] + node.solution()
         
         def map_from_states(x1, x2, y1, y2):
@@ -176,200 +196,13 @@ class SimpleAgent(MyAbstractAIAgent):
 ################################
 ################################
 
-
-class QLearningAgent(MyAbstractAIAgent):
+class MyQLearningAgent(MyAbstractAIAgent):
     """ An exploratory Q-learning agent. It avoids having to learn the transition
         model because the Q-value of a state can be related directly to those of
         its neighbors. [Figure 21.8]
     """
-    def __init__(self, problem_id, map_name_base="8x8-base"):
-        super(QLearningAgent, self).__init__(problem_id=problem_id, 
-                                             reward_hole=-0.2, 
-                                             is_stochastic=True,
-                                             map_name_base=map_name_base)
+    def is_stochastic(self):
+        return True
 
-        self.terminals = self.env.terminals
-
-    def expected_utility(self, a, s, U):
-        return sum([p * U[s1] for (p, s1, r, done) in self.env.P[s][a]])
-
-
-    def random_action_for_s(self, state):
-        if state in self.terminals:
-            return None
-
-        return self.env.action_space.sample()
-
-    def policy_iteration(self):
-        U = {s: 0 for s in self.env.P}
-        #pi = {s: self.env.P[a] for s in self.env.P}
-        pi = {s: self.random_action_for_s(s) for s in self.env.P}
-  
-        while True:
-            U = self.policy_evaluation(pi, U)
-            unchanged = True
-            for s in self.env.P:
-                a = argmax(self.env.P[s], key=lambda a: self.expected_utility(a, s, U))
-                if a != pi[s]:
-                    pi[s] = a
-                    unchanged = False
-            
-            if unchanged:
-                return pi
-
-    def T(self, state, action):
-        if action is None:
-            return [(0.0, state, self.env_mapping[5][state], True)]
-
-        return self.env.P[state][action]
-
-    def policy_evaluation(self, pi, U, k=20):
-        """Return an updated utility mapping U from each state in the MDP to its
-        utility, using an approximation (modified policy iteration)."""
-        R, gamma = self.env_mapping[5], 0.999
-
-        for i in range(k):
-            for s in self.env.P:
-                U[s] = R[s] + gamma * sum([p * U[s1] for (p, s1, r, done) in self.T(s, pi[s])])
-
-        return U
-
-    def solve(self, max_episodes=1000, max_iter_per_episode=100):
-        self.reset_lines()
-        self.reset_rewards()
-
-        # Hyperparameters
-        alpha = 0.1
-        gamma = 0.6
-        Q = np.zeros([self.env.observation_space.n, self.env.action_space.n])
-
-        for i in range(1, max_episodes):
-            state = self.env.reset()
-
-            reward = 0
-            done = False
-            
-            while not done:
-                if random.uniform(0, 1) < 0.1:
-                    action = self.env.action_space.sample() # Explore action space
-                else:
-                    action = np.argmax(Q[state]) # Exploit learned values
-
-                next_state, reward, done, info = self.env.step(action) 
-
-                if (reward == 1):
-                    print("IVE WON!!!!")
-                    print(next_state)
-                    print(Q[state, action])
-                
-                old_value = Q[state, action]
-                next_max = np.max(Q[next_state])
-                
-                new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
-                Q[state, action] = new_value
-
-                if (reward == 1):
-                    print(Q[state, action])
-
-                if reward == -0.1:
-                    penalties += 1
-
-                state = next_state
-                
-            if i % 100 == 0:
-                clear_output(wait=True)
-                print(f"Episode: {i}")
-
-        print("Training finished.\n")
-        print(Q)
-
-        for row_number, value in enumerate(Q):
-            print(row_number, value)
-
-
-    def solve2(self, max_episodes=3, max_iter_per_episode=100):
-        self.reset_lines()
-        self.reset_rewards()
-
-        # Hyperparameters
-        alpha = 0.1
-        gamma = 0.6
-        epsilon = 0.1
-        Q = np.zeros([self.env.observation_space.n, self.env.action_space.n])
-
-        for i in range(1, max_episodes):
-            state = self.env.reset()
-
-            epochs, penalties, reward, = 0, 0, 0
-            done = False
-            
-            while not done:
-                if random.uniform(0, 1) < epsilon:
-                    action = self.env.action_space.sample() # Explore action space
-                else:
-                    action = np.argmax(Q[state]) # Exploit learned values
-
-                next_state, reward, done, info = self.env.step(action) 
-                
-                old_value = Q[state, action]
-                next_max = np.max(Q[next_state])
-                
-                new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
-                Q[state, action] = new_value
-
-                if reward == -1:
-                    penalties += 1
-
-                state = next_state
-                epochs += 1
-                
-            if i % 100 == 0:
-                clear_output(wait=True)
-                print(f"Episode: {i}")
-
-        print("Training finished.\n")
-        print(Q)
-
-        for row_number, value in enumerate(Q):
-            print(row_number, value)
-
-    def get_u(self):
-        U = defaultdict(lambda: -1000.) 
-
-        for state_action, value in self._agent.Q.items():
-            state, action = state_action
-            if U[state] < value:
-                U[state] = value            
-
-        return U
-
-    def graph_utility_estimates_q(self, no_of_iterations=5000):
-        states_to_graph = [54, 62, 46, 10]
-        graphs = {state:[] for state in states_to_graph}
-
-        plt.figure(0)
-
-        for iteration in range(1, no_of_iterations+1):
-            self.solve(max_episodes=1)
-            
-            U = defaultdict(lambda: -1000.)
-            for state_action, value in self._agent.Q.items():
-                state, action = state_action
-                if U[state] < value:
-                    U[state] = value            
-
-            for state in states_to_graph:            
-                graphs[state].append((iteration, U[state]))
-        
-        for state, value in graphs.items():
-            state_x, state_y = zip(*value)
-
-            plt.plot(state_x, state_y, label=str(state))
-        
-        print(self._agent.Q.items())
-
-        plt.ylim([-1.2,1.2])
-        plt.legend(loc='lower right')
-        plt.xlabel('Iterations')
-        plt.ylabel('U')
-        plt.show(block=True)
+    def reward_hole(self):
+        return -0.04
