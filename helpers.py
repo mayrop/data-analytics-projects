@@ -3,6 +3,7 @@ import sys
 AIMA_TOOLBOX_ROOT="aima-python"
 sys.path.append(AIMA_TOOLBOX_ROOT)
 from search import *
+from mdp import MDP
 
 def to_human(action):
     if action == 0:
@@ -154,8 +155,8 @@ def env2statespace(env):
     return state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes, rewards
 
 
-def position_to_coordinates(pos, ncol):
-    return (pos // ncol, pos % ncol)
+def pos_to_coord(pos, ncol):
+    return (pos % ncol, pos // ncol)
 
 
 def env_to_grid(env):
@@ -206,10 +207,78 @@ def env_letter_to_position(env, letter=b'S'):
     indexes = [i for i, val in enumerate(grid) if bytes(val) in letter]
 
     if len(indexes):
-        return [position_to_coordinates(pos, env.ncol) for pos in indexes]
+        return [pos_to_coord(pos, env.ncol) for pos in indexes]
 
     raise ValueError('Env does not contain position: ' + letter)
 
+
+def env_to_transitions(env):
+    env.render()
+    ncol = env.ncol
+
+    transitions = {}
+
+    for state in env.P:
+        pos = pos_to_coord(state, ncol)
+        transitions[pos] = {}
+        for action in env.P[state]:
+            _transitions = env.P[state][action]
+            transition = [(p, pos_to_coord(s, ncol)) for p, s, __, __ in _transitions]
+            transitions[pos][action] = transition
+        
+    return transitions
+
+
+class EnvMDP(MDP):
+
+    """A two-dimensional grid MDP, as in [Figure 17.1]. All you have to do is
+    specify the grid as a list of lists of rewards; use None for an obstacle
+    (unreachable state). Also, you should specify the terminal states.
+    An action is an (x, y) unit vector; e.g. (1, 0) means move east."""
+
+    def __init__(self, env, gamma=.9):
+        grid = env_to_grid(env)
+        reward = {}
+        states = set()
+        self.rows = len(grid)
+        self.cols = len(grid[0])
+        self.grid = grid
+
+        for x in range(self.cols):
+            for y in range(self.rows):
+                if grid[y][x] is not None:
+                    states.add((x, y))
+                    reward[(x, y)] = grid[y][x]
+        
+        self.states = states
+        actlist = list(range(env.action_space.n))
+        transitions = env_to_transitions(env)
+        terminals = env_letter_to_position(env, letter=b'GH')
+        init = env_letter_to_position(env, letter=b'S')
+
+        MDP.__init__(self, init, actlist=actlist,
+                     terminals=terminals, transitions=transitions, 
+                     reward=reward, states=states, gamma=gamma)
+
+    def T(self, state, action):
+        return self.transitions[state][action] if action else [(0.0, state)]
+ 
+    def go(self, state, direction):
+        """Return the state that results from going in this direction."""
+
+        state1 = vector_add(state, direction)
+        return state1 if state1 in self.states else state
+
+    def to_grid(self, mapping):
+        """Convert a mapping from (x, y) to v into a [[..., v, ...]] grid."""
+
+        return list(reversed([[mapping.get((x, y), None)
+                               for x in range(self.cols)]
+                              for y in range(self.rows)]))
+
+    def to_arrows(self, policy):
+        chars = {(1, 0): '>', (0, 1): '^', (-1, 0): '<', (0, -1): 'v', None: '.'}
+        return self.to_grid({s: chars[a] for (s, a) in policy.items()})
 
 # ______________________________________________________________________________
 

@@ -9,13 +9,13 @@ from uofgsocsai import LochLomondEnv
 
 class TestRandomAgent(unittest.TestCase):
 
-    def test_position_to_coordinates(self):
-        self.assertEqual((0, 1), position_to_coordinates(1, 3))
-        self.assertEqual((0, 2), position_to_coordinates(2, 3))
-        self.assertEqual((2, 2), position_to_coordinates(8, 3))
-        self.assertEqual((3, 0), position_to_coordinates(9, 3))
-        self.assertEqual((3, 1), position_to_coordinates(10, 3))
-        self.assertEqual((3, 2), position_to_coordinates(11, 3))
+    def test_pos_to_coord(self):
+        self.assertEqual((1, 0), pos_to_coord(1, 3))
+        self.assertEqual((2, 0), pos_to_coord(2, 3))
+        self.assertEqual((2, 2), pos_to_coord(8, 3))
+        self.assertEqual((0, 3), pos_to_coord(9, 3))
+        self.assertEqual((1, 3), pos_to_coord(10, 3))
+        self.assertEqual((2, 3), pos_to_coord(11, 3))
 
     def test_env(self):
         env = LochLomondEnv(problem_id=0, is_stochastic=True, 
@@ -43,25 +43,68 @@ class TestRandomAgent(unittest.TestCase):
                             reward_hole=-0.2, map_name_base="4x4-base")
 
         terminals = env_letter_to_position(env, letter=b'GH')
+
         self.assertEqual((1, 1), terminals[0])
-        self.assertEqual((1, 3), terminals[1])
-        self.assertEqual((2, 3), terminals[2])
-        self.assertEqual((3, 0), terminals[3])
-        self.assertEqual((3, 1), terminals[4])
+        self.assertEqual((3, 1), terminals[1])
+        self.assertEqual((3, 2), terminals[2])
+        self.assertEqual((0, 3), terminals[3])
+        self.assertEqual((1, 3), terminals[4])
+
+
+    def test_env_mdp(self):
+        env = LochLomondEnv(problem_id=1, is_stochastic=True, 
+                            reward_hole=-0.2, map_name_base="4x4-base")
+
+        mdp = EnvMDP(env)     
+        print(mdp.__dict__)
+
+
+    def test_env_2_transitions(self):
+        env = LochLomondEnv(problem_id=1, is_stochastic=True, 
+                            reward_hole=-0.2, map_name_base="4x4-base")
+
+        transitions = env_to_transitions(env)
+        # transitions[current_pos][action] = [(prob, newstate)]
+
+        # moving to the left should...
+        ## move to the bottom with 0.333 prob
+        self.assertAlmostEqual(transitions[(0, 0)][0][2][0], 0.333, places=3)
+        self.assertEqual(transitions[(0, 0)][0][2][1], (0, 1))
+
+        ## stay 0.333 prob
+        self.assertAlmostEqual(transitions[(0, 0)][0][1][0], 0.333, places=3)
+        self.assertEqual(transitions[(0, 0)][0][1][1], (0, 0))
+
+        ## stay 0.333 prob
+        self.assertAlmostEqual(transitions[(0, 0)][0][0][0], 0.333, places=3)
+        self.assertEqual(transitions[(0, 0)][0][0][1], (0, 0))
+
+        # moving to the down should...
+        ## stay 0.333 prob
+        self.assertAlmostEqual(transitions[(0, 0)][1][0][0], 0.333, places=3)
+        self.assertEqual(transitions[(0, 0)][1][0][1], (0, 0))
+
+        ## move to the bottom with 0.333 prob
+        self.assertAlmostEqual(transitions[(0, 0)][1][1][0], 0.333, places=3)
+        self.assertEqual(transitions[(0, 0)][1][1][1], (0, 1))
+
+        ## move to the right with 0.333 prob
+        self.assertAlmostEqual(transitions[(0, 0)][1][2][0], 0.333, places=3)
+        self.assertEqual(transitions[(0, 0)][1][2][1], (1, 0))
 
 
     def test_env_2_init(self):
         env = LochLomondEnv(problem_id=1, is_stochastic=True, 
                             reward_hole=-0.2, map_name_base="4x4-base")
         initial = env_letter_to_position(env, letter=b'S')
-        self.assertEqual((0, 1), initial[0])
+        self.assertEqual((1, 0), initial[0])
 
 
     def test_env_2_init_02(self):
         env = LochLomondEnv(problem_id=2, is_stochastic=True, 
                             reward_hole=-0.2, map_name_base="4x4-base")
         initial = env_letter_to_position(env, letter=b'S')
-        self.assertEqual((0, 2), initial[0])    
+        self.assertEqual((2, 0), initial[0])    
 
 
     def test_4_by_4_q_learning_agent(self):
@@ -86,7 +129,7 @@ class TestRandomAgent(unittest.TestCase):
 
 #        print(agent.env.desc)
 
-        #print(position_to_coordinates(agent.env))
+        #print(pos_to_coord(agent.env))
 #         print(agent.env.render())
 #         print(agent.env.terminals)
 

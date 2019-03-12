@@ -18,7 +18,7 @@ MAPS_BASE = {
         "FHFH",
         "FFFH",
         "HFFF"
-    ],  
+    ], 
     "8x8-base": [
         "HFFFFHFF",
         "FFFFFFFF",
@@ -86,7 +86,6 @@ class LochLomondEnv(discrete.DiscreteEnv):
         # Fetch the base problem (without S and G)
         desc = MY_MAP_BASE[map_name_base]
         self.nrow, self.ncol = nrow, ncol = np.asarray(desc,dtype='c').shape
-        self.terminals = []
 
         # Check probelm_id value
         if problem_id > ncol-1:
@@ -109,6 +108,10 @@ class LochLomondEnv(discrete.DiscreteEnv):
         self.desc = desc = np.asarray(desc, dtype='c')        
         self.reward_range = (0, 1)
         self.is_stochastic = is_stochastic
+        self.terminals = []
+        self.reward_hole = reward_hole
+        self.reward = 1.0
+        self.path_cost = 0
 
         nA = 4
         nS = nrow * ncol
@@ -150,13 +153,13 @@ class LochLomondEnv(discrete.DiscreteEnv):
                                 newletter = desc[newrow, newcol]
 
                                 done = bytes(newletter) in b'GH'
-                                rew = 0.0
+                                rew = self.path_cost
                                 if(newletter == b'G'):
-                                    rew = 1.0
+                                    rew = self.reward
                                     if newstate not in self.terminals:
                                         self.terminals.append(newstate)
                                 elif(newletter == b'H'):
-                                    rew = reward_hole
+                                    rew = self.reward_hole
                                     if newstate not in self.terminals:
                                         self.terminals.append(newstate)
 
@@ -166,13 +169,13 @@ class LochLomondEnv(discrete.DiscreteEnv):
                             newstate = to_s(newrow, newcol)
                             newletter = desc[newrow, newcol]
                             done = bytes(newletter) in b'GH'
-                            rew = 0.0
+                            rew = self.path_cost
                             if(newletter == b'G'):
-                                rew = 1.0
+                                rew = self.reward
                                 if newstate not in self.terminals:
                                     self.terminals.append(newstate)
                             elif(newletter == b'H'):
-                                rew = reward_hole
+                                rew = self.reward_hole
                                 if newstate not in self.terminals:
                                     self.terminals.append(newstate)
                             li.append((1.0, newstate, rew, done))
