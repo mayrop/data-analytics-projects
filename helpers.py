@@ -164,9 +164,9 @@ class EnvMDP(MDP):
     """A two-dimensional grid MDP, as in [Figure 17.1]. All you have to do is
     specify the grid as a list of lists of rewards; use None for an obstacle
     (unreachable state). Also, you should specify the terminal states.
-    An action is an (x, y) unit vector; e.g. (1, 0) means move east."""
+    An action is an range[0, action] unit vector; e.g. (1, 0) means move east."""
 
-    def __init__(self, env, gamma=.9):
+    def __init__(self, env, gamma=.99):
         grid = EnvMDP.to_grid_matrix(env)
         reward = {}
         states = set()
@@ -192,32 +192,27 @@ class EnvMDP(MDP):
 
     def T(self, state, action):
         return self.transitions[state][action] if action else [(0.0, state)]
- 
-    def go(self, state, direction):
-        """Return the state that results from going in this direction."""
-
-        state1 = vector_add(state, direction)
-        return state1 if state1 in self.states else state
 
     def to_grid(self, mapping):
         """Convert a mapping from (x, y) to v into a [[..., v, ...]] grid."""
-
-        return list(reversed([[mapping.get((x, y), None)
-                               for x in range(self.cols)]
-                              for y in range(self.rows)]))
+        
+        rows, cols = self.rows, self.cols
+        states = []
+        for pos in list(range(rows * cols)):
+            coord = pos_to_coord(pos, cols)
+            states.append(mapping[coord])
+        
+        return np.array(states).reshape(rows, cols)
 
     def to_arrows(self, policy):
-        chars = {(1, 0): '>', (0, 1): '^', (-1, 0): '<', (0, -1): 'v', None: '.'}
+        chars = {2: '>', 3: '^', 0: '<', 1: 'v', None: '.'}
         return self.to_grid({s: chars[a] for (s, a) in policy.items()})
+
 
     @staticmethod
     def to_grid_matrix(env):
         """ 
         This simple parser maps the state space from the Open AI env to a simple grid
-
-        We *assume* full observability, i.e., we can directly ignore Hole states. Alternatively, 
-        we could place a very high step cost to a Hole state or use a directed representation 
-        (i.e., you can go to a Hole state but never return). Feel free to experiment with both if time permits.
 
         Input:
             env: an Open AI Env follwing the std in the FrozenLake-v0 env
@@ -241,17 +236,13 @@ class EnvMDP(MDP):
     @staticmethod
     def to_position(env, letter=b'S'):
         """ 
-        This simple parser maps the state space from the Open AI env to a simple grid
-
-        We *assume* full observability, i.e., we can directly ignore Hole states. Alternatively, 
-        we could place a very high step cost to a Hole state or use a directed representation 
-        (i.e., you can go to a Hole state but never return). Feel free to experiment with both if time permits.
+        This simple parser maps the state space from the Open AI env to the positions
 
         Input:
             env: an Open AI Env follwing the std in the FrozenLake-v0 env
 
         Output:
-            array with the positions of terminals
+            array with the positions that match letter
 
         """    
         grid = list(env.desc.reshape(env.nrow * env.ncol))
@@ -265,6 +256,17 @@ class EnvMDP(MDP):
 
     @staticmethod
     def to_transitions(env):
+        """ 
+        This simple parser maps the state space from the Open AI env to a simple grid
+
+        Input:
+            env: an Open AI Env follwing the std in the FrozenLake-v0 env
+
+        Output:
+            transitions[current_pos][action] = [(prob, newstate)]
+
+        """            
+        
         ncol = env.ncol
 
         transitions = {}

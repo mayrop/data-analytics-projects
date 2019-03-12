@@ -2,6 +2,7 @@ import unittest
 from agents import RandomAgent, SimpleAgent, QLearningAgent
 import random
 import numpy as np
+from mdp import policy_iteration
 from helpers import *
 from uofgsocsai import LochLomondEnv
 
@@ -64,6 +65,19 @@ class TestRandomAgent(unittest.TestCase):
         self.assertAlmostEqual(-0.2, mdp.grid[3][0])
         self.assertTrue((0, 1) in mdp.states)
         self.assertEqual((1, 1), mdp.terminals[0])
+
+
+    def test_policy_iteration(self):
+        env = LochLomondEnv(problem_id=0, is_stochastic=True, 
+                            reward_hole=-0.02, map_name_base="8x8-base")
+
+        mdp = EnvMDP(env)
+        print(env.render())        
+        pi = policy_iteration(mdp)
+
+        print(mdp.to_arrows(pi))
+
+        #print(mdp.to_grid(pi))
 
 
     def test_env_2_transitions(self):
