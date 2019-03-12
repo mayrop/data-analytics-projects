@@ -345,6 +345,7 @@ class QLearningAgentUofG(QLearningAgent):
             self.a = argmax(actions_in_state(s1), key=lambda a1: self.f(Q[s1, a1], Nsa[s1, a1], noise[0][a1]))
             if random.uniform(0, 1) < 0.1:
                 self.a = random.randint(0, n_actions-1)
+                #epsilon -= 10**-3
 
         return self.a
 

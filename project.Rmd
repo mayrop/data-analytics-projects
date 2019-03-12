@@ -1,0 +1,205 @@
+---
+title: "Artificial Intelligence 5M - Loch Lomond Lake"
+author: "Mayra A. Valdes Ibarra - 2419105v"
+header-includes: #allows you to add in your own Latex packages
+- \usepackage{float} #use the 'float' package
+- \floatplacement{figure}{H} #make every figure with caption = h    
+output:
+  pdf_document:
+    latex_engine: pdflatex
+    number_sections: yes
+    keep_tex: yes
+    fig_cap: yes
+fontsize: '11pt'
+---
+
+```{r setup, include=FALSE}
+#fig_caption: yes
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE, fig.pos= "h")
+#knitr::opts_chunk$set(fig.pos = 'H')
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+```
+
+
+```{r libraries, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+library(plyr)
+library(dplyr)
+library(data.table)
+library(tidyr)
+library(ggplot2)
+library(scales)
+library(Hmisc)
+library(kableExtra)
+library(gridExtra)
+library(grid)
+library(gtable)
+library(gridExtra)
+library(grid)
+library(egg)
+library(reshape2)
+library(grid)
+
+grid_arrange_shared_legend_2 <-function(...,
+           ncol = length(list(...)),
+           nrow = 1,
+           position = c("bottom", "right")) {
+    
+    plots <- list(...)
+    position <- match.arg(position)
+    g <-
+      ggplotGrob(plots[[1]] + theme(legend.position = position))$grobs
+    legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
+    lheight <- sum(legend$height)
+    lwidth <- sum(legend$width)
+    gl <- lapply(plots, function(x) x + theme(legend.position = "none"))
+    gl <- c(gl, ncol = ncol, nrow = nrow)
+    
+    combined <- switch(
+      position,
+      "bottom" = arrangeGrob(
+        do.call(arrangeGrob, gl),
+        legend,
+        ncol = 1,
+        heights = unit.c(unit(1, "npc") - lheight, lheight)
+      ),
+      "right" = arrangeGrob(
+        do.call(arrangeGrob, gl),
+        legend,
+        ncol = 2,
+        widths = unit.c(unit(1, "npc") - lwidth, lwidth)
+      )
+    )
+    
+    grid.draw(combined)
+}
+
+```
+
+```{r lake, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.height = 4, fig.width = 8, out.width = '70%', fig.align = "center"}
+# Plot inspired in: http://rgraphgallery.blogspot.com/2013/04/rg74-triple-three-heatmap-plot-one.html
+
+lake4 <- rbind(
+  c("S", "F", "F", "F"),
+  c("F", "H", "F", "H"),
+  c("F", "F", "F", "H"),
+  c("G", "F", "F", "F")
+)
+
+policy <- rbind(
+  c("down", NA, NA, NA),
+  c("down", NA, NA, NA),
+  c("down", NA, NA, NA),
+  c("done", NA, NA, NA)
+)
+
+lake8 <- rbind(
+  c('S', 'F', 'F', 'F', 'F', 'H', 'F', 'F'),
+  c('F', 'F', 'F', 'F', 'F', 'F', 'F', 'F'),
+  c('F', 'F', 'F', 'H', 'F', 'F', 'F', 'F'),
+  c('F', 'F', 'F', 'F', 'F', 'H', 'F', 'F'),
+  c('F', 'F', 'F', 'H', 'F', 'F', 'F', 'F'),
+  c('F', 'H', 'H', 'F', 'F', 'F', 'H', 'F'),
+  c('F', 'H', 'F', 'F', 'H', 'F', 'H', 'F'),
+  c('F', 'F', 'F', 'H', 'G', 'F', 'F', 'H')
+)
+
+create_grid <- function(grid, levels=TRUE) {
+  data.frame <- data.frame(
+    x=rep(1:ncol(grid), each=ncol(grid)),
+    y=rep(ncol(grid):1, times=ncol(grid)),
+    val=as.vector(grid)
+  )
+  
+  if (levels) {
+    data.frame$val <- factor(data.frame$val, levels = c("S", "F", "H", "G"), ordered=TRUE)
+    names(palette) <- levels(data.frame$val)
+  }
+  return(data.frame)
+}
+
+get_label <- function(x, y) {
+  return(data.frame.grid[data.frame.grid$x == x & data.frame.grid$y == y, "val"])
+  
+  if (!is.null(val)) {
+    return(val)
+  }
+  return("X")
+}
+
+finish_plot <- function(plot) {
+  plot <- plot + geom_tile(aes(fill = val), colour = "white") + 
+    geom_text(aes(label = get_label(x,y)), position = position_dodge(width=0.9), size=5) +
+    scale_fill_manual(values=palette, labels = c("Start (safe)", "Frozen (safe)", "Hole", "Goal")) + 
+    scale_x_discrete(expand=c(0,0)) +
+    scale_y_discrete(expand=c(0,0)) +
+    theme_void() +
+    labs(fill="") +
+    theme(legend.position="right", legend.direction = "horizontal", legend.box = "vertical")
+    theme(legend.title = element_blank(), legend.margin=unit(1,"cm"), legend.text=element_text(size=23))
+  return(plot)
+}
+
+palette <- c("#f1c40f", "#48dbfb", "#ff5e57", "#badc58")
+data.frame4 <- create_grid(lake4)
+data.frame8 <- create_grid(lake8)
+data.frame.grid <- create_grid(policy, levels=FALSE)
+
+plot <- ggplot(data.frame4, aes(x, y))
+plot <- finish_plot(plot)
+  
+plot2 <- ggplot(data.frame8, aes(x, y))
+plot2 <- finish_plot(plot2)
+
+plot.grid <- ggplot(data.frame.grid , aes(x, y))
+plot.grid <- finish_plot(plot.grid)
+
+grid_arrange_shared_legend_2(
+  plot + theme(plot.margin=unit(c(2,2,2,2),"cm")),
+  plot2 + theme(plot.margin=unit(c(0.2,0.2,0.2,0.2),"cm"))
+)
+
+```
+
+```{r data, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+# This environment is derived from the FrozenLake from https://gym.openai.com/envs/#toy_text
+
+# Winter is in Scotland. You and your friends were tossing around a frisbee at Loch Lomond
+# when you made a wild throw that left the frisbee out in the middle of the lake.
+# The water is mostly frozen, but there are a few holes where the ice has melted.
+# If you step into one of those holes, you'll fall into the freezing water.
+# At this time, there's an international frisbee shortage, so it's absolutely imperative that
+# you navigate across the lake and retrieve the disc.
+
+# However, the ice is slippery, so you won't always move in the direction you intend.
+# The surface is described using a grid like the following (for 8x8) with a unknown `problem_id`:
+
+# The specific environment/problem under consideration is a grid-world with a starting position (S), obstacles # (H) and a final goal (G). The task is to get from S to G. The environment is defined in uofgsocsai.py
+# via the class LochLomondEnv including documentation relating to the setting, specific states, parameters
+# etc. An example of how to instantiate the environment and navigate it using random actions is provided
+# in lochlomond_demo.py .
+# You must consider three agent types: a senseless/random agent, a simple agent and a reinforcement agent
+# based on the requirements listed in the following sections. Your agents will be tested against other instances of the same problem type, i.e., you can not (successfully) hard-code the solution. You will have
+# access to eighth specific training instances of the environment determined by the value of a single variable
+# problem_id.
+# Your agents and findings should be documented in a short (max 1500 word) technical report accompanied
+# by the actual implementation/code and evaluation scripts.
+
+```
+
+# Introduction
+The Loch Lomond Frozen Lake environment is a customized Open AI Gym derived from FrozenLake (https://gym.openai.com/envs/#toy_text).
+
+The goal of this report is to design, implement and evaluate three diferent virtual agents which are able to navigate across the Loch Lomond Frozen Lake grid and retrieve the frisbee disc. Three different agents are analyzed: a senseless agent, a simple agent and a reinforcement agent. 
+
+# Agents
+## Senseless Agent
+### Evaluation
+## Simple Agent
+### Evaluation
+## Reinforcement Learning Agent
+### Evaluation
+
+# Conclusions {#sec:con}
+
+[^1]: Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print.

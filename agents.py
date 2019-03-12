@@ -53,11 +53,7 @@ class MyAbstractAIAgent():
             "Action",
             "Done",
             "Reward",
-            "CumulativeReward",
-            "PrevLocationX",
-            "PrevLocationY",
-            "NewLocationX",
-            "NewLocationY"
+            "CumulativeReward"
         ]
 
     def is_stochastic(self):
