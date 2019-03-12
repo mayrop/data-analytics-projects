@@ -5,6 +5,7 @@ import numpy as np
 from mdp import policy_iteration
 from helpers import *
 from uofgsocsai import LochLomondEnv
+from rl import PassiveTDAgent
 
 # python test.py TestRandomAgent.test_4_by_4_q_learning_agent
 
@@ -68,14 +69,21 @@ class TestRandomAgent(unittest.TestCase):
 
 
     def test_policy_iteration(self):
-        env = LochLomondEnv(problem_id=0, is_stochastic=True, 
-                            reward_hole=-0.02, map_name_base="8x8-base")
+        reward = -0.02
 
-        mdp = EnvMDP(env)
-        print(env.render())        
-        pi = policy_iteration(mdp)
+        for i in range(7):
+            env = LochLomondEnv(problem_id=1, is_stochastic=True, 
+                                reward_hole=reward, map_name_base="8x8-base")
 
-        print(mdp.to_arrows(pi))
+            mdp = EnvMDP(env)
+            print(env.render())        
+            policy = policy_iteration(mdp)
+
+            states = [(0,0), (0,1), (4,7), (5,7), (6,6), (5,6)]
+            random.seed(1)
+            iterations = 10000
+            agent = PassiveTDAgent(policy, mdp, alpha=lambda n: 60./(59+n))
+            graph_utility_estimates(agent, mdp, iterations, states)
 
         #print(mdp.to_grid(pi))
 

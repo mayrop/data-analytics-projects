@@ -4,6 +4,9 @@ AIMA_TOOLBOX_ROOT="aima-python"
 sys.path.append(AIMA_TOOLBOX_ROOT)
 from search import *
 from mdp import MDP
+from rl import PassiveTDAgent
+from rl import run_single_trial
+import matplotlib.pyplot as plt
 
 def to_human(action):
     if action == 0:
@@ -32,6 +35,9 @@ def to_human_arrow(action):
     elif action == None:
         return "X"
     return "."    
+
+
+# ______________________________________________________________________________
 
 
 def perform_best_first_graph_search(problem, f):
@@ -79,6 +85,9 @@ def perform_a_star_search(problem, h=None):
     else in your Problem subclass."""
     h = memoize(h or problem.h, 'h') # define the heuristic function
     return perform_best_first_graph_search(problem, lambda n: n.path_cost + h(n))    
+
+
+# ______________________________________________________________________________
 
 
 def env2statespace(env):
@@ -159,6 +168,27 @@ def pos_to_coord(pos, ncol):
     return (pos % ncol, pos // ncol)
 
 
+def graph_utility_estimates(agent, mdp, iterations, states):
+    graphs = {state:[] for state in states}
+
+    for iteration in range(1, iterations+1):
+        run_single_trial(agent, mdp)
+        for state in states:
+            graphs[state].append((iteration, agent.U[state]))
+
+    for state, value in graphs.items():
+        state_x, state_y = zip(*value)
+        plt.plot(state_x, state_y, label=str(state))
+
+    plt.ylim([-1.2, 1.2])
+    plt.legend(loc='lower right')
+    plt.xlabel('Iterations')
+    plt.ylabel('U')
+    plt.show(block=True)
+
+# ______________________________________________________________________________
+
+
 class EnvMDP(MDP):
 
     """A two-dimensional grid MDP, as in [Figure 17.1]. All you have to do is
@@ -179,19 +209,19 @@ class EnvMDP(MDP):
                 if grid[y][x] is not None:
                     states.add((x, y))
                     reward[(x, y)] = grid[y][x]
-        
+
         self.states = states
         actlist = list(range(env.action_space.n))
         transitions = EnvMDP.to_transitions(env)
         terminals = EnvMDP.to_position(env, letter=b'GH')
-        init = EnvMDP.to_position(env, letter=b'S')
+        init = EnvMDP.to_position(env, letter=b'S')[0]
 
         MDP.__init__(self, init, actlist=actlist,
                      terminals=terminals, transitions=transitions, 
                      reward=reward, states=states, gamma=gamma)
 
     def T(self, state, action):
-        return self.transitions[state][action] if action else [(0.0, state)]
+        return self.transitions[state][action] if action is not None else [(0.0, state)]
 
     def to_grid(self, mapping):
         """Convert a mapping from (x, y) to v into a [[..., v, ...]] grid."""
