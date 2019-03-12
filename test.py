@@ -31,7 +31,8 @@ class TestRandomAgent(unittest.TestCase):
         env = LochLomondEnv(problem_id=0, is_stochastic=True, 
                             reward_hole=-0.2, map_name_base="4x4-base")
 
-        grid = env_to_grid(env)
+        mdp = EnvMDP(env)
+        grid = EnvMDP.to_grid_matrix(env)
         self.assertEqual(0, grid[0,0])
         self.assertEqual(0, grid[0,1])
         self.assertEqual(-0.2, grid[1,1])
@@ -42,7 +43,8 @@ class TestRandomAgent(unittest.TestCase):
         env = LochLomondEnv(problem_id=1, is_stochastic=True, 
                             reward_hole=-0.2, map_name_base="4x4-base")
 
-        terminals = env_letter_to_position(env, letter=b'GH')
+        mdp = EnvMDP(env)
+        terminals = EnvMDP.to_position(env, letter=b'GH')
 
         self.assertEqual((1, 1), terminals[0])
         self.assertEqual((3, 1), terminals[1])
@@ -55,15 +57,21 @@ class TestRandomAgent(unittest.TestCase):
         env = LochLomondEnv(problem_id=1, is_stochastic=True, 
                             reward_hole=-0.2, map_name_base="4x4-base")
 
-        mdp = EnvMDP(env)     
-        print(mdp.__dict__)
+        mdp = EnvMDP(env)
+
+        self.assertEqual(4, mdp.rows)
+        self.assertEqual(4, mdp.cols)
+        self.assertAlmostEqual(-0.2, mdp.grid[3][0])
+        self.assertTrue((0, 1) in mdp.states)
+        self.assertEqual((1, 1), mdp.terminals[0])
 
 
     def test_env_2_transitions(self):
         env = LochLomondEnv(problem_id=1, is_stochastic=True, 
                             reward_hole=-0.2, map_name_base="4x4-base")
 
-        transitions = env_to_transitions(env)
+        mdp = EnvMDP(env)
+        transitions = EnvMDP.to_transitions(env)
         # transitions[current_pos][action] = [(prob, newstate)]
 
         # moving to the left should...
@@ -96,14 +104,16 @@ class TestRandomAgent(unittest.TestCase):
     def test_env_2_init(self):
         env = LochLomondEnv(problem_id=1, is_stochastic=True, 
                             reward_hole=-0.2, map_name_base="4x4-base")
-        initial = env_letter_to_position(env, letter=b'S')
+
+        mdp = EnvMDP(env)
+        initial = EnvMDP.to_position(env, letter=b'S')
         self.assertEqual((1, 0), initial[0])
 
 
     def test_env_2_init_02(self):
         env = LochLomondEnv(problem_id=2, is_stochastic=True, 
                             reward_hole=-0.2, map_name_base="4x4-base")
-        initial = env_letter_to_position(env, letter=b'S')
+        initial = EnvMDP.to_position(env, letter=b'S')
         self.assertEqual((2, 0), initial[0])    
 
 

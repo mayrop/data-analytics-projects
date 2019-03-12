@@ -159,76 +159,6 @@ def pos_to_coord(pos, ncol):
     return (pos % ncol, pos // ncol)
 
 
-def env_to_grid(env):
-    """ 
-    This simple parser maps the state space from the Open AI env to a simple grid
-
-    We *assume* full observability, i.e., we can directly ignore Hole states. Alternatively, 
-    we could place a very high step cost to a Hole state or use a directed representation 
-    (i.e., you can go to a Hole state but never return). Feel free to experiment with both if time permits.
-
-    Input:
-        env: an Open AI Env follwing the std in the FrozenLake-v0 env
-
-    Output:
-        a grid with the reward values for each state with shape (env.nrow * env.ncol)
-
-    """    
-    matrix = env.desc.reshape(env.nrow * env.ncol)
-
-    def state_default_value(x):
-        if b'H' in x:
-            return env.reward_hole
-        if b'G' in x:
-            return env.reward
-        return env.path_cost
-
-    grid = [state_default_value(x) for x in matrix]
-    return np.array(grid).reshape((env.nrow, env.ncol))
-
-
-def env_letter_to_position(env, letter=b'S'):
-    """ 
-    This simple parser maps the state space from the Open AI env to a simple grid
-
-    We *assume* full observability, i.e., we can directly ignore Hole states. Alternatively, 
-    we could place a very high step cost to a Hole state or use a directed representation 
-    (i.e., you can go to a Hole state but never return). Feel free to experiment with both if time permits.
-
-    Input:
-        env: an Open AI Env follwing the std in the FrozenLake-v0 env
-
-    Output:
-        array with the positions of terminals
-
-    """    
-    grid = list(env.desc.reshape(env.nrow * env.ncol))
-    
-    indexes = [i for i, val in enumerate(grid) if bytes(val) in letter]
-
-    if len(indexes):
-        return [pos_to_coord(pos, env.ncol) for pos in indexes]
-
-    raise ValueError('Env does not contain position: ' + letter)
-
-
-def env_to_transitions(env):
-    env.render()
-    ncol = env.ncol
-
-    transitions = {}
-
-    for state in env.P:
-        pos = pos_to_coord(state, ncol)
-        transitions[pos] = {}
-        for action in env.P[state]:
-            _transitions = env.P[state][action]
-            transition = [(p, pos_to_coord(s, ncol)) for p, s, __, __ in _transitions]
-            transitions[pos][action] = transition
-        
-    return transitions
-
-
 class EnvMDP(MDP):
 
     """A two-dimensional grid MDP, as in [Figure 17.1]. All you have to do is
@@ -237,7 +167,7 @@ class EnvMDP(MDP):
     An action is an (x, y) unit vector; e.g. (1, 0) means move east."""
 
     def __init__(self, env, gamma=.9):
-        grid = env_to_grid(env)
+        grid = EnvMDP.to_grid_matrix(env)
         reward = {}
         states = set()
         self.rows = len(grid)
@@ -252,9 +182,9 @@ class EnvMDP(MDP):
         
         self.states = states
         actlist = list(range(env.action_space.n))
-        transitions = env_to_transitions(env)
-        terminals = env_letter_to_position(env, letter=b'GH')
-        init = env_letter_to_position(env, letter=b'S')
+        transitions = EnvMDP.to_transitions(env)
+        terminals = EnvMDP.to_position(env, letter=b'GH')
+        init = EnvMDP.to_position(env, letter=b'S')
 
         MDP.__init__(self, init, actlist=actlist,
                      terminals=terminals, transitions=transitions, 
@@ -279,6 +209,75 @@ class EnvMDP(MDP):
     def to_arrows(self, policy):
         chars = {(1, 0): '>', (0, 1): '^', (-1, 0): '<', (0, -1): 'v', None: '.'}
         return self.to_grid({s: chars[a] for (s, a) in policy.items()})
+
+    @staticmethod
+    def to_grid_matrix(env):
+        """ 
+        This simple parser maps the state space from the Open AI env to a simple grid
+
+        We *assume* full observability, i.e., we can directly ignore Hole states. Alternatively, 
+        we could place a very high step cost to a Hole state or use a directed representation 
+        (i.e., you can go to a Hole state but never return). Feel free to experiment with both if time permits.
+
+        Input:
+            env: an Open AI Env follwing the std in the FrozenLake-v0 env
+
+        Output:
+            a grid with the reward values for each state with shape (env.nrow * env.ncol)
+
+        """    
+        matrix = env.desc.reshape(env.nrow * env.ncol)
+
+        def state_value(state):
+            if b'H' in state:
+                return env.reward_hole
+            if b'G' in state:
+                return env.reward
+            return env.path_cost
+
+        grid = [state_value(state) for state in matrix]
+        return np.array(grid).reshape((env.nrow, env.ncol))
+
+    @staticmethod
+    def to_position(env, letter=b'S'):
+        """ 
+        This simple parser maps the state space from the Open AI env to a simple grid
+
+        We *assume* full observability, i.e., we can directly ignore Hole states. Alternatively, 
+        we could place a very high step cost to a Hole state or use a directed representation 
+        (i.e., you can go to a Hole state but never return). Feel free to experiment with both if time permits.
+
+        Input:
+            env: an Open AI Env follwing the std in the FrozenLake-v0 env
+
+        Output:
+            array with the positions of terminals
+
+        """    
+        grid = list(env.desc.reshape(env.nrow * env.ncol))
+        
+        indexes = [i for i, val in enumerate(grid) if bytes(val) in letter]
+
+        if len(indexes):
+            return [pos_to_coord(pos, env.ncol) for pos in indexes]
+
+        raise ValueError('Env does not contain position: ' + letter)
+
+    @staticmethod
+    def to_transitions(env):
+        ncol = env.ncol
+
+        transitions = {}
+
+        for state in env.P:
+            pos = pos_to_coord(state, ncol)
+            transitions[pos] = {}
+            for action in env.P[state]:
+                _transitions = env.P[state][action]
+                transition = [(p, pos_to_coord(s, ncol)) for p, s, __, __ in _transitions]
+                transitions[pos][action] = transition
+            
+        return transitions
 
 # ______________________________________________________________________________
 
