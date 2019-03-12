@@ -4,6 +4,7 @@ from six import StringIO, b
 
 from gym import utils
 from gym.envs.toy_text import discrete
+import copy
 
 LEFT = 0
 DOWN = 1
@@ -12,7 +13,7 @@ UP = 3
 
 MAPS_BASE = {
     "4x4-base": [
-        "SFFF",
+        "FFFF",
         "FHFH",
         "FFFH",
         "HFFF"
@@ -74,14 +75,20 @@ class LochLomondEnv(discrete.DiscreteEnv):
 
     metadata = {'render.modes': ['human', 'ansi']}
 
-    def __init__(self, problem_id=0, is_stochastic=True, reward_hole = 0.0):
+    def __init__(self, problem_id=0, is_stochastic=True, reward_hole = 0.0, map_name_base="8x8-base"):
         if reward_hole > 0.0:
             raise ValueError('reward_hole must be equal to 0 or smaller')
     
         # Fetch the base problem (without S and G)
-        map_name_base="8x8-base" # for the final submission in AI (H) this should be 8x8-base but you may want to start out with 4x4-base!        
-        desc = MAPS_BASE[map_name_base]
+        # map_name_base="8x8-base" # for the final submission in AI (H) this should be 8x8-base but you may want to start out with 4x4-base!        
+        MY_MAP_BASE = copy.deepcopy(MAPS_BASE)
+
+        desc = MY_MAP_BASE[map_name_base]
         self.nrow, self.ncol = nrow, ncol = np.asarray(desc,dtype='c').shape
+        self.is_stochastic = is_stochastic
+        self.reward_hole = reward_hole
+        self.reward = 1.0
+        self.path_cost = 0
 
         # Check probelm_id value
         if problem_id > ncol-1:
@@ -140,22 +147,22 @@ class LochLomondEnv(discrete.DiscreteEnv):
                                 newstate = to_s(newrow, newcol)
                                 newletter = desc[newrow, newcol]
                                 done = bytes(newletter) in b'GH'
-                                rew = 0.0
+                                rew = self.path_cost
                                 if(newletter == b'G'):
-                                    rew = 1.0
+                                    rew = self.reward
                                 elif(newletter == b'H'):
-                                    rew = reward_hole
+                                    rew = self.reward_hole
                                 li.append((1.0/3.0, newstate, rew, done))
                         else:
                             newrow, newcol = inc(row, col, a)
                             newstate = to_s(newrow, newcol)
                             newletter = desc[newrow, newcol]
                             done = bytes(newletter) in b'GH'
-                            rew = 0.0
+                            rew = self.path_cost
                             if(newletter == b'G'):
-                                rew = 1.0       
+                                rew = self.reward     
                             elif(newletter == b'H'):
-                                rew = reward_hole                     
+                                rew = self.reward_hole                     
                             li.append((1.0, newstate, rew, done))
 
         super(LochLomondEnv, self).__init__(nS, nA, P, isd)
