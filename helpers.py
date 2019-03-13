@@ -33,33 +33,16 @@ def to_human(action):
 # ______________________________________________________________________________
 # Graphs
 
-def my_graph_utility_estimates(agent, mdp, iterations, states=None):
-    if states is None:
-        states = mdp.states
-
-    graphs = {state:[] for state in states}
-
-    for i in range(1, iterations+1):
-        if callable(getattr(agent, 'set_episode', None)):
-            agent.set_episode(i+1)
-
-        run_single_trial(agent, mdp)
-        for state in states:
-            if callable(getattr(agent, 'update_u', None)):
-                agent.update_u()
-
-            graphs[state].append((i, agent.U[state]))
-
-    return agent, graphs
-
-def graph_utility_estimates(agent, mdp, iterations, states=None):
-    agent, graphs = my_graph_utility_estimates(agent, mdp, iterations, states)
-
+def graph_utility_estimates(graphs):
+    """ Source of this function: 
+        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
+    """
     for state, value in graphs.items():
         state_x, state_y = zip(*value)
+        print(state_x)
         plt.plot(state_x, state_y, label=str(state))
 
-    plt.ylim([-1.2, 1.2])
+    plt.ylim([-0.2, 1.2])
     plt.legend(loc='lower right')
     plt.xlabel('Iterations')
     plt.ylabel('U')
@@ -73,8 +56,7 @@ class EnvMDP(MDP):
 
     """A two-dimensional grid MDP, as in [Figure 17.1]. All you have to do is
     specify the grid as a list of lists of rewards; use None for an obstacle
-    (unreachable state). Also, you should specify the terminal states.
-    An action is an range[0, action] unit vector; e.g. (1, 0) means move east."""
+    (unreachable state). Also, you should specify the terminal states."""
 
     def __init__(self, env, gamma=.99):
         grid = EnvMDP.to_grid_matrix(env)
@@ -191,6 +173,9 @@ def u_to_list(U):
     return [[int(x), int(y), U[(x, y)]] for x, y in U]
 
 def q_to_u(Q):
+    """ Source of this function: 
+        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
+    """
     U = defaultdict(lambda: -1000.) 
     
     for state_action, value in Q.items():
@@ -200,7 +185,11 @@ def q_to_u(Q):
 
     return U
 
+
 def compare_utils(U1, U2, H1="U1", H2="U2"):
+    """ Source of this function: 
+        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
+    """
     U_diff = dict()
     
     print("%s \t %s \t %s \t %s" % ("State",H1,H2,"Diff"))
@@ -219,29 +208,36 @@ def compare_utils(U1, U2, H1="U1", H2="U2"):
     print("")    
     print("Max norm: %.5f" % (U_maxnorm))     
     print("2-norm : %.5f" % (U_2norm))     
-    #return U_diff,U_2norm,U_maxnorm
+
 
 class QLearningAgentUofG(QLearningAgent):
     """ An exploratory Q-learning agent. It avoids having to learn the transition
         model because the Q-value of a state can be related directly to those of
-        its neighbors. [Figure 21.8]    
+        its neighbors. [Figure 21.8]
+
+        Source of this class: 
+        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
+        - Modified for convenience
     """
 
-    def f(self, u):       
+    def f(self, u, n):       
         """ Exploration function."""
-        
+        # print(n)
+        # if n < self.Ne:
+        #     return self.Rplus
+
         return u
 
-    def set_episode(self, e):
-        self.e = e
-
     def __call__(self, percept):
+        noise = np.random.random((1, env.action_space.n)) / (episode**2.)
         alpha, gamma, terminals = self.alpha, self.gamma, self.terminals
         Q, Nsa = self.Q, self.Nsa
         actions_in_state = self.actions_in_state
 
         s, a, r = self.s, self.a, self.r
         s1, r1 = self.update_state(percept) # current state and reward;  s' and r'
+        print(s,a,r)
+
         
         if s in terminals: # if prev state was a terminal state it should be updated to the reward
             Q[s, None] = r  
@@ -255,8 +251,8 @@ class QLearningAgentUofG(QLearningAgent):
             self.s = self.a = self.r = None
         else:
             self.s, self.r = s1, r1
-            self.a = argmax(actions_in_state(s1), key=lambda a1: self.f(Q[s1, a1]))
-            if random.uniform(0, 1) < 0.5:
+            self.a = argmax(actions_in_state(s1), key=lambda a1: self.f(Q[s1, a1], Nsa[s, a]))
+            if random.uniform(0, 1) < 0.2:
                 self.a = random.randint(0, len(self.all_act)-1)
                 #epsilon -= 10**-3
 
