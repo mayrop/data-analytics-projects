@@ -10,7 +10,11 @@ LEFT = 0
 DOWN = 1
 RIGHT = 2
 UP = 3
-
+http#s://arxiv.org/pdf/1802.05313.pdf
+    #https://arxiv.org/pdf/1802.05313.pdf
+    #https://arxiv.org/pdf/1806.04242.pdf
+    #https://towardsdatascience.com/understanding-learning-rates-and-how-it-improves-performance-in-deep-learning-d0d4059c1c10
+    #https://www.google.co.uk/search?biw=1608&bih=937&tbm=isch&sa=1&ei=x5mAXOGvNYC71fAP1YingA0&q=performance+measure+in+artificial+intelligence+plots+frozenlake&oq=performance+measure+in+artificial+intelligence+plots+frozenlake&gs_l=img.3...11470.12925..13059...0.0..0.101.559.10j1......1....1..gws-wiz-img.PU8F5GU2FRU#imgrc=_
 MAPS_BASE = {
     "4x4-base": [
         "FFFF",

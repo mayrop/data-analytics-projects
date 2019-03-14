@@ -19,6 +19,25 @@ library(knitr)
 knitr::opts_chunk$set(echo = TRUE, fig.pos= "h")
 #knitr::opts_chunk$set(fig.pos = 'H')
 knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+
+data <- read.csv("out_rl_0_8x8-base__eval.csv")
+train <- read.csv("out_rl_0_8x8-base__train.csv")
+
+data2<- data %>%
+  arrange(desc(iteration)) %>%
+  arrange(episode) %>%
+  select(episode, rewards) %>%
+  mutate(mean_rewards=rewards/episode) %>%
+  arrange(desc(mean_rewards)) %>%
+  group_by(episode) %>%
+  mutate(pos = 1:n()) %>%
+  filter(pos==1) %>%
+  arrange(episode)
+
+
+plot(data2$episode, data2$mean_rewards, type="l")
+train2 <- train[,]
+plot(train2$episode, train2$iteration)
 ```
 
 
@@ -118,7 +137,8 @@ create_grid <- function(grid, levels=TRUE) {
   return(data.frame)
 }
 
-get_label <- function(x, y) {
+get_label <- function(x, y, val) {
+  return(val)
   return(data.frame.grid[data.frame.grid$x == x & data.frame.grid$y == y, "val"])
   
   if (!is.null(val)) {
@@ -129,7 +149,7 @@ get_label <- function(x, y) {
 
 finish_plot <- function(plot) {
   plot <- plot + geom_tile(aes(fill = val), colour = "white") + 
-    geom_text(aes(label = get_label(x,y)), position = position_dodge(width=0.9), size=5) +
+    geom_text(aes(label = get_label(x,y,val)), position = position_dodge(width=0.9), size=5) +
     scale_fill_manual(values=palette, labels = c("Start (safe)", "Frozen (safe)", "Hole", "Goal")) + 
     scale_x_discrete(expand=c(0,0)) +
     scale_y_discrete(expand=c(0,0)) +
