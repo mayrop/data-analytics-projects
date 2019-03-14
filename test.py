@@ -210,10 +210,11 @@ class TestRandomAgent(unittest.TestCase):
 
 
     def test_qlearning(self):
-        agent = ReinforcementLearningAgent(problem_id=0, map_name_base="8x8-base")
-        agent.solve()
+        for i in range(8):
+            agent = ReinforcementLearningAgent(problem_id=i, map_name_base="8x8-base")
+            agent.solve()
 
-        agent.write_eval_files()
+            agent.write_eval_files()
 
 if __name__ == '__main__':
     unittest.main()

@@ -52,8 +52,9 @@ class MyAbstractAIAgent():
         self.rewards = 0
         self.failures = 0
         self.eval = []
+        self.timeouts = 0
 
-    def solve(self, episodes=10000, iterations=200, reset=True, seed=False):
+    def solve(self, episodes=10000, iterations=1000, reset=True, seed=False):
         self.train()
         for e in range(1, episodes + 1): # iterate over episodes
             state = self.env.reset()
@@ -69,11 +70,14 @@ class MyAbstractAIAgent():
                     else:
                         self.failures += 1
 
-                    self.eval.append([self.problem_id, e, i, to_human(action), 
-                        int(reward), self.failures, self.rewards])
-
                     # break the cycle
-                    break;                   
+                    break;
+
+            if not done:
+                self.timeouts += 1
+
+            self.eval.append([self.problem_id, e, i, to_human(action), 
+                        int(reward), self.rewards, self.failures, self.timeouts])
                     
 
     def action(self, i):
@@ -131,7 +135,7 @@ class MyAbstractAIAgent():
     def header(self, index):
         if index == 'eval':
             return ['id', 'episode', 'iteration', 'action',
-                'reward', 'failures', 'rewards']
+                'reward', 'rewards', 'failures', 'timeouts']
 
         if index == 'policy':
             return ['x', 'y', 'action']
@@ -140,7 +144,8 @@ class MyAbstractAIAgent():
             return ['x', 'y', 'u'] 
 
         if index == 'train':
-            return ['id', 'episode', 'iteration', 'reward', 'failures', 'rewards']
+            return ['id', 'episode', 'iteration', 'reward', 
+                'rewards', 'failures', 'timeouts']
 
         if index == 'graphs':
             return ['x', 'y', 'value']             
@@ -296,10 +301,11 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
         states = mdp.states
         self.graphs = {coord_to_pos(state[0], state[1], mdp.cols):[] for state in states}
 
-        episodes = 100000
+        episodes = 40000
         iterations = 1000
         rewards = 0
         failures = 0
+        timeouts = 0
         self._train = []
         cols = self.env.ncol
         step = self.env.step
@@ -326,8 +332,12 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
                         failures += 1                    
                     
                     break
+
+            if not done:
+                timeouts += 1
             
-            self._train.append([self.problem_id, e, i, int(reward), failures, rewards])
+            self._train.append([self.problem_id, e, i, int(reward), 
+                               rewards, failures, timeouts])
 
             if e % 100 == 0:
             #    if self.map_name_base == '4x4-base':
@@ -404,7 +414,7 @@ class QLearningAgentUofG(QLearningAgent):
             Nsa[s, a] += 1
             #print("updating ", s, a, " ---- ", r)
             #print("Nsa[s, a]", Nsa[s, a])
-            Q[s, a] += alpha(Nsa[s, a]) * (r + 0.96 * max(Q[new_state, a1] for a1 in actions(new_state)) - Q[s, a])
+            Q[s, a] += alpha(Nsa[s, a]) * (r + 0.95 * max(Q[new_state, a1] for a1 in actions(new_state)) - Q[s, a])
 
         if new_state in terminals:
             self.Q[new_state, None] = new_reward
@@ -412,7 +422,7 @@ class QLearningAgentUofG(QLearningAgent):
         else:  
             self.s, self.r = new_state, new_reward            
             self.a = argmax(self.all_act, key=lambda a1: self.f(Q[new_state, a1], Nsa[s, a1], a1, noise[0][a1]))
-            if random.uniform(0, 1) < 0.075:
+            if random.uniform(0, 1) < 0.05:
                 self.a = random.randint(0, len(self.all_act)-1)
                 #epsilon -= 10**-3
 

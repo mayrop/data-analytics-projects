@@ -13,35 +13,7 @@ output:
 fontsize: '11pt'
 ---
 
-```{r setup, include=FALSE}
-#fig_caption: yes
-library(knitr)
-knitr::opts_chunk$set(echo = TRUE, fig.pos= "h")
-#knitr::opts_chunk$set(fig.pos = 'H')
-knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
-
-data <- read.csv("out_rl_0_8x8-base__eval.csv")
-train <- read.csv("out_rl_0_8x8-base__train.csv")
-
-data2<- data %>%
-  arrange(desc(iteration)) %>%
-  arrange(episode) %>%
-  select(episode, rewards) %>%
-  mutate(mean_rewards=rewards/episode) %>%
-  arrange(desc(mean_rewards)) %>%
-  group_by(episode) %>%
-  mutate(pos = 1:n()) %>%
-  filter(pos==1) %>%
-  arrange(episode)
-
-
-plot(data2$episode, data2$mean_rewards, type="l")
-train2 <- train[,]
-plot(train2$episode, train2$iteration)
-```
-
-
-```{r libraries, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+```{r}
 library(plyr)
 library(dplyr)
 library(data.table)
@@ -58,6 +30,30 @@ library(grid)
 library(egg)
 library(reshape2)
 library(grid)
+```
+
+```{r setup, include=FALSE}
+#fig_caption: yes
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE, fig.pos= "h")
+#knitr::opts_chunk$set(fig.pos = 'H')
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+
+data <- read.csv("out_rl_1_8x8-base__eval.csv")
+train <- read.csv("out_rl_2_8x8-base__train.csv")
+
+data2<- data %>%
+  select(episode, rewards) %>%
+  mutate(mean_rewards=rewards/episode)
+
+plot(data2$episode, data2$mean_rewards, type="l")
+#train2 <- train[,]
+#plot(train2$episode, train2$iteration)
+```
+
+
+```{r libraries, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+
 
 grid_arrange_shared_legend_2 <-function(...,
            ncol = length(list(...)),
