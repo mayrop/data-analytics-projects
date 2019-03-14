@@ -1,5 +1,5 @@
 import unittest
-from agents import RandomAgent, SimpleAgent, UofGPassiveAgent, UofGQLearningAgent
+from agents import RandomAgent, SimpleAgent, UofGPassiveAgent, ReinforcementLearningAgent
 import random
 import numpy as np
 from mdp import policy_iteration
@@ -210,7 +210,7 @@ class TestRandomAgent(unittest.TestCase):
 
 
     def test_qlearning(self):
-        agent = UofGQLearningAgent(problem_id=0, map_name_base="8x8-base")
+        agent = ReinforcementLearningAgent(problem_id=0, map_name_base="8x8-base")
         agent.solve()
 
         agent.write_eval_files()

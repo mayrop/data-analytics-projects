@@ -176,7 +176,7 @@ class LochLomondEnv(discrete.DiscreteEnv):
         desc = [[c.decode('utf-8') for c in line] for line in desc]
         desc[row][col] = "X"
 
-        #desc[row][col] = utils.colorize(desc[row][col], "red", highlight=True) # note: this does not work on all setups you can try to uncomment asnd see what happends (if it does work you'll see weird symbols)
+        desc[row][col] = utils.colorize(desc[row][col], "red", highlight=True) # note: this does not work on all setups you can try to uncomment asnd see what happends (if it does work you'll see weird symbols)
         
         if self.lastaction is not None:
             outfile.write("  ({})\n".format(["Left","Down","Right","Up"][self.lastaction]))

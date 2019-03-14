@@ -15,7 +15,6 @@ sys.path.append("aima")
 from helpers import *
 from mdp import policy_iteration
 from mdp import value_iteration
-from rl import run_single_trial
 from search import *
 from uofgsocsai import LochLomondEnv # load the class defining the custom Open AI Gym problem
 import json
@@ -107,7 +106,7 @@ class MyAbstractAIAgent():
             if name == 'policy':
                 return policy_to_list(self.policy())
             if name == 'u':
-                return u_to_list(self.u())
+                return QLearningAgentUofG.u_to_list(self.u())
             if name == 'eval':
                 return self.eval
             if name == 'q':
@@ -274,7 +273,7 @@ class UofGPassiveAgent(MyAbstractAIAgent):
 ################################
 ################################
 
-class UofGQLearningAgent(MyAbstractAIAgent):
+class ReinforcementLearningAgent(MyAbstractAIAgent):
     """ An exploratory Q-learning agent. It avoids having to learn the transition
         model because the Q-value of a state can be related directly to those of
         its neighbors. [Figure 21.8]
@@ -284,10 +283,11 @@ class UofGQLearningAgent(MyAbstractAIAgent):
 
     def reward_hole(self):
         if self.map_name_base == '4x4-base':
+            #print("REWARD HOLE!!!")
             return -0.7
 
         # this should be modified for diff env
-        return -0.05
+        return -0.15
 
     def train(self):
         mdp = EnvMDP(self.env)
@@ -297,29 +297,48 @@ class UofGQLearningAgent(MyAbstractAIAgent):
         self.graphs = {coord_to_pos(state[0], state[1], mdp.cols):[] for state in states}
 
         episodes = 100000
+        iterations = 1000
         rewards = 0
         failures = 0
         self._train = []
+        cols = self.env.ncol
+        step = self.env.step
+
+        positions = {coord_to_pos(state[0], state[1], mdp.cols):state for state in states}
+        coordinates = {state:coord_to_pos(state[0], state[1], mdp.cols) for state in states}
 
         for e in range(1, episodes + 1):
-            print("doing e: ", e)
-            reward, i = run_single_trial(q_agent, mdp)   
-            print("here...")     
-    
-            if reward == 1.0:
-                rewards += int(reward)
-            else:
-                failures += 1
+            state = self.env.reset()
+            reward = 0
+            print("EPISODEEEE", e)
+            for i in range(iterations):
+                action = q_agent.best_action(positions[state], reward, e)
+                
+                if action is not None:
+                    state, reward, done, info = step(action) 
+                
+                if done:
+                    q_agent.best_action(positions[state], reward, e)
 
+                    if reward == 1.0:
+                        rewards += int(reward)
+                    else:
+                        failures += 1                    
+                    
+                    break
+            
             self._train.append([self.problem_id, e, i, int(reward), failures, rewards])
 
-            if i % 100 == 0:
+            if e % 100 == 0:
             #    if self.map_name_base == '4x4-base':
                 for state in states:
                     q_agent.update_u()
-                    index = coord_to_pos(state[0], state[1], mdp.cols)
+                    index = coordinates[state]
+                    #print(state, index)
                     self.graphs[index].append([e, q_agent.U[state]])
     
+
+        print(q_agent.U)
         graph_utility_estimates(self.graphs)
 
         q_agent.update_u()
@@ -348,3 +367,74 @@ class UofGQLearningAgent(MyAbstractAIAgent):
 
     def name(self):
         return 'rl'
+
+
+class QLearningAgentUofG(QLearningAgent):
+    """ An exploratory Q-learning agent. It avoids having to learn the transition
+        model because the Q-value of a state can be related directly to those of
+        its neighbors. [Figure 21.8]
+
+        Source of this class: 
+        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
+        - Modified for convenience
+    """
+
+    def f(self, u, n, a, noise):       
+        """ Exploration function."""
+        # print(n)
+        #if n < self.Ne:
+        #    return self.Rplus + noise
+        #if n < self.Ne:
+        #    return self.Rplus
+
+        #print("retturning ", u, a)
+        return u + noise
+
+    def best_action(self, new_state, new_reward, episode):
+        #print("best action: ", new_reward, new_state)
+        noise = np.random.random((1, 4)) / (episode)
+        # / (episode**2.)
+        #print(noise[0])
+        alpha, gamma, terminals = self.alpha, self.gamma, self.terminals
+        Q, Nsa = self.Q, self.Nsa
+        actions = self.actions_in_state
+        s, a, r = self.s, self.a, self.r
+
+        if a is not None: # corrected from the book, we check if the last action was none i.e. no prev state or a terminal state, the book says to check for s
+            Nsa[s, a] += 1
+            #print("updating ", s, a, " ---- ", r)
+            #print("Nsa[s, a]", Nsa[s, a])
+            Q[s, a] += alpha(Nsa[s, a]) * (r + 0.96 * max(Q[new_state, a1] for a1 in actions(new_state)) - Q[s, a])
+
+        if new_state in terminals:
+            self.Q[new_state, None] = new_reward
+            self.s = self.a = self.r = None
+        else:  
+            self.s, self.r = new_state, new_reward            
+            self.a = argmax(self.all_act, key=lambda a1: self.f(Q[new_state, a1], Nsa[s, a1], a1, noise[0][a1]))
+            if random.uniform(0, 1) < 0.075:
+                self.a = random.randint(0, len(self.all_act)-1)
+                #epsilon -= 10**-3
+
+        return self.a
+
+    def update_u(self):
+        self.U = QLearningAgentUofG.q_to_u(self.Q)
+
+    @staticmethod
+    def u_to_list(U):
+        return [[int(x), int(y), U[(x, y)]] for x, y in U]
+
+    @staticmethod
+    def q_to_u(Q):
+        """ Source of this function: 
+            - Labs from Artifial Intelligence (H), University of Glasgow class 2019
+        """
+        U = defaultdict(lambda: -1000.) 
+        
+        for state_action, value in Q.items():
+            state, action = state_action
+            if U[state] < value:
+                U[state] = value     
+
+        return U

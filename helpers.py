@@ -6,7 +6,6 @@ from search import *
 from mdp import MDP
 from rl import PassiveTDAgent
 from rl import QLearningAgent
-from rl import run_single_trial
 import matplotlib.pyplot as plt
 
 
@@ -37,12 +36,12 @@ def graph_utility_estimates(graphs):
     """ Source of this function: 
         - Labs from Artifial Intelligence (H), University of Glasgow class 2019
     """
+    
     for state, value in graphs.items():
         state_x, state_y = zip(*value)
-        print(state_x)
         plt.plot(state_x, state_y, label=str(state))
 
-    plt.ylim([-0.2, 1.2])
+    plt.ylim([-0.1, 1.2])
     plt.legend(loc='lower right')
     plt.xlabel('Iterations')
     plt.ylabel('U')
@@ -169,22 +168,6 @@ def policy_to_list(policy):
 
 # Reinforcement Learning. QLearning
 
-def u_to_list(U):
-    return [[int(x), int(y), U[(x, y)]] for x, y in U]
-
-def q_to_u(Q):
-    """ Source of this function: 
-        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
-    """
-    U = defaultdict(lambda: -1000.) 
-    
-    for state_action, value in Q.items():
-        state, action = state_action
-        if U[state] < value:
-            U[state] = value     
-
-    return U
-
 
 def compare_utils(U1, U2, H1="U1", H2="U2"):
     """ Source of this function: 
@@ -209,57 +192,6 @@ def compare_utils(U1, U2, H1="U1", H2="U2"):
     print("Max norm: %.5f" % (U_maxnorm))     
     print("2-norm : %.5f" % (U_2norm))     
 
-
-class QLearningAgentUofG(QLearningAgent):
-    """ An exploratory Q-learning agent. It avoids having to learn the transition
-        model because the Q-value of a state can be related directly to those of
-        its neighbors. [Figure 21.8]
-
-        Source of this class: 
-        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
-        - Modified for convenience
-    """
-
-    def f(self, u, n):       
-        """ Exploration function."""
-        # print(n)
-        # if n < self.Ne:
-        #     return self.Rplus
-
-        return u
-
-    def __call__(self, percept):
-        noise = np.random.random((1, env.action_space.n)) / (episode**2.)
-        alpha, gamma, terminals = self.alpha, self.gamma, self.terminals
-        Q, Nsa = self.Q, self.Nsa
-        actions_in_state = self.actions_in_state
-
-        s, a, r = self.s, self.a, self.r
-        s1, r1 = self.update_state(percept) # current state and reward;  s' and r'
-        print(s,a,r)
-
-        
-        if s in terminals: # if prev state was a terminal state it should be updated to the reward
-            Q[s, None] = r  
-        
-        if a is not None: # corrected from the book, we check if the last action was none i.e. no prev state or a terminal state, the book says to check for s
-            Nsa[s, a] += 1
-            Q[s, a] += alpha(Nsa[s, a]) * (r + gamma * max(Q[s1, a1] for a1 in actions_in_state(s1)) - Q[s, a])
-        
-        # Update for next iteration
-        if s in terminals:
-            self.s = self.a = self.r = None
-        else:
-            self.s, self.r = s1, r1
-            self.a = argmax(actions_in_state(s1), key=lambda a1: self.f(Q[s1, a1], Nsa[s, a]))
-            if random.uniform(0, 1) < 0.2:
-                self.a = random.randint(0, len(self.all_act)-1)
-                #epsilon -= 10**-3
-
-        return self.a
-
-    def update_u(self):
-        self.U = q_to_u(self.Q)
 
 # ______________________________________________________________________________
 
