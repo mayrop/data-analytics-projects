@@ -37,9 +37,6 @@ class MyAbstractAIAgent():
                                  map_name_base=map_name_base)
 
         self.problem_id = problem_id
-        # state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes
-        self.env_mapping = env2statespace(self.env)
-        self.coordinates = self.env_mapping[4]
         self.reset()
 
     def is_stochastic(self):
@@ -93,14 +90,6 @@ class MyAbstractAIAgent():
         # by default no seed for abstract agent
         return None
 
-    def policy(self):
-        try:
-            return(self._policy)
-        except AttributeError:
-            self.train()
-
-        return self._policy
-
     def alias(self):
         return 'out_{}_{}_{}_'.format(self.name(), self.problem_id, 
                                      self.map_name_base)
@@ -108,9 +97,9 @@ class MyAbstractAIAgent():
     def write_eval_files(self):
         def data_for_file(name):
             if name == 'policy':
-                return policy_to_list(self.policy())
+                return policy_to_list(self.policy)
             if name == 'u':
-                return QLearningAgentUofG.u_to_list(self.u())
+                return u_to_list(self.u())
             if name == 'eval':
                 return self.eval
             if name == 'q':
@@ -132,25 +121,31 @@ class MyAbstractAIAgent():
                 data = [self.header(file)] + data_for_file(file)
                 np.savetxt(filename, data, delimiter=",", fmt='%s') 
 
-    def header(self, index):
-        if index == 'eval':
-            return ['id', 'episode', 'iteration', 'action',
-                'reward', 'rewards', 'failures', 'timeouts']
+    def header(self, key):
+        headers = {
+            'eval': [
+                'id', 'episode', 'iteration', 'action',
+                'reward', 'rewards', 'failures', 'timeouts'
+            ],
+            'policy': [
+                'x', 'y', 'action'
+            ],
+            'u': [
+                'x', 'y', 'u'
+            ],
+            'train': [
+                'id', 'episode', 'iteration', 'reward', 
+                'rewards', 'failures', 'timeouts'
+            ],
+            'graphs': [
+                'x', 'y', 'value'
+            ]
+        }
 
-        if index == 'policy':
-            return ['x', 'y', 'action']
+        if key in headers:
+            return headers[key]
 
-        if index == 'u':
-            return ['x', 'y', 'u'] 
 
-        if index == 'train':
-            return ['id', 'episode', 'iteration', 'reward', 
-                'rewards', 'failures', 'timeouts']
-
-        if index == 'graphs':
-            return ['x', 'y', 'value']             
-
-        return []           
 
 ################################
 ################################
@@ -204,17 +199,20 @@ class SimpleAgent(MyAbstractAIAgent):
         return 0.0
 
     def action(self, position):
-        return self.policy()[pos_to_coord(position, self.env.ncol)]
+        return self.policy[pos_to_coord(position, self.env.ncol)]
 
     def train(self):
         # locations, actions, state_initial_id, state_goal_id, my_map
-        graph = UndirectedGraph(self.env_mapping[1])
-        graph.locations = self.env_mapping[0]
-        problem = GraphProblem(self.env_mapping[2], 
-                               self.env_mapping[3], graph)
+        # state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes
+        mapping = env2statespace(self.env)        
+        self.env_mapping = mapping
+        graph = UndirectedGraph(mapping[1])
+        graph.locations = mapping[0]
+        problem = GraphProblem(mapping[2], 
+                               mapping[3], graph)
 
         node = astar_search(problem=problem, h=None)
-        solution = [self.env_mapping[2]] + node.solution()
+        solution = [mapping[2]] + node.solution()
         
         def map_from_states(x1, x2, y1, y2):
             if x2 > x1:
@@ -226,7 +224,7 @@ class SimpleAgent(MyAbstractAIAgent):
             if y2 < y1:
                 return 3 # "up"
 
-        self._policy = {}
+        self.policy = {}
 
         for i in range(1, len(solution)):
             prev = graph.locations[solution[i - 1]]
@@ -234,7 +232,7 @@ class SimpleAgent(MyAbstractAIAgent):
             action = map_from_states(x1=prev[0], x2=curr[0], 
                                      y1=prev[1], y2=curr[1])
 
-            self._policy[(prev[0], prev[1])] = action
+            self.policy[(prev[0], prev[1])] = action
 
     def files(self):
         return ['eval', 'policy']
@@ -259,17 +257,11 @@ class UofGPassiveAgent(MyAbstractAIAgent):
 
     def solve(self, episodes=200, iterations=200, reset=True, seed=False):
         mdp = EnvMDP(self.env)
-        self._policy = policy_iteration(mdp)
-        self._U = value_iteration(mdp, epsilon=0.000000000001)
+        self.policy = policy_iteration(mdp)
+        self.U = value_iteration(mdp, epsilon=0.000000000001)
 
     def files(self):
         return ['policy', 'u']
-
-    def policy(self):
-        return self._policy
-
-    def u(self):
-        return self._U
 
     def name(self):
         return 'passive'
@@ -292,23 +284,31 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
             return -0.7
 
         # this should be modified for diff env
-        return -0.15
+        return -0.05
+
+    def files(self):
+        return ['eval', 'u', 'policy', 'q', 'graphs', 'train']        
+
+    def action(self, position):
+        return self.policy[pos_to_coord(position, self.env.ncol)]
+
+    def name(self):
+        return 'rl'
 
     def train(self):
         mdp = EnvMDP(self.env)
-        q_agent = QLearningAgentUofG(mdp, Ne=5, Rplus=2, alpha=lambda n: 60./(59+n))
-
         states = mdp.states
-        self.graphs = {coord_to_pos(state[0], state[1], mdp.cols):[] for state in states}
-
         episodes = 40000
         iterations = 1000
         rewards = 0
         failures = 0
         timeouts = 0
-        self._train = []
         cols = self.env.ncol
         step = self.env.step
+
+        self.init_trianing(mdp, Ne=5, Rplus=2, alpha=lambda n: 60./(59+n))
+        self.graphs = {coord_to_pos(state[0], state[1], mdp.cols):[] for state in states}
+        self._train = []
 
         positions = {coord_to_pos(state[0], state[1], mdp.cols):state for state in states}
         coordinates = {state:coord_to_pos(state[0], state[1], mdp.cols) for state in states}
@@ -316,15 +316,16 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
         for e in range(1, episodes + 1):
             state = self.env.reset()
             reward = 0
-            print("EPISODEEEE", e)
+            print("Episode", e)
+
             for i in range(iterations):
-                action = q_agent.best_action(positions[state], reward, e)
+                action = self.best_action(positions[state], reward, e)
                 
                 if action is not None:
                     state, reward, done, info = step(action) 
                 
                 if done:
-                    q_agent.best_action(positions[state], reward, e)
+                    self.best_action(positions[state], reward, e)
 
                     if reward == 1.0:
                         rewards += int(reward)
@@ -342,52 +343,47 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
             if e % 100 == 0:
             #    if self.map_name_base == '4x4-base':
                 for state in states:
-                    q_agent.update_u()
+                    self.update_u()
                     index = coordinates[state]
-                    #print(state, index)
-                    self.graphs[index].append([e, q_agent.U[state]])
+                    self.graphs[index].append([e, self.U[state]])
     
-
-        print(q_agent.U)
         graph_utility_estimates(self.graphs)
 
-        q_agent.update_u()
+        self.update_u()
 
-        self._Q = []
-        self._policy = {}
-        self._U = q_agent.U
+        self.Q = []
+        self.policy = {}
 
-        for state_action, value in list(q_agent.Q.items()):
+        for state_action, value in list(self.training_Q.items()):
             state, action = state_action
             index = coord_to_pos(state[0], state[1], mdp.cols)
-            self._Q.append([index, action, value])
-            self._policy[state] = argmax(mdp.actlist, key=lambda a1: q_agent.Q[state, a1])
+            self.Q.append([index, action, value])
+            self.policy[state] = argmax(mdp.actlist, key=lambda a1: self.training_Q[state, a1])
 
-    def u(self):
-        return self._U
+    def init_trianing(self, mdp, alpha, Ne, Rplus):
+        self.gamma = mdp.gamma
+        self.terminals = mdp.terminals
+        self.all_act = mdp.actlist
+        self.Ne = Ne  # iteration limit in exploration function
+        self.Rplus = Rplus  # large value to assign before iteration limit
+        self.training_Q = defaultdict(float)
+        self.Nsa = defaultdict(float)
+        self.s = None
+        self.a = None
+        self.r = None
 
-    def q(self):
-        return self._Q
+        if alpha:
+            self.alpha = alpha
+        else:
+            self.alpha = lambda n: 1./(1+n)  # udacity video
 
-    def files(self):
-        return ['eval', 'u', 'policy', 'q', 'graphs', 'train']        
-
-    def action(self, position):
-        return self.policy()[pos_to_coord(position, self.env.ncol)]
-
-    def name(self):
-        return 'rl'
-
-
-class QLearningAgentUofG(QLearningAgent):
-    """ An exploratory Q-learning agent. It avoids having to learn the transition
-        model because the Q-value of a state can be related directly to those of
-        its neighbors. [Figure 21.8]
-
-        Source of this class: 
-        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
-        - Modified for convenience
-    """
+    def training_actions(self, state):
+        """ Return actions possible in given state.
+            Useful for max and argmax. """
+        if state in self.terminals:
+            return [None]
+        else:
+            return self.all_act
 
     def f(self, u, n, a, noise):       
         """ Exploration function."""
@@ -406,8 +402,8 @@ class QLearningAgentUofG(QLearningAgent):
         # / (episode**2.)
         #print(noise[0])
         alpha, gamma, terminals = self.alpha, self.gamma, self.terminals
-        Q, Nsa = self.Q, self.Nsa
-        actions = self.actions_in_state
+        Q, Nsa = self.training_Q, self.Nsa
+        actions = self.training_actions
         s, a, r = self.s, self.a, self.r
 
         if a is not None: # corrected from the book, we check if the last action was none i.e. no prev state or a terminal state, the book says to check for s
@@ -417,7 +413,7 @@ class QLearningAgentUofG(QLearningAgent):
             Q[s, a] += alpha(Nsa[s, a]) * (r + 0.95 * max(Q[new_state, a1] for a1 in actions(new_state)) - Q[s, a])
 
         if new_state in terminals:
-            self.Q[new_state, None] = new_reward
+            self.training_Q[new_state, None] = new_reward
             self.s = self.a = self.r = None
         else:  
             self.s, self.r = new_state, new_reward            
@@ -429,22 +425,4 @@ class QLearningAgentUofG(QLearningAgent):
         return self.a
 
     def update_u(self):
-        self.U = QLearningAgentUofG.q_to_u(self.Q)
-
-    @staticmethod
-    def u_to_list(U):
-        return [[int(x), int(y), U[(x, y)]] for x, y in U]
-
-    @staticmethod
-    def q_to_u(Q):
-        """ Source of this function: 
-            - Labs from Artifial Intelligence (H), University of Glasgow class 2019
-        """
-        U = defaultdict(lambda: -1000.) 
-        
-        for state_action, value in Q.items():
-            state, action = state_action
-            if U[state] < value:
-                U[state] = value     
-
-        return U
+        self.U = q_to_u(self.training_Q)  
