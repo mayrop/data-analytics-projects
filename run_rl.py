@@ -13,7 +13,7 @@ def main(argv):
         exit()
 
     problem_id = int(argv[0])
-    episodes = 10000
+    episodes = 50000
     grid = '8x8-base'
 
     if len(argv) > 1 and str.isdigit(argv[1]):
