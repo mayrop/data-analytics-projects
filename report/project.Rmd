@@ -1,0 +1,216 @@
+---
+title: "Artificial Intelligence 5M - Loch Lomond Lake"
+author: "Mayra A. Valdes Ibarra - 2419105v"
+header-includes: #allows you to add in your own Latex packages
+- \usepackage{float} #use the 'float' package
+- \floatplacement{figure}{H} #make every figure with caption = h    
+output:
+  pdf_document:
+    latex_engine: pdflatex
+    number_sections: yes
+    keep_tex: yes
+    fig_cap: yes
+fontsize: '11pt'
+---
+
+```{r}
+library(plyr)
+library(dplyr)
+library(data.table)
+library(tidyr)
+library(ggplot2)
+library(scales)
+library(Hmisc)
+library(kableExtra)
+library(gridExtra)
+library(grid)
+library(gtable)
+library(gridExtra)
+library(grid)
+library(egg)
+library(reshape2)
+library(grid)
+```
+
+```{r setup, include=FALSE}
+#fig_caption: yes
+library(knitr)
+knitr::opts_chunk$set(echo = FALSE, fig.pos= "h")
+#knitr::opts_chunk$set(fig.pos = 'H')
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+
+source("functions.R")
+
+#data <- read.csv("out_rl_1_8x8-base__eval.csv")
+#train <- read.csv("out_rl_2_8x8-base__train.csv")
+#train1 <- train[1:10000,]
+#train2 <- train[10001:20000,]
+#train3 <- train[20001:30000,]
+#train4 <- train[30001:40000,]
+
+#data <- train4 %>%
+#  select(episode, rewards, iteration) %>%
+#  mutate(mean_rewards=rewards/episode)
+
+#plot(data$episode, data$mean_rewards, type="l")
+
+#train2 <- train[,]
+#plot(train2$episode, train2$iteration)
+```
+
+```{r lake, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.height = 4, fig.width = 8, out.width = '70%', fig.align = "center"}
+# Plot inspired in: http://rgraphgallery.blogspot.com/2013/04/rg74-triple-three-heatmap-plot-one.html
+
+palette <- c("#f1c40f", "#48dbfb", "#ff5e57", "#badc58")
+names(palette) <- c("S", "F", "H", "G")
+#lakes$grid4 = read.csv("out/grids-4.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+
+#data.frame.grid <- create_grid(policy, levels=FALSE)
+policy <- read.csv("out/out_rl_1_8x8-base__policy.csv")
+u <- read.csv("out/out_rl_1_8x8-base__u.csv")
+
+grids <- list()
+grids[[8]] <- read.csv("out/grids-8.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+grids[[4]] <- read.csv("out/grids-4.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+grids[[8]][,"V1"] <- as.numeric(grids[[8]][,"V1"])
+grids[[4]][,"V1"] <- as.numeric(grids[[4]][,"V1"])
+
+lakes <- list()
+lakes[[4]] <- list()
+lakes[[8]] <- list()
+
+
+
+for (i in c(4, 8)) {
+  for (id in 1:8) {
+    # take the grid from i (4 or 8) grid and take the problem id "id"
+    lake <- grids[[i]][id,-1]
+    lake <- as.factor(lake)
+    lakes[[i]][[id]] <- create_grid(lake, i)
+  }
+}
+#lakes[[8]][[2]]$policy <- 
+lakes[[8]][[2]] <- lakes[[8]][[2]] %>% left_join(policy, by=c("x", "y"))
+lakes[[8]][[2]] <- lakes[[8]][[2]] %>% left_join(u, by=c("x", "y"))
+
+x<-ggplot(data = lakes[[8]][[2]], mapping = aes(x = x_grid, y = y_grid, fill = u)) +
+  geom_tile() +
+  geom_text(aes(label = round(u, digits=3)), position = position_dodge(width=0.9), size=3) +
+  xlab(label = "Sample") +
+  scale_fill_gradient(name = "Sqrt(Abundance)",
+                      low = "#1d4877",
+                      high = "#ee3e32")
+
+lakes[[8]][[2]]$action_grid <- apply(lakes[[8]][[2]], 1, function(x) {
+  if (x["val"] %in% c("H", "G")) {
+    return(x["val"])
+  }
+  if (is.na(x["action"])) {
+    return("<NA>")
+  }
+  if (x["action"] == "right") {
+    return(">")
+  }
+  if (x["action"] == "up") {
+    return("^")
+  } 
+  if (x["action"] == "down") {
+    return("v")
+  }   
+  if (x["action"] == "left") {
+    return("<")
+  }
+  return(x["val"])
+})
+
+
+# Caption
+plot <- finish_plot(ggplot(lakes[[4]][[1]], aes(x, y)))
+plot2 <- finish_plot(ggplot(lakes[[8]][[1]], aes(x, y)))
+
+grid_arrange_shared_legend(
+  plot + theme(plot.margin=unit(c(2,2,2,2), "cm")),
+  plot2 + theme(plot.margin=unit(c(0.2,0.2,0.2,0.2), "cm"))
+)
+
+```
+
+```{r lakes, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%'}
+
+grid.arrange(
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid))))) + 
+    labs(caption = "4x4 Grid Problem 0"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[2]], aes(x_grid, y_grid))))) + 
+    labs(caption = "4x4 Grid Problem 1"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[3]], aes(x_grid, y_grid))))) + 
+    labs(caption = "4x4 Grid Problem 2"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[4]], aes(x_grid, y_grid))))) + 
+    labs(caption = "4x4 Grid Problem 3"),  
+  ncol=4
+)
+```
+
+
+```{r lakes3, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 10, out.width = '90%'}
+margin = theme(plot.margin = unit(c(2,2,2,2), "cm"))
+
+grid.arrange(
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid))))) + 
+    labs(caption = "8x8 Grid Problem 0"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid))))) + 
+    labs(caption = "8x8 Grid Problem 2"),
+  ncol=2
+)
+
+grid.arrange(
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid))))) + 
+    labs(caption = "8x8 Grid Problem 1"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
+    labs(caption = "8x8 Grid Problem 2"),
+  ncol=2
+)
+
+```
+
+```{r data, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+# This environment is derived from the FrozenLake from https://gym.openai.com/envs/#toy_text
+
+# Winter is in Scotland. You and your friends were tossing around a frisbee at Loch Lomond
+# when you made a wild throw that left the frisbee out in the middle of the lake.
+# The water is mostly frozen, but there are a few holes where the ice has melted.
+# If you step into one of those holes, you'll fall into the freezing water.
+# At this time, there's an international frisbee shortage, so it's absolutely imperative that
+# you navigate across the lake and retrieve the disc.
+
+# However, the ice is slippery, so you won't always move in the direction you intend.
+# The surface is described using a grid like the following (for 8x8) with a unknown `problem_id`:
+
+# The specific environment/problem under consideration is a grid-world with a starting position (S), obstacles # (H) and a final goal (G). The task is to get from S to G. The environment is defined in uofgsocsai.py
+# via the class LochLomondEnv including documentation relating to the setting, specific states, parameters
+# etc. An example of how to instantiate the environment and navigate it using random actions is provided
+# in lochlomond_demo.py .
+# You must consider three agent types: a senseless/random agent, a simple agent and a reinforcement agent
+# based on the requirements listed in the following sections. Your agents will be tested against other instances of the same problem type, i.e., you can not (successfully) hard-code the solution. You will have
+# access to eighth specific training instances of the environment determined by the value of a single variable
+# problem_id.
+# Your agents and findings should be documented in a short (max 1500 word) technical report accompanied
+# by the actual implementation/code and evaluation scripts.
+
+```
+
+# Introduction
+The Loch Lomond Frozen Lake environment is a customized Open AI Gym derived from FrozenLake (https://gym.openai.com/envs/#toy_text).
+
+The goal of this report is to design, implement and evaluate three diferent virtual agents which are able to navigate across the Loch Lomond Frozen Lake grid and retrieve the frisbee disc. Three different agents are analyzed: a senseless agent, a simple agent and a reinforcement agent. 
+
+# Agents
+## Senseless Agent
+### Evaluation
+## Simple Agent
+### Evaluation
+## Reinforcement Learning Agent
+### Evaluation
+
+# Conclusions {#sec:con}
+
+[^1]: Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print.

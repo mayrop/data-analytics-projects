@@ -56,6 +56,8 @@ class MyAbstractAIAgent():
         for e in range(1, episodes + 1): # iterate over episodes
             state = self.env.reset()
             self.set_episode_seed(e, seed)
+            if e % 100 == 0:
+                print("Solving Episode", e)
 
             for i in range(1, iterations+1):
                 action = self.action(state) 
@@ -80,7 +82,7 @@ class MyAbstractAIAgent():
     def action(self, i):
         raise NotImplementedError
 
-    def train(self):
+    def train(self, episodes, iterations):
         raise NotImplementedError        
 
     def env(self):
@@ -174,13 +176,13 @@ class RandomAgent(MyAbstractAIAgent):
 
     def set_episode_seed(self, episode, seed=None):
         if seed is not None:
-            self.env.seed(episode)
+            #self.env.seed(episode)
             self.env.action_space.seed(episode)
 
     def action(self, position):
         return self.env.action_space.sample()
 
-    def train(self):
+    def train(self, episodes, iterations):
         return
 
     def files(self):
@@ -209,7 +211,7 @@ class SimpleAgent(MyAbstractAIAgent):
     def action(self, position):
         return self.policy[pos_to_coord(position, self.env.ncol)]
 
-    def train(self):
+    def train(self, episodes, iterations):
         # locations, actions, state_initial_id, state_goal_id, my_map
         # state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes
         self.env_mapping = env2statespace(self.env)
@@ -241,8 +243,13 @@ class SimpleAgent(MyAbstractAIAgent):
 
             self.policy[(prev[0], prev[1])] = action
 
+        for i in graph.locations:
+            state = graph.locations[i]
+            if state not in self.policy:
+                self.policy[state] = None
+
     def files(self):
-        return ['eval', 'policy']
+        return ['eval', 'policy', 'policy_arrows']
 
     def name(self):
         return 'simple'
@@ -343,7 +350,7 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
                                rewards, failures, timeouts])
 
             if e % 100 == 0:
-                print("Episode", e)
+                print("Train Episode", e)
                 for state in states:
                     self.update_u()
                     index = coordinates[state]
