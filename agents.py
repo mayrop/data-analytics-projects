@@ -106,24 +106,18 @@ class MyAbstractAIAgent():
             if name == 'q':
                 return self.Q  
             if name == 'train':
-                return self._train                   
-            if name == 'graphs':
-                return self.graphs             
+                return self._train            
 
             return []
 
         for file in self.files():
             print("Writing file...: ", file)
-            if file == 'graphs':
-                filename = 'out/{}_{}.json'.format(self.alias(), file)
-                with open(filename, 'w') as outfile:
-                    json.dump(data_for_file(file), outfile)
-            elif file == 'policy_arrows':
-                filename = 'out/{}_{}.txt'.format(self.alias(), file)
+            if file == 'policy_arrows':
+                filename = '{}_{}.txt'.format(self.alias(), file)
                 data = data_for_file(file)
                 np.savetxt(filename, data, delimiter="\t", fmt='%s') 
             else:
-                filename = 'out/{}_{}.csv'.format(self.alias(), file)
+                filename = '{}_{}.csv'.format(self.alias(), file)
                 data = [self.header(file)] + data_for_file(file)
                 np.savetxt(filename, data, delimiter=",", fmt='%s') 
 
@@ -138,10 +132,7 @@ class MyAbstractAIAgent():
             ],
             'train': [
                 'id', 'episode', 'iteration', 'reward', 
-                'rewards', 'failures', 'timeouts'
-            ],
-            'graphs': [
-                'x', 'y', 'value'
+                'rewards', 'mean_rewards', 'failures', 'timeouts'
             ],
             'q': [
                 'position', 'x', 'y', 'action', 'action_friendly', 'value'
@@ -266,7 +257,7 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
         return -0.08
 
     def files(self):
-        return ['evaluation', 'u', 'policy_arrows', 'q', 'graphs', 'train']        
+        return ['evaluation', 'u', 'policy_arrows', 'q', 'train']        
 
     def action(self, position):
         return self.policy[pos_to_coord(position, self.env.ncol)]
@@ -314,7 +305,7 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
                 timeouts += 1
             
             self._train.append([self.problem_id, e, i, int(reward), 
-                               rewards, failures, timeouts])
+                               rewards, rewards / e, failures, timeouts])
 
             if e % 100 == 0:
                 print("Train Episode", e)
@@ -368,13 +359,6 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
     def f(self, u, n, a, noise):       
         """ Exploration function."""
 
-        if self.map_name_base == '4x4-base':
-            if n < self.Ne:
-                return self.Rplus
-
-            return u
-
-        # for 8x8 grid
         return u + noise
 
     def best_action(self, new_state, new_reward, episode):
