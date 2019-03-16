@@ -34,19 +34,11 @@ def main(argv):
     episodes = 10000
     seed = True
 
-    if len(argv) > 1 and str.isdigit(argv[1]):
-        episodes = int(argv[1])
-
-    if len(argv) > 2:
-        grid = '{}_{}-base'.format(argv[2], argv[2])        
-
     print('Solving with Random Agent')
     print('Problem: ', problem_id)
     print('Episodes that will run...: ', episodes)
     print("\n\n")
 
-    print("It was found out that setting the seed for random was slow.. you can turn it off with seed=False")
-    print("More info in documentation...")
     agent = RandomAgent(problem_id=problem_id) 
     agent.solve(episodes=episodes, seed=True)
     
@@ -56,33 +48,14 @@ def main(argv):
     agent.write_eval_files()
 
     evaluation = np.array(agent.eval)
-    plt.style.use('classic')
-    print(evaluation)
-    y = evaluation[:,6]
-    x = evaluation[:,1]
-    print(y)
-    # f, ax = plt.subplots()
-    # ax.plot(range(100))
-
-    # ymin, ymax = ax.get_ylim()
-    # ax.set_yticks(np.round(np.linspace(ymin, ymax, 5), 2))
-
-    #print(y[100:200])
-
-    # fig2 = plt.figure(figsize=(10,5))
-    # print(pd.Series(y).rolling(10, min_periods=10).mean())
-    # rewards = pd.Series(y).mean()
-
-    plt.plot(y)
-    # plt.ylim([0, #0.025])
     
-
-    # #plt.legend(loc='lower right')
-    # plt.xlabel('Episodes')
-    # plt.ylabel('Mean Reward')
-    plt.savefig('plt2.png')
-    # plt.close(fig2)
-
+    y = pd.to_numeric(evaluation[:,6])
+    x = pd.to_numeric(evaluation[:,1])
+    plt.plot(x, y)
+    plt.xlabel('Episodes')
+    plt.ylabel('Mean Reward')
+    plt.savefig('out_random_{}_mean_reward.png'.format(argv[0]))
+    plt.close()
 
 if __name__ == '__main__':
     main(sys.argv[1:])
