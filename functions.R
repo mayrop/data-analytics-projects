@@ -1,4 +1,4 @@
-grid_arrange_shared_legend <-function(..., ncol = length(list(...)), nrow = 1, position = c("bottom", "right")) {
+grid_arrange_shared_legend <-function(..., ncol = length(list(...)), nrow = 1, position = c("bottom", "right", "top")) {
   plots <- list(...)
   position <- match.arg(position)
   g <-
@@ -11,6 +11,12 @@ grid_arrange_shared_legend <-function(..., ncol = length(list(...)), nrow = 1, p
   
   combined <- switch(
     position,
+    "top" = arrangeGrob(
+      legend,
+      do.call(arrangeGrob, gl),
+      ncol = 1,
+      heights = lheight, unit.c(unit(1, "npc") - lheight)
+    ),
     "bottom" = arrangeGrob(
       do.call(arrangeGrob, gl),
       legend,
@@ -34,8 +40,10 @@ grid_arrange_shared_legend <-function(..., ncol = length(list(...)), nrow = 1, p
 
 create_grid <- function(grid, ncol, levels=TRUE) {
   data.frame <- data.frame(
-    x=rep(1:ncol, times=ncol),
-    y=rep(ncol:1, times=ncol),
+    x_grid=rep(1:ncol, times=ncol),
+    y_grid=rep(ncol:1, each=ncol),
+    x=rep(0:(ncol-1), times=ncol),
+    y=rep(0:(ncol-1), each=ncol),
     val=grid
   )
   
@@ -45,26 +53,14 @@ create_grid <- function(grid, ncol, levels=TRUE) {
   return(data.frame)
 }
 
-grids <- list()
-grids[[8]] = read.csv("out/grids-8.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
-grids[[4]] = read.csv("out/grids-4.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
-grids[[8]][,"V1"] <- as.numeric(grids[[8]][,"V1"])
-grids[[4]][,"V1"] <- as.numeric(grids[[4]][,"V1"])
-
-lakes <- list()
-lakes[[4]] <- list()
-lakes[[8]] <- list()
-
-for (i in c(4, 8)) {
-  for (id in 1:8) {
-    # take the grid from i (4 or 8) grid and take the problem id "id"
-    lake <- grids[[i]][id,-1]
-    lake <- as.factor(lake)
-    lakes[[i]][[id]] <- create_grid(lake, i)
+get_label <- function(val, action_grid, key) {
+  if (key == "policy") {
+    return(action_grid)
   }
+  return(val)
 }
 
-get_label <- function(x, y, val) {
+get_label2 <- function(x, y, val) {
   return(val)
   return(data.frame.grid[data.frame.grid$x == x & data.frame.grid$y == y, "val"])
   
@@ -74,9 +70,9 @@ get_label <- function(x, y, val) {
   return("X")
 }
 
-finish_plot <- function(plot) {
+finish_plot <- function(plot, key) {
   plot <- plot + geom_tile(aes(fill = val), colour = "white") + 
-    geom_text(aes(label = get_label(x,y,val)), position = position_dodge(width=0.9), size=5) +
+    geom_text(aes(label = get_label(val, action_grid, key)), position = position_dodge(width=0.9), size=5) +
     scale_fill_manual(values=palette, labels = c("Start (safe)", "Frozen (safe)", "Hole", "Goal")) + 
     scale_x_discrete(expand=c(0,0)) +
     scale_y_discrete(expand=c(0,0)) +
@@ -87,3 +83,11 @@ finish_plot <- function(plot) {
   return(plot)
 }
 
+remove_legend <- function(plot) {
+  return(plot + theme(legend.title = element_blank()) + theme(legend.position = "none"))
+}
+
+fix_caption <- function(plot) {
+  return(plot + theme(plot.margin=unit(c(0.2,0.2,0.2,0.2), "cm")) 
+         + theme(plot.caption = element_text(hjust = 0.5, size = 14)))
+}

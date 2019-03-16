@@ -17,20 +17,6 @@ if len(sys.argv) < 1:
     print("usage: run_generation.py <type>")
     exit()
 
-def generate_grids(base):
-    grids = []
-    for i in range(base):
-        map_name_base = '{}x{}-base'.format(base, base)
-        env = LochLomondEnv(problem_id=i, is_stochastic=True, 
-                            reward_hole=-0.02, map_name_base=map_name_base)
-        print("I: ", i, " - base: ", base)
-        env.render()
-        grid = EnvMDP.to_decoded(env).reshape(env.nrow * env.ncol)
-        grids.append(np.hstack(([i], grid)))
-    
-    return grids
-
-
 def main():
     """Main Program."""
     for i in [4, 8]:
@@ -41,7 +27,6 @@ def main():
 
     file.close()    
     #np.savetxt('out/grids.csv', grids, delimiter=",", fmt='%s') 
-
 
 if __name__ == '__main__':
     main()

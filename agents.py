@@ -51,8 +51,8 @@ class MyAbstractAIAgent():
         self.eval = []
         self.timeouts = 0
 
-    def solve(self, episodes=10000, iterations=1000, reset=True, seed=False):
-        self.train()
+    def solve(self, episodes=10000, iterations=1000, seed=None, gamma=0.95):
+        self.train(episodes=episodes, iterations=iterations)
         for e in range(1, episodes + 1): # iterate over episodes
             state = self.env.reset()
             self.set_episode_seed(e, seed)
@@ -86,7 +86,7 @@ class MyAbstractAIAgent():
     def env(self):
         return self.env
 
-    def set_episode_seed(self, seed, force=False):
+    def set_episode_seed(self, episode, seed=None):
         # by default no seed for abstract agent
         return None
 
@@ -98,12 +98,14 @@ class MyAbstractAIAgent():
         def data_for_file(name):
             if name == 'policy':
                 return policy_to_list(self.policy)
+            if name == 'policy_arrows':
+                return policy_to_arrows(self.policy, self.env.ncol, self.env.ncol)
             if name == 'u':
-                return u_to_list(self.u())
+                return u_to_list(self.U)
             if name == 'eval':
                 return self.eval
             if name == 'q':
-                return self._Q  
+                return self.Q  
             if name == 'train':
                 return self._train                   
             if name == 'graphs':
@@ -112,12 +114,17 @@ class MyAbstractAIAgent():
             return []
 
         for file in self.files():
+            print("Writing file...: ", file)
             if file == 'graphs':
-                filename = '{}_{}.json'.format(self.alias(), file)
+                filename = 'out/{}_{}.json'.format(self.alias(), file)
                 with open(filename, 'w') as outfile:
                     json.dump(data_for_file(file), outfile)
+            elif file == 'policy_arrows':
+                filename = 'out/{}_{}.txt'.format(self.alias(), file)
+                data = data_for_file(file)
+                np.savetxt(filename, data, delimiter="\t", fmt='%s') 
             else:
-                filename = '{}_{}.csv'.format(self.alias(), file)
+                filename = 'out/{}_{}.csv'.format(self.alias(), file)
                 data = [self.header(file)] + data_for_file(file)
                 np.savetxt(filename, data, delimiter=",", fmt='%s') 
 
@@ -139,13 +146,14 @@ class MyAbstractAIAgent():
             ],
             'graphs': [
                 'x', 'y', 'value'
+            ],
+            'q': [
+                'position', 'x', 'y', 'action', 'action_friendly', 'value'
             ]
         }
 
         if key in headers:
             return headers[key]
-
-
 
 ################################
 ################################
@@ -164,10 +172,10 @@ class RandomAgent(MyAbstractAIAgent):
     def reward_hole(self):
         return 0.0
 
-    def set_episode_seed(self, seed, force=False):
-        if force:
-            self.env.seed(seed)
-            self.env.action_space.seed(seed)
+    def set_episode_seed(self, episode, seed=None):
+        if seed is not None:
+            self.env.seed(episode)
+            self.env.action_space.seed(episode)
 
     def action(self, position):
         return self.env.action_space.sample()
@@ -204,15 +212,14 @@ class SimpleAgent(MyAbstractAIAgent):
     def train(self):
         # locations, actions, state_initial_id, state_goal_id, my_map
         # state_space_locations, state_space_actions, state_initial_id, state_goal_id, states_indexes
-        mapping = env2statespace(self.env)        
-        self.env_mapping = mapping
-        graph = UndirectedGraph(mapping[1])
-        graph.locations = mapping[0]
-        problem = GraphProblem(mapping[2], 
-                               mapping[3], graph)
+        self.env_mapping = env2statespace(self.env)
+        graph = UndirectedGraph(self.env_mapping[1])
+        graph.locations = self.env_mapping[0]
+        problem = GraphProblem(self.env_mapping[2], 
+                               self.env_mapping[3], graph)
 
         node = astar_search(problem=problem, h=None)
-        solution = [mapping[2]] + node.solution()
+        solution = [self.env_mapping[2]] + node.solution()
         
         def map_from_states(x1, x2, y1, y2):
             if x2 > x1:
@@ -280,14 +287,12 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
 
     def reward_hole(self):
         if self.map_name_base == '4x4-base':
-            #print("REWARD HOLE!!!")
             return -0.7
 
-        # this should be modified for diff env
         return -0.05
 
     def files(self):
-        return ['eval', 'u', 'policy', 'q', 'graphs', 'train']        
+        return ['eval', 'u', 'policy', 'policy_arrows', 'q', 'graphs', 'train']        
 
     def action(self, position):
         return self.policy[pos_to_coord(position, self.env.ncol)]
@@ -295,11 +300,9 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
     def name(self):
         return 'rl'
 
-    def train(self):
-        mdp = EnvMDP(self.env)
+    def train(self, episodes=10000, iterations=1000, gamma=0.95):
+        mdp = EnvMDP(self.env, gamma=gamma)
         states = mdp.states
-        episodes = 40000
-        iterations = 1000
         rewards = 0
         failures = 0
         timeouts = 0
@@ -316,7 +319,6 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
         for e in range(1, episodes + 1):
             state = self.env.reset()
             reward = 0
-            print("Episode", e)
 
             for i in range(iterations):
                 action = self.best_action(positions[state], reward, e)
@@ -341,24 +343,28 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
                                rewards, failures, timeouts])
 
             if e % 100 == 0:
-            #    if self.map_name_base == '4x4-base':
+                print("Episode", e)
                 for state in states:
                     self.update_u()
                     index = coordinates[state]
                     self.graphs[index].append([e, self.U[state]])
     
-        graph_utility_estimates(self.graphs)
+        # graph_utility_estimates(self.graphs)
 
         self.update_u()
 
         self.Q = []
         self.policy = {}
+        actions = self.training_actions
 
         for state_action, value in list(self.training_Q.items()):
             state, action = state_action
-            index = coord_to_pos(state[0], state[1], mdp.cols)
-            self.Q.append([index, action, value])
-            self.policy[state] = argmax(mdp.actlist, key=lambda a1: self.training_Q[state, a1])
+
+            self.Q.append([coordinates[state], state[0], state[1], action, to_human(action), value])
+            self.policy[state] = argmax(actions(state), key=lambda a1: self.training_Q[state, a1])
+
+    def update_u(self):
+        self.U = q_to_u(self.training_Q)  
 
     def init_trianing(self, mdp, alpha, Ne, Rplus):
         self.gamma = mdp.gamma
@@ -387,42 +393,36 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
 
     def f(self, u, n, a, noise):       
         """ Exploration function."""
-        # print(n)
-        #if n < self.Ne:
-        #    return self.Rplus + noise
-        #if n < self.Ne:
-        #    return self.Rplus
 
-        #print("retturning ", u, a)
+        if self.map_name_base == '4x4-base':
+            if n < self.Ne:
+                return self.Rplus
+
+            return u
+
+        # for 8x8 grid
         return u + noise
 
     def best_action(self, new_state, new_reward, episode):
-        #print("best action: ", new_reward, new_state)
         noise = np.random.random((1, 4)) / (episode)
-        # / (episode**2.)
-        #print(noise[0])
         alpha, gamma, terminals = self.alpha, self.gamma, self.terminals
         Q, Nsa = self.training_Q, self.Nsa
         actions = self.training_actions
         s, a, r = self.s, self.a, self.r
 
-        if a is not None: # corrected from the book, we check if the last action was none i.e. no prev state or a terminal state, the book says to check for s
+        if a is not None:
             Nsa[s, a] += 1
-            #print("updating ", s, a, " ---- ", r)
-            #print("Nsa[s, a]", Nsa[s, a])
-            Q[s, a] += alpha(Nsa[s, a]) * (r + 0.95 * max(Q[new_state, a1] for a1 in actions(new_state)) - Q[s, a])
+            Q[s, a] += alpha(Nsa[s, a]) * (r + gamma * max(Q[new_state, a1] for a1 in actions(new_state)) - Q[s, a])
 
         if new_state in terminals:
             self.training_Q[new_state, None] = new_reward
             self.s = self.a = self.r = None
         else:  
             self.s, self.r = new_state, new_reward            
-            self.a = argmax(self.all_act, key=lambda a1: self.f(Q[new_state, a1], Nsa[s, a1], a1, noise[0][a1]))
+            self.a = argmax(self.all_act, key=lambda a1: self.f(Q[new_state, a1], 
+                                                                Nsa[s, a1], a1, noise[0][a1]))
             if random.uniform(0, 1) < 0.05:
                 self.a = random.randint(0, len(self.all_act)-1)
                 #epsilon -= 10**-3
 
         return self.a
-
-    def update_u(self):
-        self.U = q_to_u(self.training_Q)  

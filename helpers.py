@@ -26,7 +26,7 @@ def to_human(action):
         return "right"
     elif action == 3:
         return "up"
-    return "unkown"
+    return "."
 
 def u_to_list(U):
     return [[int(x), int(y), U[(x, y)]] for x, y in U]
@@ -43,6 +43,19 @@ def q_to_u(Q):
             U[state] = value
 
     return U   
+
+def generate_grids(base):
+    grids = []
+    for i in range(base):
+        map_name_base = '{}x{}-base'.format(base, base)
+        env = LochLomondEnv(problem_id=i, is_stochastic=True, 
+                            reward_hole=-0.02, map_name_base=map_name_base)
+
+        env.render()
+        grid = EnvMDP.to_decoded(env).reshape(env.nrow * env.ncol)
+        grids.append(np.hstack(([i], grid)))
+    
+    return grids
 
 # ______________________________________________________________________________
 # Graphs
