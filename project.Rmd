@@ -13,35 +13,7 @@ output:
 fontsize: '11pt'
 ---
 
-```{r setup, include=FALSE}
-#fig_caption: yes
-library(knitr)
-knitr::opts_chunk$set(echo = TRUE, fig.pos= "h")
-#knitr::opts_chunk$set(fig.pos = 'H')
-knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
-
-data <- read.csv("out_rl_0_8x8-base__eval.csv")
-train <- read.csv("out_rl_0_8x8-base__train.csv")
-
-data2<- data %>%
-  arrange(desc(iteration)) %>%
-  arrange(episode) %>%
-  select(episode, rewards) %>%
-  mutate(mean_rewards=rewards/episode) %>%
-  arrange(desc(mean_rewards)) %>%
-  group_by(episode) %>%
-  mutate(pos = 1:n()) %>%
-  filter(pos==1) %>%
-  arrange(episode)
-
-
-plot(data2$episode, data2$mean_rewards, type="l")
-train2 <- train[,]
-plot(train2$episode, train2$iteration)
-```
-
-
-```{r libraries, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+```{r}
 library(plyr)
 library(dplyr)
 library(data.table)
@@ -58,125 +30,144 @@ library(grid)
 library(egg)
 library(reshape2)
 library(grid)
+```
 
-grid_arrange_shared_legend_2 <-function(...,
-           ncol = length(list(...)),
-           nrow = 1,
-           position = c("bottom", "right")) {
-    
-    plots <- list(...)
-    position <- match.arg(position)
-    g <-
-      ggplotGrob(plots[[1]] + theme(legend.position = position))$grobs
-    legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
-    lheight <- sum(legend$height)
-    lwidth <- sum(legend$width)
-    gl <- lapply(plots, function(x) x + theme(legend.position = "none"))
-    gl <- c(gl, ncol = ncol, nrow = nrow)
-    
-    combined <- switch(
-      position,
-      "bottom" = arrangeGrob(
-        do.call(arrangeGrob, gl),
-        legend,
-        ncol = 1,
-        heights = unit.c(unit(1, "npc") - lheight, lheight)
-      ),
-      "right" = arrangeGrob(
-        do.call(arrangeGrob, gl),
-        legend,
-        ncol = 2,
-        widths = unit.c(unit(1, "npc") - lwidth, lwidth)
-      )
-    )
-    
-    grid.draw(combined)
-}
+```{r setup, include=FALSE}
+#fig_caption: yes
+library(knitr)
+knitr::opts_chunk$set(echo = FALSE, fig.pos= "h")
+#knitr::opts_chunk$set(fig.pos = 'H')
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
 
+source("functions.R")
+
+#data <- read.csv("out_rl_1_8x8-base__eval.csv")
+#train <- read.csv("out_rl_2_8x8-base__train.csv")
+#train1 <- train[1:10000,]
+#train2 <- train[10001:20000,]
+#train3 <- train[20001:30000,]
+#train4 <- train[30001:40000,]
+
+#data <- train4 %>%
+#  select(episode, rewards, iteration) %>%
+#  mutate(mean_rewards=rewards/episode)
+
+#plot(data$episode, data$mean_rewards, type="l")
+
+#train2 <- train[,]
+#plot(train2$episode, train2$iteration)
 ```
 
 ```{r lake, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.height = 4, fig.width = 8, out.width = '70%', fig.align = "center"}
 # Plot inspired in: http://rgraphgallery.blogspot.com/2013/04/rg74-triple-three-heatmap-plot-one.html
 
-lake4 <- rbind(
-  c("S", "F", "F", "F"),
-  c("F", "H", "F", "H"),
-  c("F", "F", "F", "H"),
-  c("G", "F", "F", "F")
-)
-
-policy <- rbind(
-  c("down", NA, NA, NA),
-  c("down", NA, NA, NA),
-  c("down", NA, NA, NA),
-  c("done", NA, NA, NA)
-)
-
-lake8 <- rbind(
-  c('S', 'F', 'F', 'F', 'F', 'H', 'F', 'F'),
-  c('F', 'F', 'F', 'F', 'F', 'F', 'F', 'F'),
-  c('F', 'F', 'F', 'H', 'F', 'F', 'F', 'F'),
-  c('F', 'F', 'F', 'F', 'F', 'H', 'F', 'F'),
-  c('F', 'F', 'F', 'H', 'F', 'F', 'F', 'F'),
-  c('F', 'H', 'H', 'F', 'F', 'F', 'H', 'F'),
-  c('F', 'H', 'F', 'F', 'H', 'F', 'H', 'F'),
-  c('F', 'F', 'F', 'H', 'G', 'F', 'F', 'H')
-)
-
-create_grid <- function(grid, levels=TRUE) {
-  data.frame <- data.frame(
-    x=rep(1:ncol(grid), each=ncol(grid)),
-    y=rep(ncol(grid):1, times=ncol(grid)),
-    val=as.vector(grid)
-  )
-  
-  if (levels) {
-    data.frame$val <- factor(data.frame$val, levels = c("S", "F", "H", "G"), ordered=TRUE)
-    names(palette) <- levels(data.frame$val)
-  }
-  return(data.frame)
-}
-
-get_label <- function(x, y, val) {
-  return(val)
-  return(data.frame.grid[data.frame.grid$x == x & data.frame.grid$y == y, "val"])
-  
-  if (!is.null(val)) {
-    return(val)
-  }
-  return("X")
-}
-
-finish_plot <- function(plot) {
-  plot <- plot + geom_tile(aes(fill = val), colour = "white") + 
-    geom_text(aes(label = get_label(x,y,val)), position = position_dodge(width=0.9), size=5) +
-    scale_fill_manual(values=palette, labels = c("Start (safe)", "Frozen (safe)", "Hole", "Goal")) + 
-    scale_x_discrete(expand=c(0,0)) +
-    scale_y_discrete(expand=c(0,0)) +
-    theme_void() +
-    labs(fill="") +
-    theme(legend.position="right", legend.direction = "horizontal", legend.box = "vertical")
-    theme(legend.title = element_blank(), legend.margin=unit(1,"cm"), legend.text=element_text(size=23))
-  return(plot)
-}
-
 palette <- c("#f1c40f", "#48dbfb", "#ff5e57", "#badc58")
-data.frame4 <- create_grid(lake4)
-data.frame8 <- create_grid(lake8)
-data.frame.grid <- create_grid(policy, levels=FALSE)
+names(palette) <- c("S", "F", "H", "G")
+#lakes$grid4 = read.csv("out/grids-4.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
 
-plot <- ggplot(data.frame4, aes(x, y))
-plot <- finish_plot(plot)
-  
-plot2 <- ggplot(data.frame8, aes(x, y))
-plot2 <- finish_plot(plot2)
+#data.frame.grid <- create_grid(policy, levels=FALSE)
+policy <- read.csv("out/out_rl_1_8x8-base__policy.csv")
+u <- read.csv("out/out_rl_1_8x8-base__u.csv")
 
-plot.grid <- ggplot(data.frame.grid , aes(x, y))
-plot.grid <- finish_plot(plot.grid)
+grids <- list()
+grids[[8]] <- read.csv("out/grids-8.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+grids[[4]] <- read.csv("out/grids-4.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+grids[[8]][,"V1"] <- as.numeric(grids[[8]][,"V1"])
+grids[[4]][,"V1"] <- as.numeric(grids[[4]][,"V1"])
 
-grid_arrange_shared_legend_2(
-  plot + theme(plot.margin=unit(c(2,2,2,2),"cm")),
-  plot2 + theme(plot.margin=unit(c(0.2,0.2,0.2,0.2),"cm"))
+lakes <- list()
+lakes[[4]] <- list()
+lakes[[8]] <- list()
+
+
+
+for (i in c(4, 8)) {
+  for (id in 1:8) {
+    # take the grid from i (4 or 8) grid and take the problem id "id"
+    lake <- grids[[i]][id,-1]
+    lake <- as.factor(lake)
+    lakes[[i]][[id]] <- create_grid(lake, i)
+  }
+}
+#lakes[[8]][[2]]$policy <- 
+lakes[[8]][[2]] <- lakes[[8]][[2]] %>% left_join(policy, by=c("x", "y"))
+lakes[[8]][[2]] <- lakes[[8]][[2]] %>% left_join(u, by=c("x", "y"))
+
+x<-ggplot(data = lakes[[8]][[2]], mapping = aes(x = x_grid, y = y_grid, fill = u)) +
+  geom_tile() +
+  geom_text(aes(label = round(u, digits=3)), position = position_dodge(width=0.9), size=3) +
+  xlab(label = "Sample") +
+  scale_fill_gradient(name = "Sqrt(Abundance)",
+                      low = "#1d4877",
+                      high = "#ee3e32")
+
+lakes[[8]][[2]]$action_grid <- apply(lakes[[8]][[2]], 1, function(x) {
+  if (x["val"] %in% c("H", "G")) {
+    return(x["val"])
+  }
+  if (is.na(x["action"])) {
+    return("<NA>")
+  }
+  if (x["action"] == "right") {
+    return(">")
+  }
+  if (x["action"] == "up") {
+    return("^")
+  } 
+  if (x["action"] == "down") {
+    return("v")
+  }   
+  if (x["action"] == "left") {
+    return("<")
+  }
+  return(x["val"])
+})
+
+
+# Caption
+plot <- finish_plot(ggplot(lakes[[4]][[1]], aes(x, y)))
+plot2 <- finish_plot(ggplot(lakes[[8]][[1]], aes(x, y)))
+
+grid_arrange_shared_legend(
+  plot + theme(plot.margin=unit(c(2,2,2,2), "cm")),
+  plot2 + theme(plot.margin=unit(c(0.2,0.2,0.2,0.2), "cm"))
+)
+
+```
+
+```{r lakes, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%'}
+
+grid.arrange(
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid))))) + 
+    labs(caption = "4x4 Grid Problem 0"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[2]], aes(x_grid, y_grid))))) + 
+    labs(caption = "4x4 Grid Problem 1"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[3]], aes(x_grid, y_grid))))) + 
+    labs(caption = "4x4 Grid Problem 2"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[4]], aes(x_grid, y_grid))))) + 
+    labs(caption = "4x4 Grid Problem 3"),  
+  ncol=4
+)
+```
+
+
+```{r lakes3, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 10, out.width = '90%'}
+margin = theme(plot.margin = unit(c(2,2,2,2), "cm"))
+
+grid.arrange(
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid))))) + 
+    labs(caption = "8x8 Grid Problem 0"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid))))) + 
+    labs(caption = "8x8 Grid Problem 2"),
+  ncol=2
+)
+
+grid.arrange(
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid))))) + 
+    labs(caption = "8x8 Grid Problem 1"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
+    labs(caption = "8x8 Grid Problem 2"),
+  ncol=2
 )
 
 ```

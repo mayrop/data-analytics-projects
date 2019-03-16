@@ -5,7 +5,6 @@ sys.path.append("aima")
 from search import *
 from mdp import MDP
 from rl import PassiveTDAgent
-from rl import QLearningAgent
 import matplotlib.pyplot as plt
 
 
@@ -27,7 +26,36 @@ def to_human(action):
         return "right"
     elif action == 3:
         return "up"
-    return "unkown"
+    return "."
+
+def u_to_list(U):
+    return [[int(x), int(y), U[(x, y)]] for x, y in U]
+
+def q_to_u(Q):
+    """ Source of this function: 
+        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
+    """
+    U = defaultdict(lambda: -1000.) 
+    
+    for state_action, value in Q.items():
+        state, action = state_action
+        if U[state] < value:
+            U[state] = value
+
+    return U   
+
+def generate_grids(base):
+    grids = []
+    for i in range(base):
+        map_name_base = '{}x{}-base'.format(base, base)
+        env = LochLomondEnv(problem_id=i, is_stochastic=True, 
+                            reward_hole=-0.02, map_name_base=map_name_base)
+
+        env.render()
+        grid = EnvMDP.to_decoded(env).reshape(env.nrow * env.ncol)
+        grids.append(np.hstack(([i], grid)))
+    
+    return grids
 
 # ______________________________________________________________________________
 # Graphs
@@ -86,6 +114,13 @@ class EnvMDP(MDP):
 
     def to_arrows(self, policy):
         return policy_to_arrows(policy, self.rows, self.cols)
+
+    @staticmethod
+    def to_decoded(env):
+        matrix = env.desc.reshape(env.nrow * env.ncol)
+        
+        grid = [str(state, "utf-8") for state in matrix]
+        return np.array(grid).reshape((env.nrow, env.ncol))        
 
     @staticmethod
     def to_grid_matrix(env):
