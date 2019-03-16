@@ -76,9 +76,9 @@ class MyAbstractAIAgent():
                 self.timeouts += 1
 
             self.eval.append([self.problem_id, e, i, to_human(action), 
-                        int(reward), self.rewards, self.failures, self.timeouts])
+                        int(reward), self.rewards, self.rewards / e,
+                        self.failures, self.timeouts])
                     
-
     def action(self, i):
         raise NotImplementedError
 
@@ -93,18 +93,15 @@ class MyAbstractAIAgent():
         return None
 
     def alias(self):
-        return 'out_{}_{}_{}_'.format(self.name(), self.problem_id, 
-                                     self.map_name_base)
+        return 'out_{}_{}_'.format(self.name(), self.problem_id)
 
     def write_eval_files(self):
         def data_for_file(name):
-            if name == 'policy':
-                return policy_to_list(self.policy)
             if name == 'policy_arrows':
                 return policy_to_arrows(self.policy, self.env.ncol, self.env.ncol)
             if name == 'u':
                 return u_to_list(self.U)
-            if name == 'eval':
+            if name == 'evaluation':
                 return self.eval
             if name == 'q':
                 return self.Q  
@@ -132,12 +129,9 @@ class MyAbstractAIAgent():
 
     def header(self, key):
         headers = {
-            'eval': [
+            'evaluation': [
                 'id', 'episode', 'iteration', 'action',
-                'reward', 'rewards', 'failures', 'timeouts'
-            ],
-            'policy': [
-                'x', 'y', 'action'
+                'reward', 'rewards', 'mean_rewards', 'failures', 'timeouts'
             ],
             'u': [
                 'x', 'y', 'u'
@@ -186,7 +180,7 @@ class RandomAgent(MyAbstractAIAgent):
         return
 
     def files(self):
-        return ['eval']
+        return ['evaluation']
 
     def name(self):
         return 'random'
@@ -249,37 +243,10 @@ class SimpleAgent(MyAbstractAIAgent):
                 self.policy[state] = None
 
     def files(self):
-        return ['eval', 'policy', 'policy_arrows']
+        return ['evaluation', 'policy_arrows']
 
     def name(self):
         return 'simple'
-
-
-################################
-################################
-
-class UofGPassiveAgent(MyAbstractAIAgent):
-    """ An exploratory Q-learning agent. It avoids having to learn the transition
-        model because the Q-value of a state can be related directly to those of
-        its neighbors. [Figure 21.8]
-    """
-    def is_stochastic(self):
-        return True
-
-    def reward_hole(self):
-        return -0.04
-
-    def solve(self, episodes=200, iterations=200, reset=True, seed=False):
-        mdp = EnvMDP(self.env)
-        self.policy = policy_iteration(mdp)
-        self.U = value_iteration(mdp, epsilon=0.000000000001)
-
-    def files(self):
-        return ['policy', 'u']
-
-    def name(self):
-        return 'passive'
-
         
 ################################
 ################################
@@ -296,10 +263,10 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
         if self.map_name_base == '4x4-base':
             return -0.7
 
-        return -0.05
+        return -0.08
 
     def files(self):
-        return ['eval', 'u', 'policy', 'policy_arrows', 'q', 'graphs', 'train']        
+        return ['evaluation', 'u', 'policy_arrows', 'q', 'graphs', 'train']        
 
     def action(self, position):
         return self.policy[pos_to_coord(position, self.env.ncol)]
@@ -428,7 +395,7 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
             self.s, self.r = new_state, new_reward            
             self.a = argmax(self.all_act, key=lambda a1: self.f(Q[new_state, a1], 
                                                                 Nsa[s, a1], a1, noise[0][a1]))
-            if random.uniform(0, 1) < 0.05:
+            if random.uniform(0, 1) < 0.075:
                 self.a = random.randint(0, len(self.all_act)-1)
                 #epsilon -= 10**-3
 

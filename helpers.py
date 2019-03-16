@@ -75,6 +75,7 @@ def graph_utility_estimates(graphs):
     plt.ylabel('U')
     plt.show(block=True)
 
+
 # ______________________________________________________________________________
 
 # Markov Decision Process

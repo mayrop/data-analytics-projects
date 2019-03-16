@@ -61,6 +61,10 @@ source("functions.R")
 ```{r lake, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.height = 4, fig.width = 8, out.width = '70%', fig.align = "center"}
 # Plot inspired in: http://rgraphgallery.blogspot.com/2013/04/rg74-triple-three-heatmap-plot-one.html
 
+random <- read.csv("../out/out_random_2__evaluation.csv")
+plot(data$mean_rewards, type="l")
+
+
 palette <- c("#f1c40f", "#48dbfb", "#ff5e57", "#badc58")
 names(palette) <- c("S", "F", "H", "G")
 #lakes$grid4 = read.csv("out/grids-4.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))

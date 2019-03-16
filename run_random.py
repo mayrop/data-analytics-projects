@@ -18,6 +18,8 @@ from helpers import *
 from agents import *
 from utils import print_table
 import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
 
 print('Number of arguments:', len(sys.argv), 'arguments.')
 print('Argument List:', str(sys.argv))
@@ -25,12 +27,11 @@ print('Argument List:', str(sys.argv))
 def main(argv):
     """Main Program."""
     if len(argv) < 1:
-        print("usage: run_rl.py <problem_id> <episodes=10000> <grid=8>")
+        print("usage: run_rl.py <problem_id> <episodes=10000>")
         exit()
 
     problem_id = int(argv[0])
     episodes = 10000
-    grid = '8x8-base'
     seed = True
 
     if len(argv) > 1 and str.isdigit(argv[1]):
@@ -41,19 +42,47 @@ def main(argv):
 
     print('Solving with Random Agent')
     print('Problem: ', problem_id)
-    print('Grid: ', grid)
     print('Episodes that will run...: ', episodes)
     print("\n\n")
 
     print("It was found out that setting the seed for random was slow.. you can turn it off with seed=False")
     print("More info in documentation...")
-    agent = RandomAgent(problem_id=problem_id, map_name_base=grid) 
+    agent = RandomAgent(problem_id=problem_id) 
     agent.solve(episodes=episodes, seed=True)
     
     agent.env.reset()
     print("This is the environment: ")
     print(agent.env.render())
     agent.write_eval_files()
+
+    evaluation = np.array(agent.eval)
+    plt.style.use('classic')
+    print(evaluation)
+    y = evaluation[:,6]
+    x = evaluation[:,1]
+    print(y)
+    # f, ax = plt.subplots()
+    # ax.plot(range(100))
+
+    # ymin, ymax = ax.get_ylim()
+    # ax.set_yticks(np.round(np.linspace(ymin, ymax, 5), 2))
+
+    #print(y[100:200])
+
+    # fig2 = plt.figure(figsize=(10,5))
+    # print(pd.Series(y).rolling(10, min_periods=10).mean())
+    # rewards = pd.Series(y).mean()
+
+    plt.plot(y)
+    # plt.ylim([0, #0.025])
+    
+
+    # #plt.legend(loc='lower right')
+    # plt.xlabel('Episodes')
+    # plt.ylabel('Mean Reward')
+    plt.savefig('plt2.png')
+    # plt.close(fig2)
+
 
 if __name__ == '__main__':
     main(sys.argv[1:])

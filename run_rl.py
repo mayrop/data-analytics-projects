@@ -9,12 +9,11 @@ print('Argument List:', str(sys.argv))
 def main(argv):
     """Main Program."""
     if len(argv) < 1:
-        print("usage: run_rl.py <problem_id> <episodes=10000> <grid=8>")
+        print("usage: run_rl.py <problem_id> <episodes=10000>")
         exit()
 
     problem_id = int(argv[0])
     episodes = 50000
-    grid = '8x8-base'
 
     if len(argv) > 1 and str.isdigit(argv[1]):
         episodes = int(argv[1])
@@ -24,11 +23,10 @@ def main(argv):
 
     print('Solving with Reinforcement Learning Agent')
     print('Problem: ', problem_id)
-    print('Grid: ', grid)
     print('Episodes that will run...: ', episodes)
     print("\n\n")
 
-    agent = ReinforcementLearningAgent(problem_id=problem_id, map_name_base=grid) 
+    agent = ReinforcementLearningAgent(problem_id=problem_id) 
     agent.solve(episodes=episodes)
     policy = agent.policy        
     arrows = policy_to_arrows(policy, 8, 8)
