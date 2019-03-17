@@ -42,6 +42,31 @@ library(reshape2)
 library(grid)
 ```
 
+```{r data, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+# This environment is derived from the FrozenLake from https://gym.openai.com/envs/#toy_text
+
+# Winter is in Scotland. You and your friends were tossing around a frisbee at Loch Lomond
+# when you made a wild throw that left the frisbee out in the middle of the lake.
+# The water is mostly frozen, but there are a few holes where the ice has melted.
+# If you step into one of those holes, you'll fall into the freezing water.
+# At this time, there's an international frisbee shortage, so it's absolutely imperative that
+# you navigate across the lake and retrieve the disc.
+
+# However, the ice is slippery, so you won't always move in the direction you intend.
+# The surface is described using a grid like the following (for 8x8) with a unknown `problem_id`:
+
+# The specific environment/problem under consideration is a grid-world with a starting position (S), obstacles # (H) and a final goal (G). The task is to get from S to G. The environment is defined in uofgsocsai.py
+# via the class LochLomondEnv including documentation relating to the setting, specific states, parameters
+# etc. An example of how to instantiate the environment and navigate it using random actions is provided
+# in lochlomond_demo.py .
+# You must consider three agent types: a senseless/random agent, a simple agent and a reinforcement agent
+# based on the requirements listed in the following sections. Your agents will be tested against other instances of the same problem type, i.e., you can not (successfully) hard-code the solution. You will have
+# access to eighth specific training instances of the environment determined by the value of a single variable
+# problem_id.
+# Your agents and findings should be documented in a short (max 1500 word) technical report accompanied
+# by the actual implementation/code and evaluation scripts.
+
+```
 
 ```{r setup, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
 palette <- c("#f1c40f", "#48dbfb", "#ff5e57", "#badc58")
@@ -107,61 +132,64 @@ grid_arrange_shared_legend(
 [^1]: Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print.
 
 
-```{r lakes, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%'}
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%'}
 
 grid.arrange(
   fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid))))) + 
-    labs(caption = "4x4 Grid Problem 0"),
+    labs(caption = "Problem 0"),
   fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[2]], aes(x_grid, y_grid))))) + 
-    labs(caption = "4x4 Grid Problem 1"),
+    labs(caption = "Problem 1"),
   fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[3]], aes(x_grid, y_grid))))) + 
-    labs(caption = "4x4 Grid Problem 2"),
+    labs(caption = "Problem 2"),
   fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[4]], aes(x_grid, y_grid))))) + 
-    labs(caption = "4x4 Grid Problem 3"),  
+    labs(caption = "Problem 3"),  
   ncol=4
 )
 ```
 
-```{r lakes3, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '100%'}
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%'}
+
+grid.arrange(
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid)), key="policy"))) + 
+    labs(caption = "Problem 0"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
+    labs(caption = "Problem 1"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[3]], aes(x_grid, y_grid)), key="policy"))) + 
+    labs(caption = "Problem 2"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[4]], aes(x_grid, y_grid)), key="policy"))) + 
+    labs(caption = "Problem 3"),  
+  ncol=4
+)
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%'}
+
+grid.arrange(
+  fix_caption(u_plot(lakes[[4]][[1]])) + labs(caption = "Problem 0 - Utilities Table"),
+  fix_caption(u_plot(lakes[[4]][[2]])) + labs(caption = "Problem 1 - Utilities Table"),
+  fix_caption(u_plot(lakes[[4]][[3]])) + labs(caption = "Problem 2 - Utilities Table"),
+  fix_caption(u_plot(lakes[[4]][[4]])) + labs(caption = "Problem 3 - Utilities Table"),
+  ncol=4
+)
+```
+
+```{r lakes3, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%'}
 margin = theme(plot.margin = unit(c(2,2,2,2), "cm"))
 
 grid.arrange(
   fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid))))) + 
     labs(caption = "8x8 Grid Problem 0"),
-  fix_caption(u_plot(lakes[[8]][[1]])) + labs(caption = "8x8 Grid Problem 0"),
+  fix_caption(u_plot(lakes[[8]][[1]])) + labs(caption = "8x8 Problem 0 - Utilities Table"),
   ncol=2
 )
 
 grid.arrange(
   fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
     labs(caption = "8x8 Grid Problem 1"),
+  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
+    labs(caption = "8x8 Grid Problem 1"),  
   ncol=2
 )
 
 ```
 
-```{r data, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
-# This environment is derived from the FrozenLake from https://gym.openai.com/envs/#toy_text
-
-# Winter is in Scotland. You and your friends were tossing around a frisbee at Loch Lomond
-# when you made a wild throw that left the frisbee out in the middle of the lake.
-# The water is mostly frozen, but there are a few holes where the ice has melted.
-# If you step into one of those holes, you'll fall into the freezing water.
-# At this time, there's an international frisbee shortage, so it's absolutely imperative that
-# you navigate across the lake and retrieve the disc.
-
-# However, the ice is slippery, so you won't always move in the direction you intend.
-# The surface is described using a grid like the following (for 8x8) with a unknown `problem_id`:
-
-# The specific environment/problem under consideration is a grid-world with a starting position (S), obstacles # (H) and a final goal (G). The task is to get from S to G. The environment is defined in uofgsocsai.py
-# via the class LochLomondEnv including documentation relating to the setting, specific states, parameters
-# etc. An example of how to instantiate the environment and navigate it using random actions is provided
-# in lochlomond_demo.py .
-# You must consider three agent types: a senseless/random agent, a simple agent and a reinforcement agent
-# based on the requirements listed in the following sections. Your agents will be tested against other instances of the same problem type, i.e., you can not (successfully) hard-code the solution. You will have
-# access to eighth specific training instances of the environment determined by the value of a single variable
-# problem_id.
-# Your agents and findings should be documented in a short (max 1500 word) technical report accompanied
-# by the actual implementation/code and evaluation scripts.
-
-```
