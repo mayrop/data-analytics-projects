@@ -2,8 +2,6 @@
     University of Glasgow 
     Artificial Intelligence 2018-2019
     Assessed Exercise
-
-    Basic demo code for the CUSTOM Open AI Gym problem used in AI (H) '18-'19
 """
 import copy
 import os
@@ -201,7 +199,7 @@ class MyAbstractAIAgent():
             return headers[key]
 
     def plot_train(self, rows, labels, suffix=''):
-        # Plotting mean rewards    
+        """ Plots mean rewards from training phase """
         train = np.array(self._train)
 
         x = pd.to_numeric(train[:,1])
@@ -211,7 +209,7 @@ class MyAbstractAIAgent():
         self.plot(x, y, rows, labels, filename)
 
     def plot_evaluation(self, rows, labels, suffix=''):
-        # Plotting mean rewards    
+        """ Plots mean rewards from evaluation phase """
         evaluation = np.array(self.eval)
 
         x = pd.to_numeric(evaluation[:,1])
@@ -247,13 +245,7 @@ class MyAbstractAIAgent():
 ################################
 ################################
 
-class RandomAgent(MyAbstractAIAgent):
-
-    """
-    TODO
-
-
-    """  
+class RandomAgent(MyAbstractAIAgent): 
 
     def is_stochastic(self):
         return True
@@ -263,7 +255,7 @@ class RandomAgent(MyAbstractAIAgent):
 
     def set_episode_seed(self, episode, seed=None):
         if seed is not None:
-            #self.env.seed(episode)
+            self.env.seed(episode)
             self.env.action_space.seed(episode)
 
     def action(self, position):
@@ -281,13 +273,7 @@ class RandomAgent(MyAbstractAIAgent):
 ################################
 ################################
 
-class SimpleAgent(MyAbstractAIAgent):
-
-    """
-    TODO
-
-
-    """   
+class SimpleAgent(MyAbstractAIAgent): 
 
     def is_stochastic(self):
         return False
@@ -344,10 +330,7 @@ class SimpleAgent(MyAbstractAIAgent):
 ################################
 
 class PassiveAgent(MyAbstractAIAgent):
-    """ An exploratory Q-learning agent. It avoids having to learn the transition
-        model because the Q-value of a state can be related directly to those of
-        its neighbors. [Figure 21.8]
-    """
+
     def is_stochastic(self):
         return True
 
@@ -372,7 +355,7 @@ class PassiveAgent(MyAbstractAIAgent):
 class ReinforcementLearningAgent(MyAbstractAIAgent):
     """ An exploratory Q-learning agent. It avoids having to learn the transition
         model because the Q-value of a state can be related directly to those of
-        its neighbors. [Figure 21.8]
+        its neighbors.
     """
     def is_stochastic(self):
         return True
