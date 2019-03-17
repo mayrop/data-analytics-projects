@@ -75,7 +75,8 @@ class LochLomondEnv(discrete.DiscreteEnv):
 
     metadata = {'render.modes': ['human', 'ansi']}
 
-    def __init__(self, problem_id=0, is_stochastic=True, reward_hole = 0.0, map_name_base="8x8-base"):
+    def __init__(self, problem_id=0, is_stochastic=True, reward_hole=0.0, 
+                 map_name_base="8x8-base", path_cost=0, reward=1.0):
         if reward_hole > 0.0:
             raise ValueError('reward_hole must be equal to 0 or smaller')
     
@@ -87,8 +88,8 @@ class LochLomondEnv(discrete.DiscreteEnv):
         self.nrow, self.ncol = nrow, ncol = np.asarray(desc,dtype='c').shape
         self.is_stochastic = is_stochastic
         self.reward_hole = reward_hole
-        self.reward = 1.0
-        self.path_cost = 0
+        self.reward = reward
+        self.path_cost = path_cost
 
         # Check probelm_id value
         if problem_id > ncol-1:

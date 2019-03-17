@@ -115,36 +115,129 @@ Lomond Frozen Lake grid and retrieve the frisbee disc. Three different
 agents are analyzed: a senseless agent, a simple agent and a
 reinforcement agent.
 
-\section{Environment}\label{environment}
+\section{Analysis}\label{analysis}
 
 \begin{center}\includegraphics[width=0.7\linewidth]{project_files/figure-latex/environments-1} \end{center}
 
-\section{Agents}\label{agents}
+\section{Methodology}\label{methodology}
+
+\section{Implementation}\label{implementation}
 
 \subsection{Senseless Agent}\label{senseless-agent}
 
-\subsubsection{Evaluation}\label{evaluation}
-
 \subsection{Simple Agent}\label{simple-agent}
-
-\subsubsection{Evaluation}\label{evaluation-1}
 
 \subsection{Reinforcement Learning
 Agent}\label{reinforcement-learning-agent}
 
-\subsubsection{Evaluation}\label{evaluation-2}
+\subsection{Environment Modifications}\label{environment-modifications}
+
+In order to add additional flexibility and generic support to the
+agents, slight changes were made to the \texttt{uofgsocsai.py} file, the
+one containing the main \texttt{LochLomondEnv} environment class. The
+changes below were approved as long as justification was provided. The
+changes and justifications are as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  Parameters \texttt{map\_name\_base}, \texttt{reward} and
+  \texttt{path\_cost} where added to the \texttt{LochLomondEnv}
+  constructor. The default values are \texttt{8x8-base}, \texttt{1.0}
+  and \texttt{0} respectively. The default values do not alter the
+  functionality from the original file provided.
+\item
+  Attributes \texttt{is\_stochastic}, \texttt{reward\_hole},
+  \texttt{reward} and \texttt{path\_cost} were added to the class
+\end{itemize}
+
+The reason of the changes for the constructor was to add flexibility to
+be able to test different scenarios without the need to modify the file
+every time a different variant was analyzed. The attributes added to the
+class in order to be able to access them via the object (e.g.
+\texttt{env.path\_cost}) and create a Markov Decision Process out of it.
+Even though a Markov Decision Process was out of the scope of this
+project, an inhouse mapper from \texttt{Open\ AI\ Gym} environment to
+Grid MDP with the only purpose of doing a sanity check between the final
+U and policy from the Reinforcement Learning agent and the ones that a
+\texttt{Policy\ Iteration} and \texttt{Value\ Iteration} algorithm would
+provide.
+
+Finally, the way to assign en environment grid was changed from
+\texttt{MAPS\_BASE{[}map\_name\_base{]}} to
+\texttt{copy.deepcopy(MAPS\_BASE){[}map\_name\_base{]}}, with the only
+purpose of being able to instantiate the \texttt{LochLomondEnv} more
+than once in a single run (e.g.
+\texttt{python\ run\_rl.py\ 1,2,3,4,5,6,7}), which runs all the variants
+in a single call.
+
+There may be other better ways of accomplish the same without code
+changes, but due to the current lack knowledge of Python programming,
+time did not permit to find better ways for it.
+
+\section{Evaluation}\label{evaluation}
+
+Every agent produces different evaluation files that will be created
+inside the \texttt{out} folder.
 
 \section{Conclusions}\label{sec:con}
 
-\begin{center}\includegraphics[width=0.9\linewidth]{project_files/figure-latex/unnamed-chunk-2-1} \end{center}
+\newpage
 
-\begin{center}\includegraphics[width=0.9\linewidth]{project_files/figure-latex/unnamed-chunk-3-1} \end{center}
+\section{References}\label{references}
 
-\begin{center}\includegraphics[width=0.9\linewidth]{project_files/figure-latex/unnamed-chunk-4-1} \end{center}
+\newpage
 
-\begin{center}\includegraphics[width=0.85\linewidth]{project_files/figure-latex/lakes3-1} \end{center}
+\section{Appendices}\label{appendices}
 
-\begin{center}\includegraphics[width=0.85\linewidth]{project_files/figure-latex/lakes3-2} \end{center}
+\subsection{Appendix A: Title Here}\label{appendix-a-title-here}
+
+\begin{figure}[h]
+
+{\centering \includegraphics[width=0.9\linewidth]{project_files/figure-latex/unnamed-chunk-6-1} 
+
+}
+
+\caption{\label{fig:appendixa} My caption here}\label{fig:unnamed-chunk-6}
+\end{figure}
+
+\begin{figure}[h]
+
+{\centering \includegraphics[width=0.9\linewidth]{project_files/figure-latex/unnamed-chunk-7-1} 
+
+}
+
+\caption{\label{fig:appendixa} My caption here}\label{fig:unnamed-chunk-7}
+\end{figure}
+
+\begin{figure}[h]
+
+{\centering \includegraphics[width=0.9\linewidth]{project_files/figure-latex/unnamed-chunk-8-1} 
+
+}
+
+\caption{\label{fig:appendixa} My caption here}\label{fig:unnamed-chunk-8}
+\end{figure}
+
+\newpage
+
+\subsection{Appendix B: Title Here}\label{appendix-b-title-here}
+
+\begin{figure}[h]
+
+{\centering \includegraphics[width=0.85\linewidth]{project_files/figure-latex/lakes3-1} 
+
+}
+
+\caption{\label{fig:appendixa} My caption here}\label{fig:lakes31}
+\end{figure}\begin{figure}[h]
+
+{\centering \includegraphics[width=0.85\linewidth]{project_files/figure-latex/lakes3-2} 
+
+}
+
+\caption{\label{fig:appendixa} My caption here}\label{fig:lakes32}
+\end{figure}
 
 
 \end{document}

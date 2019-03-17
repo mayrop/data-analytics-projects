@@ -14,10 +14,8 @@ fontsize: '11pt'
 ---
 
 ```{r, echo = FALSE}
-#fig_caption: yes
 library(knitr)
-knitr::opts_chunk$set(echo=FALSE, fig.pos= "h")
-#knitr::opts_chunk$set(fig.pos = 'H')
+knitr::opts_chunk$set(echo=FALSE, fig.pos= "h") #knitr::opts_chunk$set(fig.pos = 'H')
 knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
 
 source("functions.R")
@@ -101,13 +99,24 @@ for (grid_cols in c(4, 8)) {
 }
 ```
 
-
 # Introduction
 The Loch Lomond Frozen Lake environment is a customized Open AI Gym derived from FrozenLake (https://gym.openai.com/envs/#toy_text).
 
-The goal of this report is to design, implement and evaluate three diferent virtual agents which are able to navigate across the Loch Lomond Frozen Lake grid and retrieve the frisbee disc. Three different agents are analyzed: a senseless agent, a simple agent and a reinforcement agent. 
+The goal of this report is to design, implement and evaluate three diferent virtual agents which are able to navigate across the Loch Lomond Frozen Lake grid and retrieve the frisbee disc. Three different agents are analyzed: a senseless agent, a simple agent and a reinforcement agent. This report includes the analysis for the 8x8 grid, but the analysis of the different variants of the 4x4 grids are included in the Appendices.
 
-# Environment
+# Analysis
+```{r, echo = FALSE, eval = FALSE}
+# Introduction/motivation and correct PEAS analysis (including task environment characterisation).
+# ========
+# Your implementation - containing the three different agents (along with any dependencies, except the
+# Open AI Gym) - should be uploaded to Moodle as a zip-file containing the source code. You must
+# provide three separate and executable python scripts/programs named: run_random.py, run_simple.py
+# and run_rl.py which takes as (only required) argument the problem_id . Each script/program should
+# include training/learning phases (including possible repetitions/episodes of the problem) and output a
+# text file (named after the agent, e.g. ”random”) with any relevant information. Hint: A template will be
+# provided via Moodle.
+```
+
 ```{r environments, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.height = 4, fig.width = 8, out.width = '70%', fig.align = "center"}
 # Caption
 plot_4 <- finish_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid)))
@@ -119,21 +128,86 @@ grid_arrange_shared_legend(
 )
 ```
 
-# Agents
+# Methodology
+```{r, echo = FALSE, eval = FALSE}
+# The code for all the agents (not in the report!) should be well-documented, follow best-practices in 
+# software development and follow the outlined naming convention. The report must contain a presentation of
+# relevant aspects of the implementation.
+# ========
+# Your implementation - containing the three different agents (along with any dependencies, except the
+# Open AI Gym) - should be uploaded to Moodle as a zip-file containing the source code. You must
+# provide three separate and executable python scripts/programs named: run_random.py, run_simple.py
+# and run_rl.py which takes as (only required) argument the problem_id . Each script/program should
+# include training/learning phases (including possible repetitions/episodes of the problem) and output a
+# text file (named after the agent, e.g. ”random”) with any relevant information. Hint: A template will be
+# provided via Moodle.
+```
+
+# Implementation
+```{r, echo = FALSE, eval = FALSE}
+# The code for all the agents (not in the report!) should be well-documented, follow best-practices in 
+# software development and follow the outlined naming convention. The report must contain a presentation of
+# relevant aspects of the implementation.
+# ========
+# Your implementation - containing the three different agents (along with any dependencies, except the
+# Open AI Gym) - should be uploaded to Moodle as a zip-file containing the source code. You must
+# provide three separate and executable python scripts/programs named: run_random.py, run_simple.py
+# and run_rl.py which takes as (only required) argument the problem_id . Each script/program should
+# include training/learning phases (including possible repetitions/episodes of the problem) and output a
+# text file (named after the agent, e.g. "random") with any relevant information. Hint: A template will be
+# provided via Moodle.
+```
+
 ## Senseless Agent
-### Evaluation
+
 ## Simple Agent
-### Evaluation
+
 ## Reinforcement Learning Agent
-### Evaluation
+
+Additionally, a custom mapper (`EnvMDP` within `helpers.py` file) was implemented to map the enviroment from `Open AI Gym` to a `Grid MDP` in order to produce. It is important to note that the results obtained from the *Policy Iteration* and *Value Iteration* algorithms are completely independent from our reinforcement learning agent, and they are only provided as a measure of comparison of final results from our active reinforcement learning agent.
+
+## Environment Modifications
+In order to add additional flexibility and generic support to the agents, slight changes were made to the `uofgsocsai.py` file, the one containing the main `LochLomondEnv` environment class. The changes below were approved as long as justification was provided. The changes and justifications are as follows:
+
+* Parameters `map_name_base`, `reward` and `path_cost` where added to the `LochLomondEnv` constructor. The default values are `8x8-base`, `1.0` and `0` respectively. The default values do not alter the functionality from the original file provided.
+* Attributes `is_stochastic`, `reward_hole`, `reward` and `path_cost` were added to the class
+
+The reason of the changes for the constructor was to add flexibility to be able to test different scenarios without the need to modify the file every time a different variant was analyzed. The attributes were added to the class in order to be able to access them via the object (e.g. `env.path_cost`) and create a Markov Decision Process out of it. Even though a Markov Decision Process was out of the scope of this project, an inhouse mapper from `Open AI Gym` environment to `Grid MDP` with the only purpose of doing a sanity check between the final U and policy from the Reinforcement Learning agent and the ones that a *Policy Iteration* and *Value Iteration* algorithm would provide.
+
+Finally, the way to assign en environment grid was changed from `MAPS_BASE[map_name_base]` to `copy.deepcopy(MAPS_BASE)[map_name_base]`, with the only purpose of being able to instantiate the `LochLomondEnv` more than once in a single run (e.g. `python run_rl.py 1,2,3,4,5,6,7`), which runs all the variants in a single run.
+
+There may be other better ways of accomplishing the same without code changes, but due to the current lack of experience/knowledge in Python programming, time did not permit to find better ways for it.
+
+# Evaluation
+```{r, echo = FALSE, eval = FALSE}
+# An important aspect of RL is assessing and comparing the performance of agents and different policies.
+# To document the behavior of your agents you should design a suitable set of (computer) experiments
+# which produces a relevant set of graphs/tables to document the behavior of your RL agent (e.g. average
+# performance measure vs number of episodes, etc) and compares its performance against the baselines. The
+# evaluation strategy should be implemented in a single Python script (a wrapper) run_eval.py which runs
+# you entire evaluation, that is, it should call your agents, collate the results and produce the figures/tables
+# you have included in your report. The run_eval.py should be submitted via Moodle alongside your
+# implementation.
+# ========
+# - [20%] Evaluation script/program to reproduce the results (i.e. graphs/tables) adhering to the specified
+# requirements.
+# - [20%] Relevant presentation of the evaluation strategy, metrics and the obtained simulation results. A
+# suitable presentation and comparison of the performance of the agent with other agents as evaluated
+# across a suitable number of problem variations (e.g. using graphs/tables).
+```
+Every agent produces different evaluation files that will be created inside the `out` folder.
 
 # Conclusions {#sec:con}
 
-[^1]: Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print.
+\newpage
+# References
 
+\newpage
+# Appendices
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%'}
+## Appendix A: Title Here
 
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%', fig.cap = "\\label{fig:appendixa} My caption here"}
 grid.arrange(
   fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid))))) + 
     labs(caption = "Problem 0"),
@@ -147,8 +221,7 @@ grid.arrange(
 )
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%'}
-
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%', fig.cap = "\\label{fig:appendixa} My caption here"}
 grid.arrange(
   fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid)), key="policy"))) + 
     labs(caption = "Problem 0"),
@@ -162,18 +235,20 @@ grid.arrange(
 )
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%'}
-
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%', fig.cap = "\\label{fig:appendixa} My caption here"}
 grid.arrange(
-  fix_caption(u_plot(lakes[[4]][[1]])) + labs(caption = "Problem 0 - Utilities Table"),
-  fix_caption(u_plot(lakes[[4]][[2]])) + labs(caption = "Problem 1 - Utilities Table"),
-  fix_caption(u_plot(lakes[[4]][[3]])) + labs(caption = "Problem 2 - Utilities Table"),
-  fix_caption(u_plot(lakes[[4]][[4]])) + labs(caption = "Problem 3 - Utilities Table"),
+  fix_caption(u_plot(lakes[[4]][[1]])) + labs(caption = "Problem 0"),
+  fix_caption(u_plot(lakes[[4]][[2]])) + labs(caption = "Problem 1"),
+  fix_caption(u_plot(lakes[[4]][[3]])) + labs(caption = "Problem 2"),
+  fix_caption(u_plot(lakes[[4]][[4]])) + labs(caption = "Problem 3"),
   ncol=4
 )
 ```
 
-```{r lakes3, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%'}
+\newpage
+## Appendix B: Title Here
+
+```{r lakes3, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%', fig.cap = "\\label{fig:appendixa} My caption here"}
 margin = theme(plot.margin = unit(c(2,2,2,2), "cm"))
 
 grid.arrange(
@@ -190,6 +265,8 @@ grid.arrange(
     labs(caption = "8x8 Grid Problem 1"),  
   ncol=2
 )
-
 ```
+
+[^1]: Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print.
+
 
