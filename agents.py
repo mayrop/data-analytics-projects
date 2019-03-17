@@ -18,6 +18,7 @@ from mdp import value_iteration
 from search import *
 from uofgsocsai import LochLomondEnv # load the class defining the custom Open AI Gym problem
 import json
+import pandas as pd
 
 class MyAbstractAIAgent():
     """
@@ -38,6 +39,10 @@ class MyAbstractAIAgent():
 
         self.problem_id = problem_id
         self.reset()
+        self.out = 'out/'
+        self.policy = {}
+        self._train = []
+        self.graphs = {}        
 
     def is_stochastic(self):
         raise NotImplementedError
@@ -52,7 +57,17 @@ class MyAbstractAIAgent():
         self.timeouts = 0
 
     def solve(self, episodes=10000, iterations=1000, seed=None, gamma=0.95):
+        print('Solving with {} Agent'.format(self.name().capitalize()))
+        print('Problem: ', self.problem_id)
+        print('Grid: ', self.map_name_base)
+        print('Episodes that will run...: ', episodes)
+        print("\n\n")
+
         self.train(episodes=episodes, iterations=iterations)
+        rewards = self.rewards
+        timeouts = self.timeouts
+        failures = self.failures
+
         for e in range(1, episodes + 1): # iterate over episodes
             state = self.env.reset()
             self.set_episode_seed(e, seed)
@@ -65,18 +80,18 @@ class MyAbstractAIAgent():
 
                 if done:
                     if reward == 1.0:
-                        self.rewards += int(reward)
+                        rewards += int(reward)
                     else:
-                        self.failures += 1
+                        failures += 1
 
                     # break the cycle
                     break;
 
             if not done:
-                self.timeouts += 1
+                timeouts += 1
 
             self.eval.append([self.problem_id, e, i, to_human(action), 
-                        int(reward), self.rewards, self.failures, self.timeouts])
+                        int(reward), rewards, rewards/e, failures, timeouts])
                     
 
     def action(self, i):
@@ -93,8 +108,36 @@ class MyAbstractAIAgent():
         return None
 
     def alias(self):
-        return 'out_{}_{}_{}_'.format(self.name(), self.problem_id, 
-                                     self.map_name_base)
+        return '{}out_{}_{}_{}'.format(self.out, self.name(), self.problem_id, self.env.ncol)
+
+    def evaluate(self, episodes):
+        self.env.reset()
+        print("This is the environment: ")
+        print(self.env.render())
+        
+        if (len(self.policy) > 0):
+            print("This is the final policy: ")    
+            print_table(policy_to_arrows(self.policy, self.env.ncol, self.env.ncol))
+
+        print('Saving Evaluation Files...')
+        self.write_eval_files()
+
+        # Plotting mean rewards  
+        print('Saving Plots...')
+        labels = ['Episodes', 'Mean Reward']
+
+        if (len(self._train) > 0):
+            self.plot_train(range(episodes), labels, 'mr')
+            self.plot_train(range(999), labels, 'mr_first_1000')
+            self.plot_train(range(episodes-1000, episodes-1), labels, 'mr_last_1000')
+
+        if (len(self.eval) > 0):    
+            self.plot_evaluation(range(episodes), labels, 'mr')
+            self.plot_evaluation(range(999), labels, 'mr_first_1000')
+            self.plot_evaluation(range(episodes-1000, episodes-1), labels, 'mr_last_1000')
+
+        if (len(self.graphs) > 0):
+            self.plot_utilities(['Episodes', 'U'])
 
     def write_eval_files(self):
         def data_for_file(name):
@@ -116,25 +159,25 @@ class MyAbstractAIAgent():
             return []
 
         for file in self.files():
-            print("Writing file...: ", file)
             if file == 'graphs':
-                filename = 'out/{}_{}.json'.format(self.alias(), file)
+                filename = '{}_{}.json'.format(self.alias(), file)
                 with open(filename, 'w') as outfile:
                     json.dump(data_for_file(file), outfile)
             elif file == 'policy_arrows':
-                filename = 'out/{}_{}.txt'.format(self.alias(), file)
+                filename = '{}_{}.txt'.format(self.alias(), file)
                 data = data_for_file(file)
                 np.savetxt(filename, data, delimiter="\t", fmt='%s') 
             else:
-                filename = 'out/{}_{}.csv'.format(self.alias(), file)
+                filename = '{}_{}.csv'.format(self.alias(), file)
                 data = [self.header(file)] + data_for_file(file)
                 np.savetxt(filename, data, delimiter=",", fmt='%s') 
+            print('\tFile saved: {}'.format(filename))
 
     def header(self, key):
         headers = {
             'eval': [
                 'id', 'episode', 'iteration', 'action',
-                'reward', 'rewards', 'failures', 'timeouts'
+                'reward', 'rewards', 'mean_rewards', 'failures', 'timeouts'
             ],
             'policy': [
                 'x', 'y', 'action'
@@ -144,7 +187,7 @@ class MyAbstractAIAgent():
             ],
             'train': [
                 'id', 'episode', 'iteration', 'reward', 
-                'rewards', 'failures', 'timeouts'
+                'rewards', 'mean_rewards', 'failures', 'timeouts'
             ],
             'graphs': [
                 'x', 'y', 'value'
@@ -156,6 +199,50 @@ class MyAbstractAIAgent():
 
         if key in headers:
             return headers[key]
+
+    def plot_train(self, rows, labels, suffix=''):
+        # Plotting mean rewards    
+        train = np.array(self._train)
+
+        x = pd.to_numeric(train[:,1])
+        y = pd.to_numeric(train[:,5])
+        filename = '{}_train_{}.png'.format(self.alias(), suffix)
+        
+        self.plot(x, y, rows, labels, filename)
+
+    def plot_evaluation(self, rows, labels, suffix=''):
+        # Plotting mean rewards    
+        evaluation = np.array(self.eval)
+
+        x = pd.to_numeric(evaluation[:,1])
+        y = pd.to_numeric(evaluation[:,6])
+        filename = '{}_eval_{}.png'.format(self.alias(), suffix)
+        
+        self.plot(x, y, rows, labels, filename)
+    
+    def plot_utilities(self, labels):
+        for state, value in self.graphs.items():
+            x, y = zip(*value)
+            plt.plot(x, y, label=str(state))
+
+        plt.ylim([-0.1, 1.05])
+        plt.legend(loc='lower right')
+        plt.xlabel(labels[0])
+        plt.ylabel(labels[1])
+        filename='{}_utilities.png'.format(self.alias())
+        plt.savefig(filename)
+        plt.close()
+
+        print('\tPlot saved: {}'.format(filename))
+
+    def plot(self, x, y, rows, labels, filename):
+        plt.plot(x[rows], y[rows])
+        plt.xlabel(labels[0])
+        plt.ylabel(labels[1])
+        plt.savefig(filename)
+        plt.close()
+
+        print('\tPlot saved: {}'.format(filename))
 
 ################################
 ################################
@@ -233,8 +320,6 @@ class SimpleAgent(MyAbstractAIAgent):
             if y2 < y1:
                 return 3 # "up"
 
-        self.policy = {}
-
         for i in range(1, len(solution)):
             prev = graph.locations[solution[i - 1]]
             curr = graph.locations[solution[i]]
@@ -258,7 +343,7 @@ class SimpleAgent(MyAbstractAIAgent):
 ################################
 ################################
 
-class UofGPassiveAgent(MyAbstractAIAgent):
+class PassiveAgent(MyAbstractAIAgent):
     """ An exploratory Q-learning agent. It avoids having to learn the transition
         model because the Q-value of a state can be related directly to those of
         its neighbors. [Figure 21.8]
@@ -318,7 +403,6 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
 
         self.init_trianing(mdp, Ne=5, Rplus=2, alpha=lambda n: 60./(59+n))
         self.graphs = {coord_to_pos(state[0], state[1], mdp.cols):[] for state in states}
-        self._train = []
 
         positions = {coord_to_pos(state[0], state[1], mdp.cols):state for state in states}
         coordinates = {state:coord_to_pos(state[0], state[1], mdp.cols) for state in states}
@@ -347,7 +431,7 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
                 timeouts += 1
             
             self._train.append([self.problem_id, e, i, int(reward), 
-                               rewards, failures, timeouts])
+                               rewards, rewards/e, failures, timeouts])
 
             if e % 100 == 0:
                 print("Train Episode", e)
@@ -356,12 +440,9 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
                     index = coordinates[state]
                     self.graphs[index].append([e, self.U[state]])
     
-        # graph_utility_estimates(self.graphs)
-
         self.update_u()
 
         self.Q = []
-        self.policy = {}
         actions = self.training_actions
 
         for state_action, value in list(self.training_Q.items()):
@@ -426,10 +507,9 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
             self.s = self.a = self.r = None
         else:  
             self.s, self.r = new_state, new_reward            
-            self.a = argmax(self.all_act, key=lambda a1: self.f(Q[new_state, a1], 
+            self.a = argmax(actions(new_state), key=lambda a1: self.f(Q[new_state, a1], 
                                                                 Nsa[s, a1], a1, noise[0][a1]))
-            if random.uniform(0, 1) < 0.05:
+            if random.uniform(0, 1) < 0.075:
                 self.a = random.randint(0, len(self.all_act)-1)
-                #epsilon -= 10**-3
 
         return self.a

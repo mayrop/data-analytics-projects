@@ -8,7 +8,7 @@
 
   Purpose: This agent should be used as a naive baseline.
   Requirements:
-  - Sensors: None (/random/full; it doesn’t matter...)
+  - Sensors: None
   - Action: Discrete
   - State-space: No prior knowledge (i.e. it has not got a map)
   - Rewards/goal: No prior knowledge (does not know where the goal is located)  
@@ -39,21 +39,14 @@ def main(argv):
     if len(argv) > 2:
         grid = '{}_{}-base'.format(argv[2], argv[2])        
 
-    print('Solving with Random Agent')
-    print('Problem: ', problem_id)
-    print('Grid: ', grid)
-    print('Episodes that will run...: ', episodes)
-    print("\n\n")
-
-    print("It was found out that setting the seed for random was slow.. you can turn it off with seed=False")
+    print("It was found out that setting the seed for random was slow.. you can turn it on with seed=True")
     print("More info in documentation...")
+    # Reset the random generator to a known state (for reproducability)
+    np.random.seed(12)
+    # this seed doesn't work... if needed, change seed to True below
     agent = RandomAgent(problem_id=problem_id, map_name_base=grid) 
-    agent.solve(episodes=episodes, seed=True)
-    
-    agent.env.reset()
-    print("This is the environment: ")
-    print(agent.env.render())
-    agent.write_eval_files()
+    agent.solve(episodes=episodes, seed=None)
+    agent.evaluate(episodes)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
