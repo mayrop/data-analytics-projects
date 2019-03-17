@@ -1,9 +1,8 @@
-out/
 __pycache__/*
-aima-python/
 gym/
 aima/
-__aima-python/
+out/
 .Rhistory
 .RData
-project.Rmd_.tex
+report/project_files/
+report/project.tex
