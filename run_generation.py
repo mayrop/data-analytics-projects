@@ -2,7 +2,6 @@ import csv
 import os
 import sys
 from helpers import *
-from uofgsocsai import LochLomondEnv
 
 if len(sys.argv) < 1:
     print("usage: run_generation.py <type>")

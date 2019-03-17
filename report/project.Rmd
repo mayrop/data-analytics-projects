@@ -13,7 +13,17 @@ output:
 fontsize: '11pt'
 ---
 
-```{r}
+```{r, echo = FALSE}
+#fig_caption: yes
+library(knitr)
+knitr::opts_chunk$set(echo=FALSE, fig.pos= "h")
+#knitr::opts_chunk$set(fig.pos = 'H')
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+
+source("functions.R")
+```
+
+```{r libraries, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
 library(plyr)
 library(dplyr)
 library(data.table)
@@ -32,28 +42,14 @@ library(reshape2)
 library(grid)
 ```
 
-```{r setup, include=FALSE}
-#fig_caption: yes
-library(knitr)
-knitr::opts_chunk$set(echo = FALSE, fig.pos= "h")
-#knitr::opts_chunk$set(fig.pos = 'H')
-knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
 
-source("functions.R")
-```
-
-```{r lake, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.height = 4, fig.width = 8, out.width = '70%', fig.align = "center"}
+```{r setup, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
 palette <- c("#f1c40f", "#48dbfb", "#ff5e57", "#badc58")
 names(palette) <- c("S", "F", "H", "G")
-#lakes$grid4 = read.csv("out/grids-4.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
-
-#data.frame.grid <- create_grid(policy, levels=FALSE)
-policy <- read.csv("out/out_rl_1_8x8-base__policy.csv")
-u <- read.csv("out/out_rl_1_8x8-base__u.csv")
 
 grids <- list()
-grids[[8]] <- read.csv("out/grids-8.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
-grids[[4]] <- read.csv("out/grids-4.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+grids[[8]] <- read.csv("../out/grids-8.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+grids[[4]] <- read.csv("../out/grids-4.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
 grids[[8]][,"V1"] <- as.numeric(grids[[8]][,"V1"])
 grids[[4]][,"V1"] <- as.numeric(grids[[4]][,"V1"])
 
@@ -61,51 +57,55 @@ lakes <- list()
 lakes[[4]] <- list()
 lakes[[8]] <- list()
 
-for (i in c(4, 8)) {
-  for (id in 1:8) {
+for (grid_cols in c(4, 8)) {
+  for (problem_id in 1:grid_cols) {
+    filename = paste("../out/out_rl_", problem_id - 1, "_", grid_cols, "_policy.csv", sep="")
+    policy <- read.csv(filename)
+    
+    filename <- paste("../out/out_rl_", problem_id - 1, "_", grid_cols, "_u.csv", sep="")
+    u <- read.csv(filename)
+    
     # take the grid from i (4 or 8) grid and take the problem id "id"
-    lake <- grids[[i]][id,-1]
+    lake <- grids[[grid_cols]][problem_id,-1]
     lake <- as.factor(lake)
-    lakes[[i]][[id]] <- create_grid(lake, i)
+    lakes[[grid_cols]][[problem_id]] <- create_grid(lake, grid_cols)
+    lakes[[grid_cols]][[problem_id]] <- lakes[[grid_cols]][[problem_id]] %>% left_join(policy, by=c("x", "y"))
+    lakes[[grid_cols]][[problem_id]] <- lakes[[grid_cols]][[problem_id]] %>% left_join(u, by=c("x", "y"))
+    lakes[[grid_cols]][[problem_id]]$action_grid <- apply(lakes[[grid_cols]][[problem_id]], 1, arrow_from_cell)
   }
 }
-#lakes[[8]][[2]]$policy <- 
-lakes[[8]][[2]] <- lakes[[8]][[2]] %>% left_join(policy, by=c("x", "y"))
-lakes[[8]][[2]] <- lakes[[8]][[2]] %>% left_join(u, by=c("x", "y"))
-
-lakes[[8]][[2]]$action_grid <- apply(lakes[[8]][[2]], 1, function(x) {
-  if (x["val"] %in% c("H", "G")) {
-    return(x["val"])
-  }
-  if (is.na(x["action"])) {
-    return("<NA>")
-  }
-  if (x["action"] == "right") {
-    return(">")
-  }
-  if (x["action"] == "up") {
-    return("^")
-  } 
-  if (x["action"] == "down") {
-    return("v")
-  }   
-  if (x["action"] == "left") {
-    return("<")
-  }
-  return(x["val"])
-})
+```
 
 
+# Introduction
+The Loch Lomond Frozen Lake environment is a customized Open AI Gym derived from FrozenLake (https://gym.openai.com/envs/#toy_text).
+
+The goal of this report is to design, implement and evaluate three diferent virtual agents which are able to navigate across the Loch Lomond Frozen Lake grid and retrieve the frisbee disc. Three different agents are analyzed: a senseless agent, a simple agent and a reinforcement agent. 
+
+# Environment
+```{r environments, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.height = 4, fig.width = 8, out.width = '70%', fig.align = "center"}
 # Caption
-plot <- finish_plot(ggplot(lakes[[4]][[1]], aes(x, y)))
-plot2 <- finish_plot(ggplot(lakes[[8]][[1]], aes(x, y)))
+plot_4 <- finish_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid)))
+plot_8 <- finish_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid)))
 
 grid_arrange_shared_legend(
-  plot + theme(plot.margin=unit(c(2,2,2,2), "cm")),
-  plot2 + theme(plot.margin=unit(c(0.2,0.2,0.2,0.2), "cm"))
+  plot_4 + theme(plot.margin=unit(c(2,2,2,2), "cm")),
+  plot_8 + theme(plot.margin=unit(c(0.2,0.2,0.2,0.2), "cm"))
 )
-
 ```
+
+# Agents
+## Senseless Agent
+### Evaluation
+## Simple Agent
+### Evaluation
+## Reinforcement Learning Agent
+### Evaluation
+
+# Conclusions {#sec:con}
+
+[^1]: Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print.
+
 
 ```{r lakes, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%'}
 
@@ -122,23 +122,19 @@ grid.arrange(
 )
 ```
 
-
-```{r lakes3, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 10, out.width = '90%'}
+```{r lakes3, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '100%'}
 margin = theme(plot.margin = unit(c(2,2,2,2), "cm"))
 
 grid.arrange(
   fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid))))) + 
     labs(caption = "8x8 Grid Problem 0"),
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid))))) + 
-    labs(caption = "8x8 Grid Problem 2"),
+  fix_caption(u_plot(lakes[[8]][[1]])) + labs(caption = "8x8 Grid Problem 0"),
   ncol=2
 )
 
 grid.arrange(
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid))))) + 
-    labs(caption = "8x8 Grid Problem 1"),
   fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
-    labs(caption = "8x8 Grid Problem 2"),
+    labs(caption = "8x8 Grid Problem 1"),
   ncol=2
 )
 
@@ -169,28 +165,3 @@ grid.arrange(
 # by the actual implementation/code and evaluation scripts.
 
 ```
-
-# Introduction
-The Loch Lomond Frozen Lake environment is a customized Open AI Gym derived from FrozenLake (https://gym.openai.com/envs/#toy_text).
-
-The goal of this report is to design, implement and evaluate three diferent virtual agents which are able to navigate across the Loch Lomond Frozen Lake grid and retrieve the frisbee disc. Three different agents are analyzed: a senseless agent, a simple agent and a reinforcement agent. 
-
-# Agents
-## Senseless Agent
-### Evaluation
-## Simple Agent
-### Evaluation
-## Reinforcement Learning Agent
-### Evaluation
-
-# Conclusions {#sec:con}
-
-[^1]: Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print.
-
-
-
-x<-ggplot(data = lakes[[8]][[2]], mapping = aes(x = x_grid, y = y_grid, fill = u)) +
-  geom_tile() +
-  geom_text(aes(label = round(u, digits=3)), position = position_dodge(width=0.9), size=3) +
-  xlab(label = "Sample") +
-  scale_fill_gradient(name = "Sqrt(Abundance)", low = "#1d4877", high = "#ee3e32")

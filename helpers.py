@@ -6,7 +6,7 @@ from search import *
 from mdp import MDP
 from rl import PassiveTDAgent
 import matplotlib.pyplot as plt
-
+from uofgsocsai import LochLomondEnv
 
 # ______________________________________________________________________________
 # Random
@@ -78,7 +78,7 @@ def parse_args(argv):
         episodes = int(argv[1])
 
     if len(argv) > 2:
-        grid = '{}_{}-base'.format(argv[2], argv[2])
+        grid = '{}x{}-base'.format(argv[2], argv[2])
 
     return problem_ids, episodes, grid
 
