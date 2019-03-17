@@ -97,6 +97,42 @@ for (grid_cols in c(4, 8)) {
     lakes[[grid_cols]][[problem_id]]$action_grid <- apply(lakes[[grid_cols]][[problem_id]], 1, arrow_from_cell)
   }
 }
+
+actions <- as.data.frame(rbind(
+  c(1, 1.2, ""),
+  c(2, 1.2, "0.333"),
+  c(3, 1.2, ""),
+  c(1, 1.1, ""),
+  c(2, 1.1, "^"),
+  c(3, 1.1, ""),  
+  c(1, 1, "0.333"),
+  c(1.5, 1, "<"),
+  c(2, 1, "\U2191"),
+  c(2.5, 1, ">"),
+  c(3, 1, "0.333")
+))
+colnames(actions) <- c('x', 'y', 'value')
+actions[,1:2] <- apply(actions[,1:2], 2, as.numeric)
+```
+
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.height = 3, fig.width = 3, out.width = '20%', fig.align = "center"}
+#plot <- ggplot(actions, aes(x, y)) + geom_tile(aes(fill = c(rep('w', 7), c('w', 'g', 'w', 'w'))), colour = "white") + 
+#    geom_text(aes(label = value), position = position_dodge(width=0.9), size=5) + 
+#  scale_fill_manual(values=c('#DADADA', 'white')) + 
+#  theme_void()
+#
+#
+#pushViewport(viewport(y = unit(3, "lines"), width = 0.9, height = 0.8, just = "bottom", xscale = c(0, 100)))
+#grid.rect(gp = gpar(col = "grey"))
+#grid.xaxis()
+#
+#pushViewport(viewport(x = unit(60, "native"), y = unit(0.5, "npc"),
+#                      width = unit(1, "strwidth", "coordinates for everyone"),
+#                      height = unit(3, "inches")))
+#grid.rect()
+#grid.text("coordinates for everyone")
+#popViewport(2)
 ```
 
 # Introduction
@@ -119,8 +155,8 @@ The goal of this report is to design, implement and evaluate three diferent virt
 
 ```{r environments, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.height = 4, fig.width = 8, out.width = '70%', fig.align = "center"}
 # Caption
-plot_4 <- finish_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid)))
-plot_8 <- finish_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid)))
+plot_4 <- env_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid)))
+plot_8 <- env_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid)))
 
 grid_arrange_shared_legend(
   plot_4 + theme(plot.margin=unit(c(2,2,2,2), "cm")),
@@ -163,6 +199,42 @@ grid_arrange_shared_legend(
 ## Simple Agent
 
 ## Reinforcement Learning Agent
+This agent was implemented through an active reinforcement lerning algorithm. This agent, as stated before, does not have prior knowlege of the environment, but its goal is to learn it via the sensors/actions each episode. Given our specifications, we need a model-free method for our agent, thus we decided to use Q-learning method. Using a temporal-differene approach[^1], we make use of the update equation:
+$$Q(s,a) = Q(s,a) + \alpha(R(s) + \gamma \cdot max_{a'}Q(s',a') - Q(s,a))$$
+Where:
+* $Q(s,a)$ denotes the value of doing action $a$ in state $s%
+
+
+$$Q(s,a) = Q(s,a) + \alpha(R(s) + 0.95 \cdot max_{a'}Q(s',a') - Q(s,a))$$
+
+* $s$ is the current  
+
+Our exploration functions are as follows:
+$$
+\begin{equation}
+  \begin{split}
+    f(u, n) =
+    \begin{cases}
+      R^+       & \quad \text{if } n \text{ < }N_e\\
+      u  & \quad \text{otherwise}
+    \end{cases}
+  \end{split}
+\quad\quad\quad\quad\quad
+  \begin{split}
+    f(u, n) =
+    \begin{cases}
+      n/2       & \quad \text{if } n \text{ is even}\\
+      -(n+1)/2  & \quad \text{if } n \text{ is odd}
+    \end{cases}
+  \end{split}
+\end{equation}  
+$$
+
+
+$$U(s) = max_{a}Q(s,a) $$
+
+The relation between Q-values and the utility values are as follows[]:
+$$U(s) = max_{a}Q(s,a) $$
 
 Additionally, a custom mapper (`EnvMDP` within `helpers.py` file) was implemented to map the enviroment from `Open AI Gym` to a `Grid MDP` in order to produce. It is important to note that the results obtained from the *Policy Iteration* and *Value Iteration* algorithms are completely independent from our reinforcement learning agent, and they are only provided as a measure of comparison of final results from our active reinforcement learning agent.
 
@@ -209,13 +281,13 @@ Every agent produces different evaluation files that will be created inside the 
 
 ```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%', fig.cap = "\\label{fig:appendixa} My caption here"}
 grid.arrange(
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid))))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid))))) + 
     labs(caption = "Problem 0"),
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[2]], aes(x_grid, y_grid))))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[4]][[2]], aes(x_grid, y_grid))))) + 
     labs(caption = "Problem 1"),
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[3]], aes(x_grid, y_grid))))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[4]][[3]], aes(x_grid, y_grid))))) + 
     labs(caption = "Problem 2"),
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[4]], aes(x_grid, y_grid))))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[4]][[4]], aes(x_grid, y_grid))))) + 
     labs(caption = "Problem 3"),  
   ncol=4
 )
@@ -223,13 +295,13 @@ grid.arrange(
 
 ```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%', fig.cap = "\\label{fig:appendixa} My caption here"}
 grid.arrange(
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid)), key="policy"))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid)), key="policy"))) + 
     labs(caption = "Problem 0"),
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[4]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
     labs(caption = "Problem 1"),
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[3]], aes(x_grid, y_grid)), key="policy"))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[4]][[3]], aes(x_grid, y_grid)), key="policy"))) + 
     labs(caption = "Problem 2"),
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[4]][[4]], aes(x_grid, y_grid)), key="policy"))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[4]][[4]], aes(x_grid, y_grid)), key="policy"))) + 
     labs(caption = "Problem 3"),  
   ncol=4
 )
@@ -252,16 +324,16 @@ grid.arrange(
 margin = theme(plot.margin = unit(c(2,2,2,2), "cm"))
 
 grid.arrange(
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid))))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid))))) + 
     labs(caption = "8x8 Grid Problem 0"),
   fix_caption(u_plot(lakes[[8]][[1]])) + labs(caption = "8x8 Problem 0 - Utilities Table"),
   ncol=2
 )
 
 grid.arrange(
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
     labs(caption = "8x8 Grid Problem 1"),
-  fix_caption(remove_legend(finish_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
     labs(caption = "8x8 Grid Problem 1"),  
   ncol=2
 )

@@ -70,7 +70,7 @@ u_plot <- function(data) {
   return(plot)
 }
 
-finish_plot <- function(plot, key="val") {
+env_plot <- function(plot, key="val") {
   plot <- plot + geom_tile(aes(fill = val), colour = "white") + 
     geom_text(aes(label = get_label(val, action_grid, key)), position = position_dodge(width=0.9), size=5) +
     scale_fill_manual(values=palette, labels = c("Start (safe)", "Frozen (safe)", "Hole", "Goal")) + 

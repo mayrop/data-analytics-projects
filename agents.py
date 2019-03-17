@@ -355,7 +355,7 @@ class PassiveAgent(MyAbstractAIAgent):
         return -0.04
 
     def solve(self, episodes=200, iterations=200, reset=True, seed=False, gamma=0.95):
-        mdp = EnvMDP(self.env, gamma=0.95)
+        mdp = EnvMDP(self.env, gamma=gamma)
         self.policy = policy_iteration(mdp)
         self.U = value_iteration(mdp, epsilon=0.000000000001)
 
@@ -480,7 +480,7 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
         else:
             return self.all_act
 
-    def f(self, u, n, a, noise):       
+    def f(self, u, n, noise):       
         """ Exploration function."""
 
         if self.map_name_base == '4x4-base':
@@ -509,7 +509,7 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
         else:  
             self.s, self.r = new_state, new_reward            
             self.a = argmax(actions(new_state), key=lambda a1: self.f(Q[new_state, a1], 
-                                                                Nsa[s, a1], a1, noise[0][a1]))
+                                                                Nsa[s, a1], noise[0][a1]))
             if random.uniform(0, 1) < 0.075:
                 self.a = random.randint(0, len(self.all_act)-1)
 
