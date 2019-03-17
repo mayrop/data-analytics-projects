@@ -61,7 +61,6 @@ class MyAbstractAIAgent():
         print('Problem: ', self.problem_id)
         print('Grid: ', self.map_name_base)
         print('Episodes that will run...: ', episodes)
-        print("\n\n")
 
         self.train(episodes=episodes, iterations=iterations)
         rewards = self.rewards
@@ -71,8 +70,9 @@ class MyAbstractAIAgent():
         for e in range(1, episodes + 1): # iterate over episodes
             state = self.env.reset()
             self.set_episode_seed(e, seed)
-            if e % 100 == 0:
-                print("Solving Episode", e)
+            
+            if e % 1000 == 0:
+                print("Eval Episode", e)
 
             for i in range(1, iterations+1):
                 action = self.action(state) 
@@ -354,13 +354,13 @@ class PassiveAgent(MyAbstractAIAgent):
     def reward_hole(self):
         return -0.04
 
-    def solve(self, episodes=200, iterations=200, reset=True, seed=False):
-        mdp = EnvMDP(self.env)
+    def solve(self, episodes=200, iterations=200, reset=True, seed=False, gamma=0.95):
+        mdp = EnvMDP(self.env, gamma=0.95)
         self.policy = policy_iteration(mdp)
         self.U = value_iteration(mdp, epsilon=0.000000000001)
 
     def files(self):
-        return ['policy', 'u']
+        return ['policy', 'policy_arrows', 'u']
 
     def name(self):
         return 'passive'
@@ -434,7 +434,8 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
                                rewards, rewards/e, failures, timeouts])
 
             if e % 100 == 0:
-                print("Train Episode", e)
+                if e % 1000 == 0:
+                    print("Train Episode", e)
                 for state in states:
                     self.update_u()
                     index = coordinates[state]

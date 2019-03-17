@@ -14,39 +14,25 @@
   - Rewards/goal: No prior knowledge (does not know where the goal is located)  
 """
 import sys
-from helpers import *
-from agents import *
-from utils import print_table
+from helpers import parse_args
+from agents import RandomAgent
 import numpy as np
 
-print('Number of arguments:', len(sys.argv), 'arguments.')
-print('Argument List:', str(sys.argv))
+def main(args):
+    """Main Program."""     
 
-def main(argv):
-    """Main Program."""
-    if len(argv) < 1:
-        print("usage: run_rl.py <problem_id> <episodes=10000> <grid=8>")
-        exit()
-
-    problem_id = int(argv[0])
-    episodes = 10000
-    grid = '8x8-base'
-    seed = True
-
-    if len(argv) > 1 and str.isdigit(argv[1]):
-        episodes = int(argv[1])
-
-    if len(argv) > 2:
-        grid = '{}_{}-base'.format(argv[2], argv[2])        
-
-    print("It was found out that setting the seed for random was slow.. you can turn it on with seed=True")
-    print("More info in documentation...")
+    problem_ids, episodes, grid = parse_args(args)
+    print('It was found out that setting the seed for random was slow.. you can turn it on with seed=True')
+    print('More info in documentation...')
+    
     # Reset the random generator to a known state (for reproducability)
     np.random.seed(12)
-    # this seed doesn't work... if needed, change seed to True below
-    agent = RandomAgent(problem_id=problem_id, map_name_base=grid) 
-    agent.solve(episodes=episodes, seed=None)
-    agent.evaluate(episodes)
+
+    for problem_id in problem_ids:
+        # this seed doesn't work... if needed, change seed to True below
+        agent = RandomAgent(problem_id=problem_id, map_name_base=grid) 
+        agent.solve(episodes=episodes, seed=None)
+        agent.evaluate(episodes)
 
 if __name__ == '__main__':
     main(sys.argv[1:])

@@ -1,31 +1,21 @@
 import sys
-from helpers import *
-from agents import *
-from utils import print_table
-import numpy as np
-import pandas as pd
+from helpers import compare_utils, parse_args
+from agents import ReinforcementLearningAgent, PassiveAgent
 
-def main(argv):
+def main(args):
     """Main Program."""
-    if len(argv) < 1:
-        print("usage: run_rl.py <problem_id> <episodes=10000> <grid=8>")
-        exit()
+    problem_ids, episodes, grid = parse_args(args)
 
-    problem_id = int(argv[0])
-    episodes = 10000
-    grid = '8x8-base'
+    for problem_id in problem_ids:
+        agent = ReinforcementLearningAgent(problem_id=problem_id, map_name_base=grid) 
+        agent.solve(episodes=episodes)
+        agent.evaluate(episodes)
 
-    if len(argv) > 1 and str.isdigit(argv[1]):
-        episodes = int(argv[1])
+        passive_agent = PassiveAgent(problem_id=problem_id, map_name_base=grid) 
+        passive_agent.solve()
+        passive_agent.evaluate(episodes)
 
-    if len(argv) > 2:
-        grid = '{}_{}-base'.format(argv[2], argv[2])
-
-    agent = ReinforcementLearningAgent(problem_id=problem_id, map_name_base=grid) 
-    agent.solve(episodes=episodes)
-    agent.evaluate(episodes)
-
-    passive_agent = ReinforcementLearningAgent(problem_id=problem_id, map_name_base=grid) 
+        compare_utils(passive_agent.U, agent.U)
 
 if __name__ == '__main__':
     main(sys.argv[1:])

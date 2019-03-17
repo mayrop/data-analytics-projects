@@ -1,12 +1,3 @@
-"""HELLO CLI
-Usage:
-    hello.py
-    hello.py <name>
-    hello.py -h|--help
-    hello.py -v|--version
-Options:
-    <type> grids
-"""
 import csv
 import os
 import sys

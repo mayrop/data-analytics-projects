@@ -44,10 +44,10 @@ def q_to_u(Q):
 
     return U   
 
-def generate_grids(base):
+def generate_grids(cols):
     grids = []
-    for i in range(base):
-        map_name_base = '{}x{}-base'.format(base, base)
+    for i in range(cols):
+        map_name_base = '{}x{}-base'.format(cols, cols)
         env = LochLomondEnv(problem_id=i, is_stochastic=True, 
                             reward_hole=-0.02, map_name_base=map_name_base)
 
@@ -57,23 +57,30 @@ def generate_grids(base):
     
     return grids
 
-# ______________________________________________________________________________
-# Graphs
 
-def graph_utility_estimates(graphs):
-    """ Source of this function: 
-        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
-    """
+def parse_args(argv):
+    if len(argv) < 1:
+        print('usage: run_rl.py <problem_ids> <episodes=10000> <grid=8>')
+        exit()
+
+    problem_ids = [abs(int(problem_id.strip())) for problem_id in argv[0].split(',')]
+    problem_ids = [problem_id for problem_id in problem_ids if problem_id < 8]
     
-    for state, value in graphs.items():
-        state_x, state_y = zip(*value)
-        plt.plot(state_x, state_y, label=str(state))
+    if len(problem_ids) == 0:
+        print('please provide problem ids between 0 and 7')
+        print('usage: run_rl.py <problem_ids> <episodes=10000> <grid=8>')
+        exit()
 
-    plt.ylim([-0.1, 1.2])
-    plt.legend(loc='lower right')
-    plt.xlabel('Iterations')
-    plt.ylabel('U')
-    plt.show(block=True)
+    episodes = 10000
+    grid = '8x8-base'
+
+    if len(argv) > 1 and str.isdigit(argv[1]):
+        episodes = int(argv[1])
+
+    if len(argv) > 2:
+        grid = '{}_{}-base'.format(argv[2], argv[2])
+
+    return problem_ids, episodes, grid
 
 # ______________________________________________________________________________
 
@@ -221,7 +228,6 @@ def policy_to_list(policy):
 
 # Reinforcement Learning. QLearning
 
-
 def compare_utils(U1, U2, H1="U1", H2="U2"):
     """ Source of this function: 
         - Labs from Artifial Intelligence (H), University of Glasgow class 2019
@@ -233,8 +239,12 @@ def compare_utils(U1, U2, H1="U1", H2="U2"):
     U_maxnorm = -10000
 
     for state in U1.keys():
+        if state not in U2:
+            print("State skipped: ", state)
+            continue
+
         U_diff[state] = U1[state] - U2[state]        
-        U_2norm = U_2norm + U_diff[state]**2
+        U_2norm = U_2norm + U_diff[state] ** 2
 
         if np.abs(U_diff[state]) > U_maxnorm:
             U_maxnorm = np.abs(U_diff[state])
