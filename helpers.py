@@ -1,12 +1,11 @@
-import numpy as np
 import sys
-#AIMA_TOOLBOX_ROOT="aima-python"
-sys.path.append("aima")
-from search import *
-from mdp import MDP
-from rl import PassiveTDAgent
+import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from uofgsocsai import LochLomondEnv
+from aima_search import *
+from aima_mdp import MDP
+from aima_rl import PassiveTDAgent
 
 # ______________________________________________________________________________
 # Random
@@ -75,12 +74,51 @@ def parse_args(argv):
     grid = '8x8-base'
 
     if len(argv) > 1 and str.isdigit(argv[1]):
+        if int(argv[1]) < 2000:
+            print('please a number of episodes > 2000')
+            print('usage: run_rl.py <problem_ids> <episodes=10000> <grid=8>')
+            exit()
         episodes = int(argv[1])
 
-    if len(argv) > 2:
+    if len(argv) > 2 and str.isdigit(argv[2]):
+        if int(argv[2]) not in [4, 8]:
+            print('please provide a grid, either 4 or 8')
+            print('usage: run_rl.py <problem_ids> <episodes=10000> <grid=8>')
+            exit()
         grid = '{}x{}-base'.format(argv[2], argv[2])
+        problem_ids = [problem_id for problem_id in problem_ids if problem_id < int(argv[2])]
 
     return problem_ids, episodes, grid
+
+
+def plot_eval(agents, rows, labels, filename, title, subtitle, training=True):
+    random_agent_eval = np.array(agents['random'].eval)
+    random_x = pd.to_numeric(random_agent_eval[:,1])
+    random_y = pd.to_numeric(random_agent_eval[:,6])
+
+    simple_agent_eval = np.array(agents['simple'].eval)
+    simple_x = pd.to_numeric(simple_agent_eval[:,1])
+    simple_y = pd.to_numeric(simple_agent_eval[:,6])
+
+    if training:
+        rl_agent_eval = np.array(agents['rl']._train)
+        rl_x = pd.to_numeric(rl_agent_eval[:,1])
+        rl_y = pd.to_numeric(rl_agent_eval[:,5])
+    else:
+        rl_agent_eval = np.array(agents['rl'].eval)
+        rl_x = pd.to_numeric(rl_agent_eval[:,1])
+        rl_y = pd.to_numeric(rl_agent_eval[:,6])
+
+    plt.plot(random_x[rows], random_y[rows], '-b', label='Random')
+    plt.plot(simple_x[rows], simple_y[rows], '-g', label='Simple')
+    plt.plot(rl_x[rows], rl_y[rows], '-r', label='RL')
+    plt.xlabel(labels[0])
+    plt.ylabel(labels[1])
+    plt.suptitle(title, fontsize=12)
+    plt.title(subtitle, fontsize=10)
+    plt.legend(loc='upper right')    
+    plt.savefig('out/out_all_{}.png'.format(filename))
+    plt.close()
 
 # ______________________________________________________________________________
 

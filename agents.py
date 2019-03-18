@@ -9,14 +9,14 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-sys.path.append("aima")
-from helpers import *
-from mdp import policy_iteration
-from mdp import value_iteration
-from search import *
-from uofgsocsai import LochLomondEnv # load the class defining the custom Open AI Gym problem
 import json
 import pandas as pd
+from helpers import *
+
+from aima_mdp import policy_iteration
+from aima_mdp import value_iteration
+from aima_search import *
+from uofgsocsai import LochLomondEnv # load the class defining the custom Open AI Gym problem
 
 class MyAbstractAIAgent():
     """
@@ -123,26 +123,36 @@ class MyAbstractAIAgent():
         # Plotting mean rewards  
         print('Saving Plots...')
         labels = ['Episodes', 'Mean Reward']
+        title = 'Problem {}. Plot for {} Agent'.format(self.problem_id, self.name().capitalize())
 
         if (len(self._train) > 0):
-            self.plot_train(range(episodes), labels, 'mr')
-            self.plot_train(range(999), labels, 'mr_first_1000')
-            self.plot_train(range(episodes-1000, episodes-1), labels, 'mr_last_1000')
+            subtitle = 'Episodes vs Mean Reward (Training Phase).'
+            self.plot_train(range(episodes), labels, title, subtitle, 'mr')
 
-        if (len(self.eval) > 0):    
-            self.plot_evaluation(range(episodes), labels, 'mr')
-            self.plot_evaluation(range(999), labels, 'mr_first_1000')
-            self.plot_evaluation(range(episodes-1000, episodes-1), labels, 'mr_last_1000')
+            subtitle = 'First 1000 Episodes vs Mean Reward (Training Phase).'
+            self.plot_train(range(999), labels, title, subtitle, 'mr_first_1000')
+
+            subtitle = 'Last 1000 Episodes vs Mean Reward (Training Phase).'
+            self.plot_train(range(episodes-1000, episodes-1), labels, title, subtitle, 'mr_last_1000')
+
+        if (len(self.eval) > 0):   
+            subtitle = 'Episodes vs Mean Reward (Evaluation Phase).'
+            self.plot_evaluation(range(episodes), labels, title, subtitle, 'mr')
+
+            subtitle = 'First 1000 Episodes vs Mean Reward (Evaluation Phase).'
+            self.plot_evaluation(range(999), labels, title, subtitle, 'mr_first_1000')
+
+            subtitle = 'Last 1000 Episodes vs Mean Reward (Evaluation Phase).'
+            self.plot_evaluation(range(episodes-1000, episodes-1), labels, title, subtitle, 'mr_last_1000')
 
         if (len(self.graphs) > 0):
-            self.plot_utilities(['Episodes', 'U'])
+            subtitle = 'Utilities plot'
+            self.plot_utilities(['Episodes', 'U'], title, subtitle)
 
     def write_eval_files(self):
         def data_for_file(name):
             if name == 'policy':
                 return policy_to_list(self.policy)
-            if name == 'policy_arrows':
-                return policy_to_arrows(self.policy, self.env.ncol, self.env.ncol)
             if name == 'u':
                 return u_to_list(self.U)
             if name == 'eval':
@@ -161,10 +171,6 @@ class MyAbstractAIAgent():
                 filename = '{}_{}.json'.format(self.alias(), file)
                 with open(filename, 'w') as outfile:
                     json.dump(data_for_file(file), outfile)
-            elif file == 'policy_arrows':
-                filename = '{}_{}.txt'.format(self.alias(), file)
-                data = data_for_file(file)
-                np.savetxt(filename, data, delimiter="\t", fmt='%s') 
             else:
                 filename = '{}_{}.csv'.format(self.alias(), file)
                 data = [self.header(file)] + data_for_file(file)
@@ -198,7 +204,7 @@ class MyAbstractAIAgent():
         if key in headers:
             return headers[key]
 
-    def plot_train(self, rows, labels, suffix=''):
+    def plot_train(self, rows, labels,  title, subtitle, suffix=''):
         """ Plots mean rewards from training phase """
         train = np.array(self._train)
 
@@ -206,9 +212,9 @@ class MyAbstractAIAgent():
         y = pd.to_numeric(train[:,5])
         filename = '{}_train_{}.png'.format(self.alias(), suffix)
         
-        self.plot(x, y, rows, labels, filename)
+        self.plot(x, y, rows, labels, filename, title, subtitle)
 
-    def plot_evaluation(self, rows, labels, suffix=''):
+    def plot_evaluation(self, rows, labels, title, subtitle, suffix=''):
         """ Plots mean rewards from evaluation phase """
         evaluation = np.array(self.eval)
 
@@ -216,9 +222,9 @@ class MyAbstractAIAgent():
         y = pd.to_numeric(evaluation[:,6])
         filename = '{}_eval_{}.png'.format(self.alias(), suffix)
         
-        self.plot(x, y, rows, labels, filename)
+        self.plot(x, y, rows, labels, filename, title, subtitle)
     
-    def plot_utilities(self, labels):
+    def plot_utilities(self, labels, title, subtitle):
         for state, value in self.graphs.items():
             x, y = zip(*value)
             plt.plot(x, y, label=str(state))
@@ -228,16 +234,20 @@ class MyAbstractAIAgent():
         plt.xlabel(labels[0])
         plt.ylabel(labels[1])
         filename='{}_utilities.png'.format(self.alias())
+        plt.suptitle(title, fontsize=12)
+        plt.title(subtitle, fontsize=10)        
         plt.savefig(filename)
         plt.close()
 
         print('\tPlot saved: {}'.format(filename))
 
-    def plot(self, x, y, rows, labels, filename):
+    def plot(self, x, y, rows, labels, filename, title, subtitle):
         plt.plot(x[rows], y[rows])
         plt.xlabel(labels[0])
         plt.ylabel(labels[1])
         plt.savefig(filename)
+        plt.suptitle(title, fontsize=12)
+        plt.title(subtitle, fontsize=10)        
         plt.close()
 
         print('\tPlot saved: {}'.format(filename))
@@ -320,7 +330,7 @@ class SimpleAgent(MyAbstractAIAgent):
                 self.policy[state] = None
 
     def files(self):
-        return ['eval', 'policy', 'policy_arrows']
+        return ['eval', 'policy']
 
     def name(self):
         return 'simple'
@@ -343,7 +353,7 @@ class PassiveAgent(MyAbstractAIAgent):
         self.U = value_iteration(mdp, epsilon=0.000000000001)
 
     def files(self):
-        return ['policy', 'policy_arrows', 'u']
+        return ['policy', 'u']
 
     def name(self):
         return 'passive'
@@ -367,10 +377,16 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
         return -0.05
 
     def files(self):
-        return ['eval', 'u', 'policy', 'policy_arrows', 'q', 'graphs', 'train']        
+        return ['eval', 'u', 'policy', 'q', 'graphs', 'train']        
 
     def action(self, position):
-        return self.policy[pos_to_coord(position, self.env.ncol)]
+        coordinates = pos_to_coord(position, self.env.ncol)
+        
+        if coordinates in self.policy:
+            return self.policy[coordinates]
+
+        # in case it did not converge
+        self.env.action_space.sample()
 
     def name(self):
         return 'rl'
@@ -476,7 +492,6 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
         return u + noise
 
     def best_action(self, new_state, new_reward, episode):
-        noise = np.random.random((1, 4)) / (episode)
         alpha, gamma, terminals = self.alpha, self.gamma, self.terminals
         Q, Nsa = self.training_Q, self.Nsa
         actions = self.training_actions
@@ -490,6 +505,8 @@ class ReinforcementLearningAgent(MyAbstractAIAgent):
             self.training_Q[new_state, None] = new_reward
             self.s = self.a = self.r = None
         else:  
+            noise = np.random.random((1, 4)) / (episode)
+
             self.s, self.r = new_state, new_reward            
             self.a = argmax(actions(new_state), key=lambda a1: self.f(Q[new_state, a1], 
                                                                 Nsa[s, a1], noise[0][a1]))

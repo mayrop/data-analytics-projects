@@ -82,9 +82,8 @@ class LochLomondEnv(discrete.DiscreteEnv):
     
         # Fetch the base problem (without S and G)
         # map_name_base="8x8-base" # for the final submission in AI (H) this should be 8x8-base but you may want to start out with 4x4-base!        
-        MY_MAP_BASE = copy.deepcopy(MAPS_BASE)
 
-        desc = MY_MAP_BASE[map_name_base]
+        desc = copy.deepcopy(MAPS_BASE)[map_name_base]
         self.nrow, self.ncol = nrow, ncol = np.asarray(desc,dtype='c').shape
         self.is_stochastic = is_stochastic
         self.reward_hole = reward_hole
