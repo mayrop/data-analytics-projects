@@ -355,47 +355,58 @@ mean_rewards <- all_stats %>%
 successes %>% 
   kable(
     col.names = c("Problem ID", "Random Agent", "Simple Agent", "Training Phase", "Evaluation Phase"),
-    caption = '\\label{tab:summary_sucesses} .', 
+    caption = '\\label{tab:summary_sucesses} Total of successes by agent', 
     booktabs = TRUE, 
-    format = "latex"
+    format = "latex",
+    digits = 2, linesep=c('')
   ) %>%
-  kable_styling(font_size = 10, latex_options = "HOLD_position")
-
-failures %>% 
-  kable(
-    col.names = c("Problem ID", "Random Agent", "Training Phase", "Evaluation Phase"),
-    caption = '\\label{tab:summary_sucesses} .', 
-    booktabs = TRUE, 
-    format = "latex"
-  ) %>%
-  kable_styling(font_size = 10, latex_options = "HOLD_position")
-
-failures_mean_iteration %>% 
-  kable(
-    col.names = c("Problem ID", "Random Agent", "Simple Agent", "Training Phase", "Evaluation Phase"),
-    caption = '\\label{tab:summary_sucesses} .', 
-    booktabs = TRUE, 
-    format = "latex"
-  ) %>%
-  kable_styling(font_size = 10, latex_options = "HOLD_position")
+  kable_styling(font_size = 10, latex_options = c("HOLD_position", "striped")) %>%
+  add_header_above(c(" ", " ", " ", "Reinforcement Learning Agent" = 2))
 
 successes_mean_iteration %>% 
   kable(
     col.names = c("Problem ID", "Random Agent", "Simple Agent", "Training Phase", "Evaluation Phase"),
-    caption = '\\label{tab:summary_sucesses} .', 
+    caption = '\\label{tab:summary_sucesses} Average iterations per episode where the agent reached the goal', 
     booktabs = TRUE, 
-    format = "latex"
+    format = "latex",
+    digits = 2, linesep=c('')
   ) %>%
-  kable_styling(font_size = 10, latex_options = "HOLD_position")
+  kable_styling(font_size = 10, latex_options = "HOLD_position") %>%
+  add_header_above(c(" ", " ", " ", "Reinforcement Learning Agent" = 2))
+
+failures %>% 
+  kable(
+    col.names = c("Problem ID", "Random Agent", "Training Phase", "Evaluation Phase"),
+    caption = '\\label{tab:summary_failures} Total of failures by agent', 
+    booktabs = TRUE, 
+    format = "latex",
+    digits = 2, linesep=c('')
+  ) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position") %>%
+  add_header_above(c(" ", " ", "Reinforcement Learning Agent" = 2)) %>%
+  footnote(general = "Simple agent is not added in this table as it never failed.")
+
+failures_mean_iteration %>% 
+  kable(
+    col.names = c("Problem ID", "Random Agent", "Training Phase", "Evaluation Phase"),
+    caption = '\\label{tab:summary_sucesses} Average iterations per episode where the agent failed (reached a hole)', 
+    booktabs = TRUE, 
+    format = "latex",
+    digits = 2, linesep=c('')
+  ) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position") %>%
+  add_header_above(c(" ", " ", "Reinforcement Learning Agent" = 2)) %>%
+  footnote(general = "Simple agent is not added in this table as it never failed.")
 
 mean_rewards %>% 
   kable(
     col.names = c("Problem ID", "Random Agent", "Simple Agent", "Training Phase", "Evaluation Phase"),
-    caption = '\\label{tab:summary_sucesses} .', 
+    caption = '\\label{tab:summary_sucesses} Mean rewards per episode', 
     booktabs = TRUE, 
     format = "latex"
   ) %>%
-  kable_styling(font_size = 10, latex_options = "HOLD_position")
+  kable_styling(font_size = 10, latex_options = "HOLD_position") %>%
+  add_header_above(c(" ", " ", "Reinforcement Learning Agent" = 2))
 ```
 
 ```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_0} Evaluation Plots for Problem 0 (Training Phase)"}
