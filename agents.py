@@ -33,8 +33,7 @@ class MyAbstractAIAgent():
         self.map_name_base = map_name_base
         self.env = LochLomondEnv(problem_id=problem_id, 
                                  is_stochastic=self.is_stochastic(), 
-                                 reward_hole=self.reward_hole(), 
-                                 map_name_base=map_name_base)
+                                 reward_hole=self.reward_hole())
 
         self.problem_id = problem_id
         self.reset()

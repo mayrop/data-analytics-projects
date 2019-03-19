@@ -1,5 +1,5 @@
 import unittest
-from agents import RandomAgent, SimpleAgent, UofGPassiveAgent, ReinforcementLearningAgent
+from agents import RandomAgent, SimpleAgent, ReinforcementLearningAgent
 import random
 import numpy as np
 from mdp import policy_iteration
@@ -36,7 +36,7 @@ class TestRandomAgent(unittest.TestCase):
 
     def test_env(self):
         env = LochLomondEnv(problem_id=0, is_stochastic=True, 
-                            reward_hole=-0.02, map_name_base="4x4-base")
+                            reward_hole=-0.02)
 
         self.assertEqual(b'S', env.desc[0,0])
         self.assertEqual(b'F', env.desc[0,1])
@@ -46,13 +46,13 @@ class TestRandomAgent(unittest.TestCase):
 
     def test_env_converter(self):
         env = LochLomondEnv(problem_id=0, is_stochastic=True, 
-                            reward_hole=-0.02, map_name_base="4x4-base")
+                            reward_hole=-0.02)
         self.assertEqual(['S','F','F','F'], EnvMDP.to_decoded(env)[0].tolist())
 
 
     def test_env_2_grid(self):
         env = LochLomondEnv(problem_id=0, is_stochastic=True, 
-                            reward_hole=-0.2, map_name_base="4x4-base")
+                            reward_hole=-0.2)
 
         mdp = EnvMDP(env)
         grid = EnvMDP.to_grid_matrix(env)
@@ -64,7 +64,7 @@ class TestRandomAgent(unittest.TestCase):
 
     def test_env_2_terminals(self):
         env = LochLomondEnv(problem_id=1, is_stochastic=True, 
-                            reward_hole=-0.2, map_name_base="4x4-base")
+                            reward_hole=-0.2)
 
         mdp = EnvMDP(env)
         terminals = EnvMDP.to_position(env, letter=b'GH')
@@ -78,7 +78,7 @@ class TestRandomAgent(unittest.TestCase):
 
     def test_env_mdp(self):
         env = LochLomondEnv(problem_id=1, is_stochastic=True, 
-                            reward_hole=-0.2, map_name_base="4x4-base")
+                            reward_hole=-0.2)
 
         mdp = EnvMDP(env)
         self.assertEqual(4, mdp.rows)
@@ -90,7 +90,7 @@ class TestRandomAgent(unittest.TestCase):
 
     def test_env_2_transitions(self):
         env = LochLomondEnv(problem_id=1, is_stochastic=True, 
-                            reward_hole=-0.2, map_name_base="4x4-base")
+                            reward_hole=-0.2)
 
         mdp = EnvMDP(env)
         transitions = EnvMDP.to_transitions(env)
@@ -125,7 +125,7 @@ class TestRandomAgent(unittest.TestCase):
 
     def test_env_2_init(self):
         env = LochLomondEnv(problem_id=1, is_stochastic=True, 
-                            reward_hole=-0.2, map_name_base="4x4-base")
+                            reward_hole=-0.2)
 
         mdp = EnvMDP(env)
         initial = EnvMDP.to_position(env, letter=b'S')
@@ -134,13 +134,13 @@ class TestRandomAgent(unittest.TestCase):
 
     def test_env_2_init_02(self):
         env = LochLomondEnv(problem_id=2, is_stochastic=True, 
-                            reward_hole=-0.2, map_name_base="4x4-base")
+                            reward_hole=-0.2)
         initial = EnvMDP.to_position(env, letter=b'S')
         self.assertEqual((2, 0), initial[0])    
 
 
     def test_4_by_4_random_agent(self):
-        agent = RandomAgent(problem_id=1, map_name_base="4x4-base")
+        agent = RandomAgent(problem_id=1)
         self.assertEqual(agent.problem_id, 1)
         self.assertEqual(agent.is_stochastic(), True)
         self.assertEqual(agent.env.ncol, 4)
@@ -162,7 +162,7 @@ class TestRandomAgent(unittest.TestCase):
 
 
     def test_simple_agent(self):
-        agent = SimpleAgent(problem_id=1, map_name_base="8x8-base")
+        agent = SimpleAgent(problem_id=1)
         agent.solve()
         
         self.assertEqual([1, 1, 11, 'down', 1, 1, 0, 0], agent.eval[0])
@@ -178,33 +178,20 @@ class TestRandomAgent(unittest.TestCase):
         self.assertTrue('S_0_1' in agent.env_mapping[0])
         self.assertFalse('S_1_1' in agent.env_mapping[0]) 
 
-        agent = SimpleAgent(problem_id=0, map_name_base="8x8-base")
+        agent = SimpleAgent(problem_id=0)
         agent.solve()
         self.assertTrue('S_0_0' in agent.env_mapping[0])
         self.assertTrue('S_0_1' in agent.env_mapping[0])
         self.assertEqual('S_0_0', agent.env_mapping[2])
 
 
-    def test_passive(self):
-        agent = UofGPassiveAgent(problem_id=1, map_name_base="8x8-base")
-        agent.solve()
-        
-        policy = agent.policy()
-        arrows = policy_to_arrows(policy, 8, 8)
-        self.assertEqual(['v', '^', '^', '^', '>', 'v', '>', 'v'], arrows[1].tolist())
-        
-        policy_list = policy_to_list(policy)
-        self.assertEqual([7, 3, 'down'], policy_list[0])
-
-        agent.write_eval_files()
-
 
     def test_qlearning(self):
-        agent = ReinforcementLearningAgent(problem_id=0, map_name_base="8x8-base")
+        agent = ReinforcementLearningAgent(problem_id=0)
         
         # print(grid)
         # for i in range(8):
-        #     agent = ReinforcementLearningAgent(problem_id=i, map_name_base="8x8-base")
+        #     agent = ReinforcementLearningAgent(problem_id=i)
         #     agent.solve()
 
         #     agent.write_eval_files()
