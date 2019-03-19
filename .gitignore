@@ -1,4 +1,5 @@
 out/
+aima/__pycache__/*
 __pycache__/*
 aima-python/
 gym/
