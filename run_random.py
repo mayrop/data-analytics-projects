@@ -1,14 +1,12 @@
 from helpers import *
-from utils import print_table
 from uofgsocsai import LochLomondEnv
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import sys
 import itertools  
 import operator  
 
-def main(problem_id):
+def random_agent(problem_id):
 
     # should be less than or equal to 0.0 (you can fine tune this  depending on you RL agent choice)
     reward_hole = 0.0
@@ -59,17 +57,12 @@ def main(problem_id):
     dataframe['cumulative_rewards'] = list(itertools.accumulate(dataframe['reward'], operator.add))
     dataframe['mean_rewards'] = dataframe.apply(lambda x: mean_rewards(x), axis=1)
 
-    problem_data = dataframe
-
-    # # Plotting mean rewards    
-    x = range(1, len(problem_data) + 1)
-    y = problem_data['mean_rewards']
+    x = range(1, len(dataframe) + 1)
+    y = dataframe['mean_rewards']
     
-    plt.plot(x, y)
-    plt.xlabel('Episodes')
-    plt.ylabel('Mean Reward')
-    plt.savefig('out_random_{}_mean_reward.png'.format(problem_id))
-    plt.close()
+    add_plot('out_random_{}_mean_reward.png'.format(problem_id))
+
+    return dataframe
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -79,5 +72,5 @@ if __name__ == '__main__':
     if not (0 <= int(sys.argv[1]) <= 7):
         raise ValueError("Problem ID must be 0 <= problem_id <= 7")        
 
-    main(int(sys.argv[1]))
+    random_agent(int(sys.argv[1]))
 
