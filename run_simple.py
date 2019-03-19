@@ -29,7 +29,7 @@ def get_action_from_location(previous, current):
     if current[1] < previous[1]:
         return 0
 
-def random_agent(problem_id):
+def simple_agent(problem_id):
 
     # should be less than or equal to 0.0 (you can fine tune this  depending on you RL agent choice)
     reward_hole = 0.0
@@ -109,5 +109,5 @@ if __name__ == '__main__':
     if not (0 <= int(sys.argv[1]) <= 7):
         raise ValueError("Problem ID must be 0 <= problem_id <= 7")        
 
-    random_agent(int(sys.argv[1]))
+    simple_agent(int(sys.argv[1]))
 

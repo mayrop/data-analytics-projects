@@ -17,14 +17,22 @@ def add_plot(x, y, name):
     plt.savefig(name)
     plt.close()
 
-def pos_to_coord(pos, ncol):
+def position_to_coordinates(pos, ncol):
+    """ 
+    TODO
+    """       
     return (pos % ncol, pos // ncol)
+
+def get_terminals(env):
+    """ 
+    TODO
+    """    
+    grid = list(env.desc.reshape(env.nrow * env.ncol))
+    
+    return [i for i, val in enumerate(grid) if bytes(val) in b'GH']
 
 def coord_to_pos(x, y, ncol):
     return x + y * ncol    
-
-def u_to_list(U):
-    return [[int(x), int(y), U[(x, y)]] for x, y in U]
 
 def q_to_u(Q):
     """ Source of this function: 
@@ -38,19 +46,6 @@ def q_to_u(Q):
             U[state] = value
 
     return U   
-
-def generate_grids(base):
-    grids = []
-    for i in range(base):
-        map_name_base = '{}x{}-base'.format(base, base)
-        env = LochLomondEnv(problem_id=i, is_stochastic=True, 
-                            reward_hole=-0.02, map_name_base=map_name_base)
-
-        env.render()
-        grid = EnvMDP.to_decoded(env).reshape(env.nrow * env.ncol)
-        grids.append(np.hstack(([i], grid)))
-    
-    return grids
 
 # ______________________________________________________________________________
 # Graphs
