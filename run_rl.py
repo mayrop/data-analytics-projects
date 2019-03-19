@@ -61,6 +61,8 @@ class QLearningAgentUofG:
             Q[s, a] += alpha * (r + gamma * max(Q[s1, a1] for a1 in self.actions_in_state(s1)) - Q[s, a])
 
         if s1 in terminals:
+            print(terminals)
+            print(s1)
             self.Q[s1, None] = s1
             self.s = self.a = self.r = None
         else:  
@@ -69,6 +71,8 @@ class QLearningAgentUofG:
 
             if random.uniform(0, 1) < (1 / (episode+1)):
                 self.a = random.randint(0, len(self.all_act)-1)
+
+        # print(Q)
 
         return self.a
 
@@ -116,7 +120,14 @@ def rl_agent(problem_id):
             if done:
                 percept = (state, reward)
 
+                print("we're done: ", percept)
+                print("we're done: ", q_agent.Q)
+                print("we're done: ", get_terminals(env))
+
                 q_agent(percept, e)
+
+                print("we're done: ", percept)
+                print("we're done: ", q_agent.Q)
 
                 if reward == reward_hole: 
                     lost_episodes += 1
