@@ -11,18 +11,14 @@ def random_agent(problem_id):
     # should be less than or equal to 0.0 (you can fine tune this  depending on you RL agent choice)
     reward_hole = 0.0
 
-    # should be False for A-star (deterministic search) and True for the RL agent
-    is_stochastic = True 
-
     # you can decide you rerun the problem many times thus generating many episodes... you can learn from them all!
     max_episodes = 10000   
 
     # you decide how many iterations/actions can be executed per episode
-    max_iter_per_episode = 1000 
+    max_iter_per_episode = 2000 
 
     # TODO - add doc on this
     lost_episodes = 0
-    cumulative_rewards = 0
 
     # Generate the specific problem 
     env = LochLomondEnv(problem_id=problem_id, is_stochastic=True, reward_hole=reward_hole)

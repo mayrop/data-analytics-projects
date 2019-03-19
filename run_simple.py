@@ -1,43 +1,113 @@
-import sys
 from helpers import *
-from agents import *
-from utils import print_table
+from uofgsocsai import LochLomondEnv
+import numpy as np
 import pandas as pd
+import sys
+import itertools  
+import operator  
+from search import *
 
-def main(problem_id):
-    """Write Doc Here"""
-    episodes = 10000
+def get_action_from_location(previous, current):
+    # todo - double check
 
-    print('Running Simple Agent')
-    print('Problem: ', problem_id)
+    # previous[0] = y coordinate of prev value
+    # previous[1] = x coordinate of prev value
 
-    agent = SimpleAgent(problem_id=problem_id) 
-    agent.solve(episodes=episodes)
-    policy = agent.policy        
-    arrows = policy_to_arrows(policy, 8, 8)
+    # current[0] = y coordinate of current value
+    # current[1] = x coordinate of current value
+
+    # down
+    if current[0] > previous[0]:
+        return 1
+    # up
+    if current[0] < previous[0]:
+        return 3
+    # right
+    if current[1] > previous[1]:
+        return 2
+    # left
+    if current[1] < previous[1]:
+        return 0
+
+def random_agent(problem_id):
+
+    # should be less than or equal to 0.0 (you can fine tune this  depending on you RL agent choice)
+    reward_hole = 0.0
+
+    # you can decide you rerun the problem many times thus generating many episodes... you can learn from them all!
+    max_episodes = 10000   
+
+    # you decide how many iterations/actions can be executed per episode
+    max_iter_per_episode = 100 
+
+    # TODO - add doc on this
+    lost_episodes = 0
+
+    actions = []
+    results = []
+
+    env = LochLomondEnv(problem_id=problem_id, is_stochastic=False, reward_hole=reward_hole)
+    state_space_locations, state_space_actions, state_initial_id, state_goal_id = env2statespace(env)
+
+    undirected_graph = UndirectedGraph(state_space_actions)
+    undirected_graph.locations = state_space_locations
+    graph_problem = GraphProblem(state_initial_id, state_goal_id, undirected_graph)
+
+    node = astar_search(problem=graph_problem, h=None)
+    best_path = node.solution()
+
+    for i in range(len(best_path)):
+        if i == 0:
+            previous = undirected_graph.locations[state_initial_id]
+        else:
+            previous = undirected_graph.locations[best_path[i - 1]]
+
+        current = undirected_graph.locations[best_path[i]]
+
+        action = get_action_from_location(previous, current)
+        actions.append(action)
+
+    for e in range(max_episodes): # iterate over episodes
+
+        observation = env.reset() # reset the state of the env to the starting state     
+        
+        for iter in range(max_iter_per_episode):
+            # pick an action from the solution
+            action = actions[iter]
+
+            # observe what happends when you take the action
+            observation, reward, done, info = env.step(action)
+          
+            # Check if we are done and monitor rewards etc...
+            if (done and reward==reward_hole): 
+                lost_episodes += 1
+                break
+
+            if (done and reward == +1.0):
+                break
+
+        results.append([e, iter, int(reward), lost_episodes])
+
+    columns = ['episode', 'iteration', 'reward', 'lost_episodes']
     
-    agent.env.reset()
-    print("This is the environment: ")
-    print(agent.env.render())
-    print("This is the final policy: ")    
-    print_table(arrows)
-    agent.write_eval_files()
+    dataframe = pd.DataFrame(data=np.array(results), index=np.array(results)[0:,0], columns=columns)
+    dataframe['cumulative_rewards'] = list(itertools.accumulate(dataframe['reward'], operator.add))
+    dataframe['mean_rewards'] = dataframe.apply(lambda x: mean_rewards(x), axis=1)
 
-    evaluation = np.array(agent.eval)
-
-    # Plotting mean rewards    
-    x = pd.to_numeric(evaluation[:,1])
-    y = pd.to_numeric(evaluation[:,6])
+    x = range(1, len(dataframe) + 1)
+    y = dataframe['mean_rewards']
     
-    plt.plot(x, y)
-    plt.xlabel('Episodes')
-    plt.ylabel('Mean Reward')
-    plt.savefig('out_simple_{}_mean_reward.png'.format(problem_id))
-    plt.close()    
+    add_plot(x, y, 'out_simple_{}_mean_reward.png'.format(problem_id))
+
+    return dataframe
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("usage: run_simple.py <problem_id>")
         exit()
+    
+    if not (0 <= int(sys.argv[1]) <= 7):
+        raise ValueError("Problem ID must be 0 <= problem_id <= 7")        
 
-    main(int(sys.argv[1]))
+    random_agent(int(sys.argv[1]))
+

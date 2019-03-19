@@ -1,4 +1,5 @@
 from run_random import random_agent
+from run_simple import simple_agent
 import sys
 import matplotlib.pyplot as plt
 from helpers import *
@@ -6,11 +7,8 @@ from helpers import *
 def main(problem_id):
 
     random_agent_data = random_agent(problem_id)
+    random_agent_data = simple_agent(problem_id)
 
-    x = range(1, len(random_agent_data) + 1)
-    y = random_agent_data['mean_rewards']
-    
-    add_plot(x, y, 'out_random_{}_mean_reward.png'.format(problem_id))
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
