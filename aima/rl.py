@@ -1,8 +1,8 @@
 """Reinforcement Learning (Chapter 21)"""
 
 from collections import defaultdict
-from aima_utils import argmax
-from aima_mdp import MDP, policy_evaluation
+from utils import argmax
+from mdp import MDP, policy_evaluation
 
 import random
 
