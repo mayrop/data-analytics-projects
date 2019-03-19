@@ -7,3 +7,4 @@ __aima-python/
 .Rhistory
 .RData
 project.Rmd_.tex
+out_*
