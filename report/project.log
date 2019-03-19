@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  18 MAR 2019 05:21
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  18 MAR 2019 08:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -643,16 +643,10 @@ LaTeX Warning: Label `tab:unnamed-chunk-7' multiply defined.
 LaTeX Warning: Label `tab:summary_sucesses' multiply defined.
 
 
-LaTeX Warning: Label `tab:unnamed-chunk-7' multiply defined.
-
-
-LaTeX Warning: Label `tab:unnamed-chunk-7' multiply defined.
+LaTeX Warning: Label `tab:unnamed-chunk-8' multiply defined.
 
 
 LaTeX Warning: Label `tab:summary_sucesses' multiply defined.
-
-
-LaTeX Warning: Label `tab:unnamed-chunk-7' multiply defined.
 
 
 LaTeX Warning: Label `tab:summary_sucesses' multiply defined.
@@ -676,49 +670,19 @@ LaTeX Warning: Label `fig:appendixa' multiply defined.
 LaTeX Warning: Label `fig:appendixa' multiply defined.
 
 
-LaTeX Warning: Label `fig:appendixa' multiply defined.
-
-
-LaTeX Warning: Label `fig:appendix_c_0' multiply defined.
-
-
-LaTeX Warning: Label `fig:appendix_c_0' multiply defined.
+LaTeX Warning: Label `fig:appendix_c_1' multiply defined.
 
 
 LaTeX Warning: Label `fig:appendix_c_1' multiply defined.
 
 
-LaTeX Warning: Label `fig:appendix_c_0' multiply defined.
+LaTeX Warning: Label `fig:appendix_c_1' multiply defined.
 
 
 LaTeX Warning: Label `fig:appendix_c_1' multiply defined.
 
 
-LaTeX Warning: Label `fig:appendix_c_0' multiply defined.
-
-
 LaTeX Warning: Label `fig:appendix_c_1' multiply defined.
-
-
-LaTeX Warning: Label `fig:appendix_c_0' multiply defined.
-
-
-LaTeX Warning: Label `fig:appendix_c_1' multiply defined.
-
-
-LaTeX Warning: Label `fig:appendix_c_0' multiply defined.
-
-
-LaTeX Warning: Label `fig:appendix_c_1' multiply defined.
-
-
-LaTeX Warning: Label `fig:appendix_c_0' multiply defined.
-
-
-LaTeX Warning: Label `fig:appendix_c_1' multiply defined.
-
-
-LaTeX Warning: Label `fig:appendix_c_0' multiply defined.
 
 
 LaTeX Warning: Label `fig:appendix_c_1' multiply defined.
@@ -851,50 +815,50 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 123.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 126.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 123.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 126.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 123
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 126
 .
 (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 123
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 126
 .
 (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 123.
+(Font)              <10.95> on input line 126.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 123.
+(Font)              <8> on input line 126.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 123.
-LaTeX Font Info:    Try loading font information for U+msa on input line 123.
+(Font)              <6> on input line 126.
+LaTeX Font Info:    Try loading font information for U+msa on input line 126.
 (/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (/usr/local/texlive/2018/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 123.
+LaTeX Font Info:    Try loading font information for U+msb on input line 126.
 (/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (/usr/local/texlive/2018/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
-<project_files/figure-latex/environments-1.pdf, id=89, 516.93124pt x 284.06125p
-t>
+<project_files/figure-latex/environments-1.pdf, id=105, 516.93124pt x 284.06125
+pt>
 File: project_files/figure-latex/environments-1.pdf Graphic file (type pdf)
 <use project_files/figure-latex/environments-1.pdf>
 Package pdftex.def Info: project_files/figure-latex/environments-1.pdf  used on
- input line 130.
+ input line 137.
 (pdftex.def)             Requested size: 328.83926pt x 180.70195pt.
 [1
 
@@ -904,649 +868,811 @@ ready used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.155 
+l.154 
        <./project_files/figure-latex/environments-1.pdf>]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 164.
+(Font)              <10> on input line 163.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 164.
+(Font)              <7> on input line 163.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 164.
+(Font)              <5> on input line 163.
+LaTeX Font Info:    Try loading font information for T1+lmtt on input line 175.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/lm/t1lmtt.fd
+File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 220.
+(Font)              <9> on input line 195.
 [2pdfTeX warning (ext4): destination with the same identifier (name{table.1}) h
 as been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.222 
+l.221 
       ]
-LaTeX Font Info:    Try loading font information for T1+lmtt on input line 265.
-
-(/usr/local/texlive/2018/texmf-dist/tex/latex/lm/t1lmtt.fd
-File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [3]
-Underfull \hbox (badness 2035) in paragraph at lines 314--327
-\OMS/lmsy/m/n/10.95 ^^O$ \T1/lmr/m/n/10.95 (+20) At-tributes \T1/lmtt/m/n/10.95
- is_stochastic\T1/lmr/m/n/10.95 (+20) , \T1/lmtt/m/n/10.95 reward_hole\T1/lmr/m
-/n/10.95 (+20) , \T1/lmtt/m/n/10.95 reward \T1/lmr/m/n/10.95 (+20) and \T1/lmtt
-/m/n/10.95 path_cost \T1/lmr/m/n/10.95 (+20) were added to the
+Underfull \hbox (badness 4366) in paragraph at lines 263--272
+\T1/lmr/m/n/10.95 (+20) Our agents can be called through the \T1/lmtt/m/n/10.95
+ run_random.py {problem_id}\T1/lmr/m/n/10.95 (+20) , \T1/lmtt/m/n/10.95 run_sim
+ple.py
  []
 
-[4] [5pdfTeX warning (ext4): destination with the same identifier (name{table.2
-}) has been already used, duplicate ignored
+[3] [4] [5pdfTeX warning (ext4): destination with the same identifier (name{tab
+le.2}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.430 
+l.428 
       pdfTeX warning (ext4): destination with the same identifier (name{table.3
 }) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.430 
+l.428 
+      pdfTeX warning (ext4): destination with the same identifier (name{table.4
+}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.428 
       ]
-<../out/out_all_0_8_training.png, id=147, 462.528pt x 346.896pt>
+<../out/out_all_0_8_training.png, id=169, 462.528pt x 346.896pt>
 File: ../out/out_all_0_8_training.png Graphic file (type png)
 <use ../out/out_all_0_8_training.png>
-Package pdftex.def Info: ../out/out_all_0_8_training.png  used on input line 48
-2.
+Package pdftex.def Info: ../out/out_all_0_8_training.png  used on input line 46
+4.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_0_8_first_1000_training.png, id=149, 462.528pt x 346.896pt>
+<../out/out_all_0_8_first_1000_training.png, id=171, 462.528pt x 346.896pt>
 File: ../out/out_all_0_8_first_1000_training.png Graphic file (type png)
 <use ../out/out_all_0_8_first_1000_training.png>
 Package pdftex.def Info: ../out/out_all_0_8_first_1000_training.png  used on in
-put line 482.
+put line 464.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_0_8_evaluation.png, id=150, 462.528pt x 346.896pt>
-File: ../out/out_all_0_8_evaluation.png Graphic file (type png)
-<use ../out/out_all_0_8_evaluation.png>
-Package pdftex.def Info: ../out/out_all_0_8_evaluation.png  used on input line 
-489.
-(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_0_8_first_1000_evaluation.png, id=151, 462.528pt x 346.896pt>
-File: ../out/out_all_0_8_first_1000_evaluation.png Graphic file (type png)
-<use ../out/out_all_0_8_first_1000_evaluation.png>
-Package pdftex.def Info: ../out/out_all_0_8_first_1000_evaluation.png  used on 
-input line 489.
-(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-[6pdfTeX warning (ext4): destination with the same identifier (name{table.4}) h
+[6pdfTeX warning (ext4): destination with the same identifier (name{table.5}) h
 as been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.489 ...l_0_8_first_1000_evaluation} \end{center}
-                                                  pdfTeX warning (ext4): destin
-ation with the same identifier (name{table.5}) has been already used, duplicate
- ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.489 ...l_0_8_first_1000_evaluation} \end{center}
+l.464 ...all_0_8_first_1000_training} \end{center}
                                                   pdfTeX warning (ext4): destin
 ation with the same identifier (name{table.6}) has been already used, duplicate
  ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.489 ...l_0_8_first_1000_evaluation} \end{center}
-                                                  ] [7pdfTeX warning (ext4): de
-stination with the same identifier (name{figure.2}) has been already used, dupl
-icate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.497 \newpage
-               <../out/out_all_0_8_training.png> <../out/out_all_0_8_first_1000
-_training.png> <../out/out_all_0_8_evaluation.png> <../out/out_all_0_8_first_10
-00_evaluation.png>]
-<project_files/figure-latex/unnamed-chunk-11-1.pdf, id=170, 712.6625pt x 204.76
-5pt>
-File: project_files/figure-latex/unnamed-chunk-11-1.pdf Graphic file (type pdf)
-
-<use project_files/figure-latex/unnamed-chunk-11-1.pdf>
-Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-11-1.pdf  use
-d on input line 506.
-(pdftex.def)             Requested size: 422.7726pt x 121.47267pt.
-<project_files/figure-latex/unnamed-chunk-12-1.pdf, id=171, 712.6625pt x 204.76
-5pt>
+l.464 ...all_0_8_first_1000_training} \end{center}
+                                                  ]
+<../out/out_all_0_8_evaluation.png, id=178, 462.528pt x 346.896pt>
+File: ../out/out_all_0_8_evaluation.png Graphic file (type png)
+<use ../out/out_all_0_8_evaluation.png>
+Package pdftex.def Info: ../out/out_all_0_8_evaluation.png  used on input line 
+468.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_all_0_8_first_1000_evaluation.png, id=179, 462.528pt x 346.896pt>
+File: ../out/out_all_0_8_first_1000_evaluation.png Graphic file (type png)
+<use ../out/out_all_0_8_first_1000_evaluation.png>
+Package pdftex.def Info: ../out/out_all_0_8_first_1000_evaluation.png  used on 
+input line 468.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<project_files/figure-latex/unnamed-chunk-12-1.pdf, id=180, 279.0425pt x 134.50
+25pt>
 File: project_files/figure-latex/unnamed-chunk-12-1.pdf Graphic file (type pdf)
 
 <use project_files/figure-latex/unnamed-chunk-12-1.pdf>
 Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-12-1.pdf  use
-d on input line 515.
-(pdftex.def)             Requested size: 422.7726pt x 121.47267pt.
-<project_files/figure-latex/unnamed-chunk-13-1.pdf, id=172, 712.6625pt x 204.76
-5pt>
-File: project_files/figure-latex/unnamed-chunk-13-1.pdf Graphic file (type pdf)
+d on input line 487.
+(pdftex.def)             Requested size: 279.04607pt x 134.5042pt.
 
-<use project_files/figure-latex/unnamed-chunk-13-1.pdf>
-Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-13-1.pdf  use
-d on input line 524.
-(pdftex.def)             Requested size: 422.7726pt x 121.47267pt.
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../out/out_rl_0_8_train_mr.png, id=181, 462.528pt x 346.896pt>
+File: ../out/out_rl_0_8_train_mr.png Graphic file (type png)
+<use ../out/out_rl_0_8_train_mr.png>
+Package pdftex.def Info: ../out/out_rl_0_8_train_mr.png  used on input line 494
+.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_0_8_eval_mr.png, id=182, 462.528pt x 346.896pt>
+File: ../out/out_rl_0_8_eval_mr.png Graphic file (type png)
+<use ../out/out_rl_0_8_eval_mr.png>
+Package pdftex.def Info: ../out/out_rl_0_8_eval_mr.png  used on input line 494.
+
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+[7pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) 
+has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.494 ...]{../out/out_rl_0_8_eval_mr} \end{center}
+                                                   <../out/out_all_0_8_training
+.png> <../out/out_all_0_8_first_1000_training.png> <../out/out_all_0_8_evaluati
+on.png> <../out/out_all_0_8_first_1000_evaluation.png>]
+<../out/out_rl_0_8_train_mr_first_1000.png, id=193, 462.528pt x 346.896pt>
+File: ../out/out_rl_0_8_train_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_0_8_train_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_0_8_train_mr_first_1000.png  used on inp
+ut line 498.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_0_8_eval_mr_first_1000.png, id=194, 462.528pt x 346.896pt>
+File: ../out/out_rl_0_8_eval_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_0_8_eval_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_0_8_eval_mr_first_1000.png  used on inpu
+t line 498.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<project_files/figure-latex/unnamed-chunk-15-1.pdf, id=195, 279.0425pt x 279.04
+25pt>
+File: project_files/figure-latex/unnamed-chunk-15-1.pdf Graphic file (type pdf)
+
+<use project_files/figure-latex/unnamed-chunk-15-1.pdf>
+Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-15-1.pdf  use
+d on input line 510.
+(pdftex.def)             Requested size: 211.39323pt x 211.39323pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
 [8pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) 
 has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.531 \newpage
+l.517 \newpage
               pdfTeX warning (ext4): destination with the same identifier (name
 {figure.4}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.531 \newpage
-              pdfTeX warning (ext4): destination with the same identifier (name
-{figure.5}) has been already used, duplicate ignored
+l.517 \newpage
+               <./project_files/figure-latex/unnamed-chunk-12-1.pdf> <../out/ou
+t_rl_0_8_train_mr.png> <../out/out_rl_0_8_eval_mr.png> <../out/out_rl_0_8_train
+_mr_first_1000.png> <../out/out_rl_0_8_eval_mr_first_1000.png>] [9pdfTeX warnin
+g (ext4): destination with the same identifier (name{figure.5}) has been alread
+y used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.531 \newpage
-               <./project_files/figure-latex/unnamed-chunk-11-1.pdf> <./project
-_files/figure-latex/unnamed-chunk-12-1.pdf> <./project_files/figure-latex/unnam
-ed-chunk-13-1.pdf>]
-<project_files/figure-latex/unnamed-chunk-14-1.pdf, id=201, 568.1225pt x 277.03
-5pt>
-File: project_files/figure-latex/unnamed-chunk-14-1.pdf Graphic file (type pdf)
+l.539 \newpage
+               <./project_files/figure-latex/unnamed-chunk-15-1.pdf>]
+Underfull \hbox (badness 2035) in paragraph at lines 544--557
+\OMS/lmsy/m/n/10.95 ^^O$ \T1/lmr/m/n/10.95 (+20) At-tributes \T1/lmtt/m/n/10.95
+ is_stochastic\T1/lmr/m/n/10.95 (+20) , \T1/lmtt/m/n/10.95 reward_hole\T1/lmr/m
+/n/10.95 (+20) , \T1/lmtt/m/n/10.95 reward \T1/lmr/m/n/10.95 (+20) and \T1/lmtt
+/m/n/10.95 path_cost \T1/lmr/m/n/10.95 (+20) were added to the
+ []
 
-<use project_files/figure-latex/unnamed-chunk-14-1.pdf>
-Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-14-1.pdf  use
-d on input line 538.
-(pdftex.def)             Requested size: 399.31276pt x 194.71788pt.
-<project_files/figure-latex/unnamed-chunk-15-1.pdf, id=202, 568.1225pt x 277.03
-5pt>
-File: project_files/figure-latex/unnamed-chunk-15-1.pdf Graphic file (type pdf)
-
-<use project_files/figure-latex/unnamed-chunk-15-1.pdf>
-Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-15-1.pdf  use
-d on input line 547.
-(pdftex.def)             Requested size: 399.31276pt x 194.71788pt.
-<project_files/figure-latex/unnamed-chunk-16-1.pdf, id=203, 568.1225pt x 277.03
+[10] [11]
+<project_files/figure-latex/unnamed-chunk-16-1.pdf, id=234, 712.6625pt x 204.76
 5pt>
 File: project_files/figure-latex/unnamed-chunk-16-1.pdf Graphic file (type pdf)
 
 <use project_files/figure-latex/unnamed-chunk-16-1.pdf>
 Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-16-1.pdf  use
-d on input line 556.
-(pdftex.def)             Requested size: 399.31276pt x 194.71788pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<project_files/figure-latex/unnamed-chunk-17-1.pdf, id=204, 568.1225pt x 277.03
+d on input line 596.
+(pdftex.def)             Requested size: 422.7726pt x 121.47267pt.
+<project_files/figure-latex/unnamed-chunk-17-1.pdf, id=235, 712.6625pt x 204.76
 5pt>
 File: project_files/figure-latex/unnamed-chunk-17-1.pdf Graphic file (type pdf)
 
 <use project_files/figure-latex/unnamed-chunk-17-1.pdf>
 Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-17-1.pdf  use
-d on input line 565.
-(pdftex.def)             Requested size: 399.31276pt x 194.71788pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<project_files/figure-latex/unnamed-chunk-18-1.pdf, id=205, 568.1225pt x 277.03
+d on input line 605.
+(pdftex.def)             Requested size: 422.7726pt x 121.47267pt.
+<project_files/figure-latex/unnamed-chunk-18-1.pdf, id=236, 712.6625pt x 204.76
 5pt>
 File: project_files/figure-latex/unnamed-chunk-18-1.pdf Graphic file (type pdf)
 
 <use project_files/figure-latex/unnamed-chunk-18-1.pdf>
 Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-18-1.pdf  use
-d on input line 574.
+d on input line 614.
+(pdftex.def)             Requested size: 422.7726pt x 121.47267pt.
+[12pdfTeX warning (ext4): destination with the same identifier (name{figure.6})
+ has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.621 \newpage
+              pdfTeX warning (ext4): destination with the same identifier (name
+{figure.7}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.621 \newpage
+              pdfTeX warning (ext4): destination with the same identifier (name
+{figure.8}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.621 \newpage
+               <./project_files/figure-latex/unnamed-chunk-16-1.pdf> <./project
+_files/figure-latex/unnamed-chunk-17-1.pdf> <./project_files/figure-latex/unnam
+ed-chunk-18-1.pdf>]
+<project_files/figure-latex/unnamed-chunk-19-1.pdf, id=265, 568.1225pt x 134.50
+25pt>
+File: project_files/figure-latex/unnamed-chunk-19-1.pdf Graphic file (type pdf)
+
+<use project_files/figure-latex/unnamed-chunk-19-1.pdf>
+Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-19-1.pdf  use
+d on input line 626.
+(pdftex.def)             Requested size: 469.7731pt x 111.21835pt.
+<project_files/figure-latex/unnamed-chunk-20-1.pdf, id=266, 568.1225pt x 134.50
+25pt>
+File: project_files/figure-latex/unnamed-chunk-20-1.pdf Graphic file (type pdf)
+
+<use project_files/figure-latex/unnamed-chunk-20-1.pdf>
+Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-20-1.pdf  use
+d on input line 630.
+(pdftex.def)             Requested size: 469.7731pt x 111.21835pt.
+<project_files/figure-latex/unnamed-chunk-21-1.pdf, id=267, 568.1225pt x 134.50
+25pt>
+File: project_files/figure-latex/unnamed-chunk-21-1.pdf Graphic file (type pdf)
+
+<use project_files/figure-latex/unnamed-chunk-21-1.pdf>
+Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-21-1.pdf  use
+d on input line 637.
+(pdftex.def)             Requested size: 469.7731pt x 111.21835pt.
+<project_files/figure-latex/unnamed-chunk-22-1.pdf, id=268, 568.1225pt x 134.50
+25pt>
+File: project_files/figure-latex/unnamed-chunk-22-1.pdf Graphic file (type pdf)
+
+<use project_files/figure-latex/unnamed-chunk-22-1.pdf>
+Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-22-1.pdf  use
+d on input line 641.
+(pdftex.def)             Requested size: 469.7731pt x 111.21835pt.
+<project_files/figure-latex/unnamed-chunk-23-1.pdf, id=269, 568.1225pt x 277.03
+5pt>
+File: project_files/figure-latex/unnamed-chunk-23-1.pdf Graphic file (type pdf)
+
+<use project_files/figure-latex/unnamed-chunk-23-1.pdf>
+Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-23-1.pdf  use
+d on input line 648.
+(pdftex.def)             Requested size: 399.31276pt x 194.71788pt.
+[13pdfTeX warning (ext4): destination with the same identifier (name{figure.9})
+ has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.648 ...re-latex/unnamed-chunk-23-1} \end{center}
+                                                  pdfTeX warning (ext4): destin
+ation with the same identifier (name{figure.10}) has been already used, duplica
+te ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.648 ...re-latex/unnamed-chunk-23-1} \end{center}
+                                                   <./project_files/figure-late
+x/unnamed-chunk-19-1.pdf> <./project_files/figure-latex/unnamed-chunk-20-1.pdf>
+ <./project_files/figure-latex/unnamed-chunk-21-1.pdf> <./project_files/figure-
+latex/unnamed-chunk-22-1.pdf>]
+<project_files/figure-latex/unnamed-chunk-24-1.pdf, id=305, 568.1225pt x 277.03
+5pt>
+File: project_files/figure-latex/unnamed-chunk-24-1.pdf Graphic file (type pdf)
+
+<use project_files/figure-latex/unnamed-chunk-24-1.pdf>
+Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-24-1.pdf  use
+d on input line 650.
+(pdftex.def)             Requested size: 399.31276pt x 194.71788pt.
+<project_files/figure-latex/unnamed-chunk-25-1.pdf, id=306, 568.1225pt x 277.03
+5pt>
+File: project_files/figure-latex/unnamed-chunk-25-1.pdf Graphic file (type pdf)
+
+<use project_files/figure-latex/unnamed-chunk-25-1.pdf>
+Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-25-1.pdf  use
+d on input line 652.
+(pdftex.def)             Requested size: 399.31276pt x 194.71788pt.
+<project_files/figure-latex/unnamed-chunk-26-1.pdf, id=307, 568.1225pt x 277.03
+5pt>
+File: project_files/figure-latex/unnamed-chunk-26-1.pdf Graphic file (type pdf)
+
+<use project_files/figure-latex/unnamed-chunk-26-1.pdf>
+Package pdftex.def Info: project_files/figure-latex/unnamed-chunk-26-1.pdf  use
+d on input line 656.
 (pdftex.def)             Requested size: 399.31276pt x 194.71788pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
+[14 <./project_files/figure-latex/unnamed-chunk-23-1.pdf> <./project_files/figu
+re-latex/unnamed-chunk-24-1.pdf> <./project_files/figure-latex/unnamed-chunk-25
+-1.pdf>]
 File: ../out/out_all_0_8_training.png Graphic file (type png)
 <use ../out/out_all_0_8_training.png>
-Package pdftex.def Info: ../out/out_all_0_8_training.png  used on input line 58
-8.
+Package pdftex.def Info: ../out/out_all_0_8_training.png  used on input line 67
+0.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+File: ../out/out_all_0_8_evaluation.png Graphic file (type png)
+<use ../out/out_all_0_8_evaluation.png>
+Package pdftex.def Info: ../out/out_all_0_8_evaluation.png  used on input line 
+670.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
 File: ../out/out_all_0_8_first_1000_training.png Graphic file (type png)
 <use ../out/out_all_0_8_first_1000_training.png>
 Package pdftex.def Info: ../out/out_all_0_8_first_1000_training.png  used on in
-put line 588.
-(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-File: ../out/out_all_0_8_evaluation.png Graphic file (type png)
-<use ../out/out_all_0_8_evaluation.png>
-Package pdftex.def Info: ../out/out_all_0_8_evaluation.png  used on input line 
-597.
+put line 672.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
 File: ../out/out_all_0_8_first_1000_evaluation.png Graphic file (type png)
 <use ../out/out_all_0_8_first_1000_evaluation.png>
 Package pdftex.def Info: ../out/out_all_0_8_first_1000_evaluation.png  used on 
-input line 597.
+input line 672.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_1_8_training.png, id=206, 462.528pt x 346.896pt>
+<../out/out_all_1_8_training.png, id=334, 462.528pt x 346.896pt>
 File: ../out/out_all_1_8_training.png Graphic file (type png)
 <use ../out/out_all_1_8_training.png>
-Package pdftex.def Info: ../out/out_all_1_8_training.png  used on input line 60
-6.
+Package pdftex.def Info: ../out/out_all_1_8_training.png  used on input line 67
+4.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_1_8_first_1000_training.png, id=207, 462.528pt x 346.896pt>
-File: ../out/out_all_1_8_first_1000_training.png Graphic file (type png)
-<use ../out/out_all_1_8_first_1000_training.png>
-Package pdftex.def Info: ../out/out_all_1_8_first_1000_training.png  used on in
-put line 606.
-(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_1_8_evaluation.png, id=208, 462.528pt x 346.896pt>
+<../out/out_all_1_8_evaluation.png, id=335, 462.528pt x 346.896pt>
 File: ../out/out_all_1_8_evaluation.png Graphic file (type png)
 <use ../out/out_all_1_8_evaluation.png>
 Package pdftex.def Info: ../out/out_all_1_8_evaluation.png  used on input line 
-615.
+674.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_1_8_first_1000_evaluation.png, id=209, 462.528pt x 346.896pt>
+[15pdfTeX warning (ext4): destination with the same identifier (name{figure.11}
+) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.674 .../out/out_all_1_8_evaluation} \end{center}
+                                                   <./project_files/figure-late
+x/unnamed-chunk-26-1.pdf>]
+<../out/out_all_1_8_first_1000_training.png, id=348, 462.528pt x 346.896pt>
+File: ../out/out_all_1_8_first_1000_training.png Graphic file (type png)
+<use ../out/out_all_1_8_first_1000_training.png>
+Package pdftex.def Info: ../out/out_all_1_8_first_1000_training.png  used on in
+put line 676.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_all_1_8_first_1000_evaluation.png, id=349, 462.528pt x 346.896pt>
 File: ../out/out_all_1_8_first_1000_evaluation.png Graphic file (type png)
 <use ../out/out_all_1_8_first_1000_evaluation.png>
 Package pdftex.def Info: ../out/out_all_1_8_first_1000_evaluation.png  used on 
-input line 615.
+input line 676.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_2_8_training.png, id=210, 462.528pt x 346.896pt>
+<../out/out_all_2_8_training.png, id=350, 462.528pt x 346.896pt>
 File: ../out/out_all_2_8_training.png Graphic file (type png)
 <use ../out/out_all_2_8_training.png>
-Package pdftex.def Info: ../out/out_all_2_8_training.png  used on input line 62
-4.
+Package pdftex.def Info: ../out/out_all_2_8_training.png  used on input line 67
+8.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_2_8_first_1000_training.png, id=211, 462.528pt x 346.896pt>
-File: ../out/out_all_2_8_first_1000_training.png Graphic file (type png)
-<use ../out/out_all_2_8_first_1000_training.png>
-Package pdftex.def Info: ../out/out_all_2_8_first_1000_training.png  used on in
-put line 624.
-(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_2_8_evaluation.png, id=212, 462.528pt x 346.896pt>
+<../out/out_all_2_8_evaluation.png, id=351, 462.528pt x 346.896pt>
 File: ../out/out_all_2_8_evaluation.png Graphic file (type png)
 <use ../out/out_all_2_8_evaluation.png>
 Package pdftex.def Info: ../out/out_all_2_8_evaluation.png  used on input line 
-633.
+678.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_2_8_first_1000_evaluation.png, id=213, 462.528pt x 346.896pt>
+<../out/out_all_2_8_first_1000_training.png, id=352, 462.528pt x 346.896pt>
+File: ../out/out_all_2_8_first_1000_training.png Graphic file (type png)
+<use ../out/out_all_2_8_first_1000_training.png>
+Package pdftex.def Info: ../out/out_all_2_8_first_1000_training.png  used on in
+put line 680.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_all_2_8_first_1000_evaluation.png, id=353, 462.528pt x 346.896pt>
 File: ../out/out_all_2_8_first_1000_evaluation.png Graphic file (type png)
 <use ../out/out_all_2_8_first_1000_evaluation.png>
 Package pdftex.def Info: ../out/out_all_2_8_first_1000_evaluation.png  used on 
-input line 633.
+input line 680.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_3_8_training.png, id=214, 462.528pt x 346.896pt>
+[16 <../out/out_all_1_8_training.png> <../out/out_all_1_8_evaluation.png> <../o
+ut/out_all_1_8_first_1000_training.png> <../out/out_all_1_8_first_1000_evaluati
+on.png> <../out/out_all_2_8_training.png> <../out/out_all_2_8_evaluation.png>]
+<../out/out_all_3_8_training.png, id=364, 462.528pt x 346.896pt>
 File: ../out/out_all_3_8_training.png Graphic file (type png)
 <use ../out/out_all_3_8_training.png>
-Package pdftex.def Info: ../out/out_all_3_8_training.png  used on input line 64
+Package pdftex.def Info: ../out/out_all_3_8_training.png  used on input line 68
 2.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_3_8_first_1000_training.png, id=215, 462.528pt x 346.896pt>
-File: ../out/out_all_3_8_first_1000_training.png Graphic file (type png)
-<use ../out/out_all_3_8_first_1000_training.png>
-Package pdftex.def Info: ../out/out_all_3_8_first_1000_training.png  used on in
-put line 642.
-(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_3_8_evaluation.png, id=216, 462.528pt x 346.896pt>
+<../out/out_all_3_8_evaluation.png, id=365, 462.528pt x 346.896pt>
 File: ../out/out_all_3_8_evaluation.png Graphic file (type png)
 <use ../out/out_all_3_8_evaluation.png>
 Package pdftex.def Info: ../out/out_all_3_8_evaluation.png  used on input line 
-651.
+682.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_3_8_first_1000_evaluation.png, id=217, 462.528pt x 346.896pt>
+<../out/out_all_3_8_first_1000_training.png, id=366, 462.528pt x 346.896pt>
+File: ../out/out_all_3_8_first_1000_training.png Graphic file (type png)
+<use ../out/out_all_3_8_first_1000_training.png>
+Package pdftex.def Info: ../out/out_all_3_8_first_1000_training.png  used on in
+put line 684.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_all_3_8_first_1000_evaluation.png, id=367, 462.528pt x 346.896pt>
 File: ../out/out_all_3_8_first_1000_evaluation.png Graphic file (type png)
 <use ../out/out_all_3_8_first_1000_evaluation.png>
 Package pdftex.def Info: ../out/out_all_3_8_first_1000_evaluation.png  used on 
-input line 651.
+input line 684.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_4_8_training.png, id=218, 462.528pt x 346.896pt>
+<../out/out_all_4_8_training.png, id=368, 462.528pt x 346.896pt>
 File: ../out/out_all_4_8_training.png Graphic file (type png)
 <use ../out/out_all_4_8_training.png>
-Package pdftex.def Info: ../out/out_all_4_8_training.png  used on input line 66
-0.
+Package pdftex.def Info: ../out/out_all_4_8_training.png  used on input line 68
+6.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_4_8_first_1000_training.png, id=219, 462.528pt x 346.896pt>
-File: ../out/out_all_4_8_first_1000_training.png Graphic file (type png)
-<use ../out/out_all_4_8_first_1000_training.png>
-Package pdftex.def Info: ../out/out_all_4_8_first_1000_training.png  used on in
-put line 660.
-(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_4_8_evaluation.png, id=220, 462.528pt x 346.896pt>
+<../out/out_all_4_8_evaluation.png, id=369, 462.528pt x 346.896pt>
 File: ../out/out_all_4_8_evaluation.png Graphic file (type png)
 <use ../out/out_all_4_8_evaluation.png>
 Package pdftex.def Info: ../out/out_all_4_8_evaluation.png  used on input line 
-669.
+686.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_4_8_first_1000_evaluation.png, id=221, 462.528pt x 346.896pt>
+[17 <../out/out_all_2_8_first_1000_training.png> <../out/out_all_2_8_first_1000
+_evaluation.png> <../out/out_all_3_8_training.png> <../out/out_all_3_8_evaluati
+on.png> <../out/out_all_3_8_first_1000_training.png> <../out/out_all_3_8_first_
+1000_evaluation.png>]
+<../out/out_all_4_8_first_1000_training.png, id=380, 462.528pt x 346.896pt>
+File: ../out/out_all_4_8_first_1000_training.png Graphic file (type png)
+<use ../out/out_all_4_8_first_1000_training.png>
+Package pdftex.def Info: ../out/out_all_4_8_first_1000_training.png  used on in
+put line 688.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_all_4_8_first_1000_evaluation.png, id=381, 462.528pt x 346.896pt>
 File: ../out/out_all_4_8_first_1000_evaluation.png Graphic file (type png)
 <use ../out/out_all_4_8_first_1000_evaluation.png>
 Package pdftex.def Info: ../out/out_all_4_8_first_1000_evaluation.png  used on 
-input line 669.
+input line 688.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_5_8_training.png, id=222, 462.528pt x 346.896pt>
+<../out/out_all_5_8_training.png, id=382, 462.528pt x 346.896pt>
 File: ../out/out_all_5_8_training.png Graphic file (type png)
 <use ../out/out_all_5_8_training.png>
-Package pdftex.def Info: ../out/out_all_5_8_training.png  used on input line 67
-8.
+Package pdftex.def Info: ../out/out_all_5_8_training.png  used on input line 69
+0.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_5_8_first_1000_training.png, id=223, 462.528pt x 346.896pt>
-File: ../out/out_all_5_8_first_1000_training.png Graphic file (type png)
-<use ../out/out_all_5_8_first_1000_training.png>
-Package pdftex.def Info: ../out/out_all_5_8_first_1000_training.png  used on in
-put line 678.
-(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_5_8_evaluation.png, id=224, 462.528pt x 346.896pt>
+<../out/out_all_5_8_evaluation.png, id=383, 462.528pt x 346.896pt>
 File: ../out/out_all_5_8_evaluation.png Graphic file (type png)
 <use ../out/out_all_5_8_evaluation.png>
 Package pdftex.def Info: ../out/out_all_5_8_evaluation.png  used on input line 
-687.
+690.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_5_8_first_1000_evaluation.png, id=225, 462.528pt x 346.896pt>
+<../out/out_all_5_8_first_1000_training.png, id=384, 462.528pt x 346.896pt>
+File: ../out/out_all_5_8_first_1000_training.png Graphic file (type png)
+<use ../out/out_all_5_8_first_1000_training.png>
+Package pdftex.def Info: ../out/out_all_5_8_first_1000_training.png  used on in
+put line 692.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_all_5_8_first_1000_evaluation.png, id=385, 462.528pt x 346.896pt>
 File: ../out/out_all_5_8_first_1000_evaluation.png Graphic file (type png)
 <use ../out/out_all_5_8_first_1000_evaluation.png>
 Package pdftex.def Info: ../out/out_all_5_8_first_1000_evaluation.png  used on 
-input line 687.
+input line 692.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_6_8_training.png, id=226, 462.528pt x 346.896pt>
+[18 <../out/out_all_4_8_training.png> <../out/out_all_4_8_evaluation.png> <../o
+ut/out_all_4_8_first_1000_training.png> <../out/out_all_4_8_first_1000_evaluati
+on.png> <../out/out_all_5_8_training.png> <../out/out_all_5_8_evaluation.png>]
+<../out/out_all_6_8_training.png, id=396, 462.528pt x 346.896pt>
 File: ../out/out_all_6_8_training.png Graphic file (type png)
 <use ../out/out_all_6_8_training.png>
 Package pdftex.def Info: ../out/out_all_6_8_training.png  used on input line 69
-6.
+4.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_6_8_first_1000_training.png, id=227, 462.528pt x 346.896pt>
+<../out/out_all_6_8_evaluation.png, id=397, 462.528pt x 346.896pt>
+File: ../out/out_all_6_8_evaluation.png Graphic file (type png)
+<use ../out/out_all_6_8_evaluation.png>
+Package pdftex.def Info: ../out/out_all_6_8_evaluation.png  used on input line 
+694.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_all_6_8_first_1000_training.png, id=398, 462.528pt x 346.896pt>
 File: ../out/out_all_6_8_first_1000_training.png Graphic file (type png)
 <use ../out/out_all_6_8_first_1000_training.png>
 Package pdftex.def Info: ../out/out_all_6_8_first_1000_training.png  used on in
 put line 696.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_6_8_evaluation.png, id=228, 462.528pt x 346.896pt>
-File: ../out/out_all_6_8_evaluation.png Graphic file (type png)
-<use ../out/out_all_6_8_evaluation.png>
-Package pdftex.def Info: ../out/out_all_6_8_evaluation.png  used on input line 
-705.
-(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_6_8_first_1000_evaluation.png, id=229, 462.528pt x 346.896pt>
+<../out/out_all_6_8_first_1000_evaluation.png, id=399, 462.528pt x 346.896pt>
 File: ../out/out_all_6_8_first_1000_evaluation.png Graphic file (type png)
 <use ../out/out_all_6_8_first_1000_evaluation.png>
 Package pdftex.def Info: ../out/out_all_6_8_first_1000_evaluation.png  used on 
-input line 705.
+input line 696.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_7_8_training.png, id=230, 462.528pt x 346.896pt>
+<../out/out_all_7_8_training.png, id=400, 462.528pt x 346.896pt>
 File: ../out/out_all_7_8_training.png Graphic file (type png)
 <use ../out/out_all_7_8_training.png>
-Package pdftex.def Info: ../out/out_all_7_8_training.png  used on input line 71
-4.
+Package pdftex.def Info: ../out/out_all_7_8_training.png  used on input line 69
+8.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_7_8_first_1000_training.png, id=231, 462.528pt x 346.896pt>
-File: ../out/out_all_7_8_first_1000_training.png Graphic file (type png)
-<use ../out/out_all_7_8_first_1000_training.png>
-Package pdftex.def Info: ../out/out_all_7_8_first_1000_training.png  used on in
-put line 714.
-(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_all_7_8_evaluation.png, id=232, 462.528pt x 346.896pt>
+<../out/out_all_7_8_evaluation.png, id=401, 462.528pt x 346.896pt>
 File: ../out/out_all_7_8_evaluation.png Graphic file (type png)
 <use ../out/out_all_7_8_evaluation.png>
 Package pdftex.def Info: ../out/out_all_7_8_evaluation.png  used on input line 
-723.
+698.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_all_7_8_first_1000_evaluation.png, id=233, 462.528pt x 346.896pt>
+[19 <../out/out_all_5_8_first_1000_training.png> <../out/out_all_5_8_first_1000
+_evaluation.png> <../out/out_all_6_8_training.png> <../out/out_all_6_8_evaluati
+on.png> <../out/out_all_6_8_first_1000_training.png> <../out/out_all_6_8_first_
+1000_evaluation.png>]
+<../out/out_all_7_8_first_1000_training.png, id=413, 462.528pt x 346.896pt>
+File: ../out/out_all_7_8_first_1000_training.png Graphic file (type png)
+<use ../out/out_all_7_8_first_1000_training.png>
+Package pdftex.def Info: ../out/out_all_7_8_first_1000_training.png  used on in
+put line 700.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_all_7_8_first_1000_evaluation.png, id=414, 462.528pt x 346.896pt>
 File: ../out/out_all_7_8_first_1000_evaluation.png Graphic file (type png)
 <use ../out/out_all_7_8_first_1000_evaluation.png>
 Package pdftex.def Info: ../out/out_all_7_8_first_1000_evaluation.png  used on 
-input line 723.
+input line 700.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_rl_0_8_train_mr.png, id=234, 462.528pt x 346.896pt>
+[20 <../out/out_all_7_8_training.png> <../out/out_all_7_8_evaluation.png> <../o
+ut/out_all_7_8_first_1000_training.png> <../out/out_all_7_8_first_1000_evaluati
+on.png>]
 File: ../out/out_rl_0_8_train_mr.png Graphic file (type png)
 <use ../out/out_rl_0_8_train_mr.png>
-Package pdftex.def Info: ../out/out_rl_0_8_train_mr.png  used on input line 735
+Package pdftex.def Info: ../out/out_rl_0_8_train_mr.png  used on input line 707
 .
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_rl_0_8_eval_mr.png, id=235, 462.528pt x 346.896pt>
 File: ../out/out_rl_0_8_eval_mr.png Graphic file (type png)
 <use ../out/out_rl_0_8_eval_mr.png>
-Package pdftex.def Info: ../out/out_rl_0_8_eval_mr.png  used on input line 735.
+Package pdftex.def Info: ../out/out_rl_0_8_eval_mr.png  used on input line 707.
 
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../out/out_rl_0_8_train_mr_first_1000.png, id=236, 462.528pt x 346.896pt>
 File: ../out/out_rl_0_8_train_mr_first_1000.png Graphic file (type png)
 <use ../out/out_rl_0_8_train_mr_first_1000.png>
 Package pdftex.def Info: ../out/out_rl_0_8_train_mr_first_1000.png  used on inp
-ut line 744.
+ut line 711.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
-<../out/out_rl_0_8_eval_mr_last_1000.png, id=237, 462.528pt x 346.896pt>
-File: ../out/out_rl_0_8_eval_mr_last_1000.png Graphic file (type png)
-<use ../out/out_rl_0_8_eval_mr_last_1000.png>
-Package pdftex.def Info: ../out/out_rl_0_8_eval_mr_last_1000.png  used on input
- line 744.
+File: ../out/out_rl_0_8_eval_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_0_8_eval_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_0_8_eval_mr_first_1000.png  used on inpu
+t line 711.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_1_8_train_mr.png, id=423, 462.528pt x 346.896pt>
+File: ../out/out_rl_1_8_train_mr.png Graphic file (type png)
+<use ../out/out_rl_1_8_train_mr.png>
+Package pdftex.def Info: ../out/out_rl_1_8_train_mr.png  used on input line 718
+.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_1_8_eval_mr.png, id=424, 462.528pt x 346.896pt>
+File: ../out/out_rl_1_8_eval_mr.png Graphic file (type png)
+<use ../out/out_rl_1_8_eval_mr.png>
+Package pdftex.def Info: ../out/out_rl_1_8_eval_mr.png  used on input line 718.
+
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_1_8_train_mr_first_1000.png, id=425, 462.528pt x 346.896pt>
+File: ../out/out_rl_1_8_train_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_1_8_train_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_1_8_train_mr_first_1000.png  used on inp
+ut line 722.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_1_8_eval_mr_first_1000.png, id=426, 462.528pt x 346.896pt>
+File: ../out/out_rl_1_8_eval_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_1_8_eval_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_1_8_eval_mr_first_1000.png  used on inpu
+t line 722.
 (pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 752.
-[9pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) 
-has been already used, duplicate ignored
+<../out/out_rl_2_8_train_mr.png, id=427, 462.528pt x 346.896pt>
+File: ../out/out_rl_2_8_train_mr.png Graphic file (type png)
+<use ../out/out_rl_2_8_train_mr.png>
+Package pdftex.def Info: ../out/out_rl_2_8_train_mr.png  used on input line 729
+.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_2_8_eval_mr.png, id=428, 462.528pt x 346.896pt>
+File: ../out/out_rl_2_8_eval_mr.png Graphic file (type png)
+<use ../out/out_rl_2_8_eval_mr.png>
+Package pdftex.def Info: ../out/out_rl_2_8_eval_mr.png  used on input line 729.
+
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+[21pdfTeX warning (ext4): destination with the same identifier (name{figure.12}
+) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.7}) has been already used, duplicate ignored
+l.729 ...]{../out/out_rl_2_8_eval_mr} \end{center}
+                                                   <../out/out_rl_1_8_train_mr.
+png> <../out/out_rl_1_8_eval_mr.png>]
+<../out/out_rl_2_8_train_mr_first_1000.png, id=436, 462.528pt x 346.896pt>
+File: ../out/out_rl_2_8_train_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_2_8_train_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_2_8_train_mr_first_1000.png  used on inp
+ut line 733.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_2_8_eval_mr_first_1000.png, id=437, 462.528pt x 346.896pt>
+File: ../out/out_rl_2_8_eval_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_2_8_eval_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_2_8_eval_mr_first_1000.png  used on inpu
+t line 733.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_3_8_train_mr.png, id=438, 462.528pt x 346.896pt>
+File: ../out/out_rl_3_8_train_mr.png Graphic file (type png)
+<use ../out/out_rl_3_8_train_mr.png>
+Package pdftex.def Info: ../out/out_rl_3_8_train_mr.png  used on input line 740
+.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_3_8_eval_mr.png, id=439, 462.528pt x 346.896pt>
+File: ../out/out_rl_3_8_eval_mr.png Graphic file (type png)
+<use ../out/out_rl_3_8_eval_mr.png>
+Package pdftex.def Info: ../out/out_rl_3_8_eval_mr.png  used on input line 740.
+
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+[22pdfTeX warning (ext4): destination with the same identifier (name{figure.13}
+) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.752 \end{document}
-                     <./project_files/figure-latex/unnamed-chunk-14-1.pdf> <./p
-roject_files/figure-latex/unnamed-chunk-15-1.pdf>] [10pdfTeX warning (ext4): de
-stination with the same identifier (name{figure.8}) has been already used, dupl
-icate ignored
+l.740 ...]{../out/out_rl_3_8_eval_mr} \end{center}
+                                                  pdfTeX warning (ext4): destin
+ation with the same identifier (name{figure.14}) has been already used, duplica
+te ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.9}) has been already used, duplicate ignored
+l.740 ...]{../out/out_rl_3_8_eval_mr} \end{center}
+                                                   <../out/out_rl_1_8_train_mr_
+first_1000.png> <../out/out_rl_1_8_eval_mr_first_1000.png> <../out/out_rl_2_8_t
+rain_mr.png> <../out/out_rl_2_8_eval_mr.png> <../out/out_rl_2_8_train_mr_first_
+1000.png> <../out/out_rl_2_8_eval_mr_first_1000.png>]
+<../out/out_rl_3_8_train_mr_first_1000.png, id=452, 462.528pt x 346.896pt>
+File: ../out/out_rl_3_8_train_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_3_8_train_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_3_8_train_mr_first_1000.png  used on inp
+ut line 744.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_3_8_eval_mr_first_1000.png, id=453, 462.528pt x 346.896pt>
+File: ../out/out_rl_3_8_eval_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_3_8_eval_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_3_8_eval_mr_first_1000.png  used on inpu
+t line 744.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_4_8_train_mr.png, id=454, 462.528pt x 346.896pt>
+File: ../out/out_rl_4_8_train_mr.png Graphic file (type png)
+<use ../out/out_rl_4_8_train_mr.png>
+Package pdftex.def Info: ../out/out_rl_4_8_train_mr.png  used on input line 751
+.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_4_8_eval_mr.png, id=455, 462.528pt x 346.896pt>
+File: ../out/out_rl_4_8_eval_mr.png Graphic file (type png)
+<use ../out/out_rl_4_8_eval_mr.png>
+Package pdftex.def Info: ../out/out_rl_4_8_eval_mr.png  used on input line 751.
+
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_4_8_train_mr_first_1000.png, id=456, 462.528pt x 346.896pt>
+File: ../out/out_rl_4_8_train_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_4_8_train_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_4_8_train_mr_first_1000.png  used on inp
+ut line 755.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_4_8_eval_mr_first_1000.png, id=457, 462.528pt x 346.896pt>
+File: ../out/out_rl_4_8_eval_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_4_8_eval_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_4_8_eval_mr_first_1000.png  used on inpu
+t line 755.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../out/out_rl_5_8_train_mr.png, id=458, 462.528pt x 346.896pt>
+File: ../out/out_rl_5_8_train_mr.png Graphic file (type png)
+<use ../out/out_rl_5_8_train_mr.png>
+Package pdftex.def Info: ../out/out_rl_5_8_train_mr.png  used on input line 762
+.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_5_8_eval_mr.png, id=459, 462.528pt x 346.896pt>
+File: ../out/out_rl_5_8_eval_mr.png Graphic file (type png)
+<use ../out/out_rl_5_8_eval_mr.png>
+Package pdftex.def Info: ../out/out_rl_5_8_eval_mr.png  used on input line 762.
+
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+[23pdfTeX warning (ext4): destination with the same identifier (name{figure.15}
+) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.752 \end{document}
-                     <./project_files/figure-latex/unnamed-chunk-16-1.pdf> <./p
-roject_files/figure-latex/unnamed-chunk-17-1.pdf>] [11pdfTeX warning (ext4): de
-stination with the same identifier (name{figure.10}) has been already used, dup
-licate ignored
+l.762 ...]{../out/out_rl_5_8_eval_mr} \end{center}
+                                                   <../out/out_rl_3_8_train_mr.
+png> <../out/out_rl_3_8_eval_mr.png> <../out/out_rl_3_8_train_mr_first_1000.png
+> <../out/out_rl_3_8_eval_mr_first_1000.png> <../out/out_rl_4_8_train_mr.png> <
+../out/out_rl_4_8_eval_mr.png>]
+<../out/out_rl_5_8_train_mr_first_1000.png, id=471, 462.528pt x 346.896pt>
+File: ../out/out_rl_5_8_train_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_5_8_train_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_5_8_train_mr_first_1000.png  used on inp
+ut line 766.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_5_8_eval_mr_first_1000.png, id=472, 462.528pt x 346.896pt>
+File: ../out/out_rl_5_8_eval_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_5_8_eval_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_5_8_eval_mr_first_1000.png  used on inpu
+t line 766.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_6_8_train_mr.png, id=473, 462.528pt x 346.896pt>
+File: ../out/out_rl_6_8_train_mr.png Graphic file (type png)
+<use ../out/out_rl_6_8_train_mr.png>
+Package pdftex.def Info: ../out/out_rl_6_8_train_mr.png  used on input line 773
+.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_6_8_eval_mr.png, id=474, 462.528pt x 346.896pt>
+File: ../out/out_rl_6_8_eval_mr.png Graphic file (type png)
+<use ../out/out_rl_6_8_eval_mr.png>
+Package pdftex.def Info: ../out/out_rl_6_8_eval_mr.png  used on input line 773.
+
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+[24pdfTeX warning (ext4): destination with the same identifier (name{figure.16}
+) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.11}) has been already used, duplicate ignored
+l.773 ...]{../out/out_rl_6_8_eval_mr} \end{center}
+                                                  pdfTeX warning (ext4): destin
+ation with the same identifier (name{figure.17}) has been already used, duplica
+te ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.12}) has been already used, duplicate ignored
+l.773 ...]{../out/out_rl_6_8_eval_mr} \end{center}
+                                                   <../out/out_rl_4_8_train_mr_
+first_1000.png> <../out/out_rl_4_8_eval_mr_first_1000.png> <../out/out_rl_5_8_t
+rain_mr.png> <../out/out_rl_5_8_eval_mr.png> <../out/out_rl_5_8_train_mr_first_
+1000.png> <../out/out_rl_5_8_eval_mr_first_1000.png>]
+<../out/out_rl_6_8_train_mr_first_1000.png, id=487, 462.528pt x 346.896pt>
+File: ../out/out_rl_6_8_train_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_6_8_train_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_6_8_train_mr_first_1000.png  used on inp
+ut line 777.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_6_8_eval_mr_first_1000.png, id=488, 462.528pt x 346.896pt>
+File: ../out/out_rl_6_8_eval_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_6_8_eval_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_6_8_eval_mr_first_1000.png  used on inpu
+t line 777.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_7_8_train_mr.png, id=489, 462.528pt x 346.896pt>
+File: ../out/out_rl_7_8_train_mr.png Graphic file (type png)
+<use ../out/out_rl_7_8_train_mr.png>
+Package pdftex.def Info: ../out/out_rl_7_8_train_mr.png  used on input line 784
+.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_7_8_eval_mr.png, id=490, 462.528pt x 346.896pt>
+File: ../out/out_rl_7_8_eval_mr.png Graphic file (type png)
+<use ../out/out_rl_7_8_eval_mr.png>
+Package pdftex.def Info: ../out/out_rl_7_8_eval_mr.png  used on input line 784.
+
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_7_8_train_mr_first_1000.png, id=491, 462.528pt x 346.896pt>
+File: ../out/out_rl_7_8_train_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_7_8_train_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_7_8_train_mr_first_1000.png  used on inp
+ut line 788.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+<../out/out_rl_7_8_eval_mr_first_1000.png, id=492, 462.528pt x 346.896pt>
+File: ../out/out_rl_7_8_eval_mr_first_1000.png Graphic file (type png)
+<use ../out/out_rl_7_8_eval_mr_first_1000.png>
+Package pdftex.def Info: ../out/out_rl_7_8_eval_mr_first_1000.png  used on inpu
+t line 788.
+(pdftex.def)             Requested size: 230.18361pt x 172.63771pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 796.
+[25pdfTeX warning (ext4): destination with the same identifier (name{figure.18}
+) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.752 \end{document}
-                     <./project_files/figure-latex/unnamed-chunk-18-1.pdf>] [12
-pdfTeX warning (ext4): destination with the same identifier (name{figure.13}) h
-as been already used, duplicate ignored
+l.796 \end{document}
+                     <../out/out_rl_6_8_train_mr.png> <../out/out_rl_6_8_eval_m
+r.png> <../out/out_rl_6_8_train_mr_first_1000.png> <../out/out_rl_6_8_eval_mr_f
+irst_1000.png> <../out/out_rl_7_8_train_mr.png> <../out/out_rl_7_8_eval_mr.png>
+] [26pdfTeX warning (ext4): destination with the same identifier (name{figure.1
+9}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.14}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.15}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                     <../out/out_all_1_8_training.png> <../out/out_all_1_8_firs
-t_1000_training.png> <../out/out_all_1_8_evaluation.png> <../out/out_all_1_8_fi
-rst_1000_evaluation.png> <../out/out_all_2_8_training.png> <../out/out_all_2_8_
-first_1000_training.png>] [13pdfTeX warning (ext4): destination with the same i
-dentifier (name{figure.16}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.17}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.18}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                     <../out/out_all_2_8_evaluation.png> <../out/out_all_2_8_fi
-rst_1000_evaluation.png> <../out/out_all_3_8_training.png> <../out/out_all_3_8_
-first_1000_training.png> <../out/out_all_3_8_evaluation.png> <../out/out_all_3_
-8_first_1000_evaluation.png>] [14pdfTeX warning (ext4): destination with the sa
-me identifier (name{figure.19}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.20}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.21}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                     <../out/out_all_4_8_training.png> <../out/out_all_4_8_firs
-t_1000_training.png> <../out/out_all_4_8_evaluation.png> <../out/out_all_4_8_fi
-rst_1000_evaluation.png> <../out/out_all_5_8_training.png> <../out/out_all_5_8_
-first_1000_training.png>] [15pdfTeX warning (ext4): destination with the same i
-dentifier (name{figure.22}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.23}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.24}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                     <../out/out_all_5_8_evaluation.png> <../out/out_all_5_8_fi
-rst_1000_evaluation.png> <../out/out_all_6_8_training.png> <../out/out_all_6_8_
-first_1000_training.png> <../out/out_all_6_8_evaluation.png> <../out/out_all_6_
-8_first_1000_evaluation.png>] [16pdfTeX warning (ext4): destination with the sa
-me identifier (name{figure.25}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.26}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                    pdfTeX warning (ext4): destination with the same identifier
- (name{figure.27}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                     <../out/out_all_7_8_training.png> <../out/out_all_7_8_firs
-t_1000_training.png> <../out/out_all_7_8_evaluation.png> <../out/out_all_7_8_fi
-rst_1000_evaluation.png> <../out/out_rl_0_8_train_mr.png> <../out/out_rl_0_8_ev
-al_mr.png>] [17pdfTeX warning (ext4): destination with the same identifier (nam
-e{figure.28}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.752 \end{document}
-                     <../out/out_rl_0_8_train_mr_first_1000.png> <../out/out_rl
-_0_8_eval_mr_last_1000.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 752.
+l.796 \end{document}
+                     <../out/out_rl_7_8_train_mr_first_1000.png> <../out/out_rl
+_7_8_eval_mr_first_1000.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 796.
 (./project.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 752.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 752.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 796.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 796.
 Package rerunfilecheck Info: File `project.out' has not changed.
-(rerunfilecheck)             Checksum: EE753BE82BC94DE9439F328E1B844C4D;3626.
+(rerunfilecheck)             Checksum: D8A024B8FC44C128E026E29F697BF47E;4549.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 752.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 796.
  ) 
 Here is how much of TeX's memory you used:
- 14371 strings out of 492649
- 214096 string characters out of 6129622
- 334420 words of memory out of 5000000
- 17830 multiletter control sequences out of 15000+600000
- 88661 words of font info for 124 fonts, out of 8000000 for 9000
+ 14509 strings out of 492649
+ 219963 string characters out of 6129622
+ 333352 words of memory out of 5000000
+ 17964 multiletter control sequences out of 15000+600000
+ 88484 words of font info for 123 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 34i,9n,38p,393b,396s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/
-texlive/2018/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/20
-18/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2018/texmf-d
-ist/fonts/enc/dvips/lm/lm-rm.enc}</usr/local/texlive/2018/texmf-dist/fonts/type
+ 34i,9n,38p,465b,398s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/
+texlive/2018/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/texlive/2018/t
+exmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/2018/texmf-dist/
+fonts/enc/dvips/lm/lm-mathit.enc}</usr/local/texlive/2018/texmf-dist/fonts/type
 1/public/lm/lmbx10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/l
 m/lmbx12.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/lm/lmmi10.p
 fb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/lo
@@ -1561,10 +1687,10 @@ e/2018/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2018/tex
 mf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2018/texmf-dist/fon
 ts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/pu
 blic/lm/lmtt10.pfb>
-Output written on project.pdf (17 pages, 1141366 bytes).
+Output written on project.pdf (26 pages, 1847094 bytes).
 PDF statistics:
- 442 PDF objects out of 1000 (max. 8388607)
- 304 compressed objects within 4 object streams
- 77 named destinations out of 1000 (max. 500000)
- 22922 words of extra memory for PDF output out of 24883 (max. 10000000)
+ 590 PDF objects out of 1000 (max. 8388607)
+ 372 compressed objects within 4 object streams
+ 83 named destinations out of 1000 (max. 500000)
+ 23119 words of extra memory for PDF output out of 24883 (max. 10000000)
 

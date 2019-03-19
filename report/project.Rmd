@@ -106,9 +106,9 @@ for (grid_cols in c(4, 8)) {
 ```
 
 # Introduction
-You and your friends were tossing around a frisbee at Loch Lomond when you made a wild throw that left the frisbee out in the middle of the lake.
+You and your friends were tossing around a frisbee at Loch Lomond when you made a wild throw that left the frisbee out in the middle of the lake. It is your job now to navigate across the lake and retrieve the disc without stepping into the holes where the ice has melted. The ice is slippery, so you won't always move in the direction you intend. 
 
-The goal of this report is to design, implement and evaluate three diferent virtual agents which are able to navigate across the Loch Lomond Frozen Lake grid and retrieve the frisbee disc. Three different agents are analyzed: a senseless/random agent, a simple agent and a reinforcement learning agent.
+The goal of this report is to design, implement and evaluate three different virtual agents that are able to navigate across the Loch Lomond Frozen Lake grid and retrieve the frisbee disc. Three different agents are analyzed: a senseless/random agent, a simple agent and a reinforcement learning agent. These agents are evaluated over eight different 8x8 grid environments.
 
 # Analysis
 ```{r, echo = FALSE, eval = FALSE}
@@ -122,9 +122,11 @@ The goal of this report is to design, implement and evaluate three diferent virt
 # text file (named after the agent, e.g. ”random”) with any relevant information. Hint: A template will be
 # provided via Moodle.
 ```
-The Loch Lomond Frozen Lake environment is a customized Open AI Gym environment derived from FrozenLake (https://gym.openai.com/envs/#toy_text). It consists grid-world with a starting position (S), obstacles (holes) (H) and a final goal (G), where the frisbee disc is located. The task for our agents will be to get to get from S to G. 
+The Loch Lomond Frozen Lake environment is a customized Open AI Gym environment derived from FrozenLake (https://gym.openai.com/envs/#toy_text). It consists grid-world with a starting position (S), frozen surface (F), obstacles (holes) (H) and a final goal (G), where the frisbee disc is located. The task for our agents will be to get to get from S to G. 
 
-```{r environments, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.height = 4, fig.width = 8, out.width = '70%', fig.align = "center", fig.cap = "\\label{fig:intro} Loch Lomond Frozen Lake Grid Scenarios, 4x4 (left) and 8x8 (right)"}
+Our random agent is be used as a naive baseline, while the simple agent is used as an ideal baseline to find the optimal path under ideal circumstances.
+
+```{r environments, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.height = 4, fig.width = 8, out.width = '70%', fig.align = "center", fig.cap = "\\label{fig:intro} Loch Lomond Frozen Lake Grid for Problem 0, 4x4 (left) and 8x8 (right)"}
 # Caption
 plot_4 <- env_plot(ggplot(lakes[[4]][[1]], aes(x_grid, y_grid)))
 plot_8 <- env_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid)))
@@ -141,11 +143,8 @@ $\bullet$ **Environment**: 4x4 and 8x8 grids, as observed in Figure \ref{fig:int
 $\bullet$ **Actions**: Left (0), Down (1), Right (2), Up (3).  
 $\bullet$ **Sensors**: Grid coordinates knowledge of current state.  
 
+## Task Environments and their Characteristics
 
-In the stochastic environments (which will be the case for the random and reinforcement learning agents), the "intended" action occurs with probability 0.333, but with probability 0.666 the agent moves at right angles to the intented direction. A collision with a wall will result in non movement. Our goal state (G) has reward of *1.0*, the obstacles (H) have a reward of *-0.05*, and the rest of non terminal states have a reward of *0*.
-
-
-## Task Environment and Characteristics 
 ```{r, echo = FALSE, eval = TRUE}
 task_environment <- rbind(
   c('Random Agent', 'Partially observable', 'Stochastic', 'Episodic', 'Discrete', 'Unknown'),
@@ -162,10 +161,7 @@ task_environment %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
-Further explanation of the task environment is found below:   
-$\bullet$ **Random Agent**: No knowledge about the current state nor state-space in general.  
-$\bullet$ **Simple Agent**: Perfect information about the current state and thus available actions in that state. Full knowledge of the state-space in general as well as full knowledge of the rewards, goals and obstacles.  
-$\bullet$ **Reinforcement Learning Agent**: Perfect information about the current state and thus available actions in that state; no prior knowledge about the state-space in general.  
+In the stochastic environments, the "intended" action occurs with probability `0.333`, but with probability `0.666` the agent moves at right angles to the intented direction. A collision with a wall will result in non movement. For all our agents, the goal state (G) has reward of `1.0` and the rest of non terminal states have a reward of `0`. For the random and simple environments the reward of the obstacles (H) is `0`, while the reward of the reinforcement learning agent was set to `-0.05`.
 
 # Methodology
 ```{r, echo = FALSE, eval = FALSE}
@@ -186,20 +182,20 @@ $\bullet$ **Reinforcement Learning Agent**: Perfect information about the curren
 This agent does not have a specific algorithm as its nature is to behave randomly.
 
 ## Simple Agent
-Our simple agent implements an $A^* search$ algorithm, using the following formula:
+Our simple agent implements an $A^* search$ algorithm, using the following formula[^1]:
 \begin{equation}
   f(n) = g(n) + h(n)
 \end{equation}
 
 An $A^* search$ algorithm evaluates the cost to reach a node $g(n)$, and uses a heuristic $h(n)$ function to evaluate the cost to get from the node to the goal.
 
-In our frozen like grid, we define our $g(n)$ and $h(n)$ as follows (PAGE 93):  
+In our frozen like grid, we define our $g(n)$ and $h(n)$ as follows:  
 $\bullet$ $g(n)$ will represent the geodesic distance between the node and the starting point.  
 $\bullet$ $h(n)$ will represent the euclidean distance between the node and the goal.  
 
 ## Reinforcement Learning Agent
 
-Given our specifications, we decided to use an Q-learning agent, given that we needed a **model-free** method for solving the problem. Using a temporal-difference approach[^1], we make use of the update Bellman equation:
+Given our specifications, we decided to use an Q-learning agent, given that we needed a **model-free** method for solving the problem. Using a temporal-difference approach, we make use of the update Bellman equation[^2]:
 
 \begin{equation}
   Q(s,a) = Q(s,a) + \alpha(R(s) + \gamma \cdot max_{a'}Q(s',a') - Q(s,a))
@@ -216,7 +212,7 @@ $\bullet$ $\alpha$ is the learning rate, which was implemented with a value of $
 $\bullet$ $R(s)$ denotes the reward for the state
 
 ### Action selection
-We make use of a greedy agent in the limit of infinite exploration, or GLIE. This means that our agent chooses a random action a fraction $1/t$ of the time. We specified $t$ as $0.075$. Selection of the optimal action given a state is defined as:
+We make use of a greedy agent in the limit of infinite exploration, or GLIE[^3]. This means that our agent chooses a random action a fraction $1/t$ of the time. We specified $t$ as $0.075$. Selection of the optimal action given a state is defined as:
 \begin{equation}
   a = argmax_{a'}(Q(s',a') + noise)
 \end{equation}
@@ -241,6 +237,8 @@ $$U(s) = max_{a}Q(s,a)$$
 # provided via Moodle.
 ```
 
+Our agents can be called through the `run_random.py {problem_id}`, `run_simple.py {problem_id}` and `run_rl.py {problem_id}` scripts, where `problem_id` takes a user input value of an integer between 0 and 7. It also has support for comma separated values, e.g. `run_rl.py 0,1,2,3`. The code implementation uses an object-oriented paradigm, where the agents inherit functionality from a `MyAbstractAIAgent` base agent.
+
 ## Senseless Agent
 The implementation of our senseless is pretty simple. Basically we make use of the function `env.action_space.sample()` in order to pull a random action every step. 
 
@@ -252,22 +250,9 @@ Internally, `GraphProblem` is the class that defines the heuristic function, and
 Once the `astar_search` finds the shortest way from $S$ to $G$, we make use of the solution in order to create a policy $\pi$ that will be used by our agent. Since simple agent is deterministic, making use of this policy will guarantee reaching the goal with the shortest possible path.
 
 ## Reinforcement Learning Agent
-For our reinforcement learning agent, before running our evaluation phase, we run a "training phase", which helps to find the optimal policy for our agent.
+Our reinforcement learning agent has two phases, training and evaluation. Before running evaluation phase, we run a "training phase", where the agent finds the optimal policy $\pi$. Policy $\pi$ is then used during evaluation phase. Both phases are evaluated/analyzed below. Different values for our discount factor, learning rate, action selection, and reward hole value were tested. The final implementation maximizes the performance of our agent.
 
 As noted before, our action selection has a formula $a = argmax_{a'}(Q(s',a') + noise)$. The reason behind adding the *noise* was that we encoutered a pattern where the left action was the preferred action chosen by our agent since left action is defined by `0`, being the first option for the agent to pick it through the `argmax` function as well (first index in Python arrays is 0).
-
-Additionally, a custom mapper (`EnvMDP` within `helpers.py` file) was implemented in order to map the enviroment from `Open AI Gym` to a `Grid MDP`. The idea was to get an optimal policy $\pi$ as well as a utilities table through *Policy Iteration* and *Value Iteration* and compare it to the results obtained by our agent. It is important to note that the results obtained from the *Policy Iteration* and *Value Iteration* algorithms are completely independent from our reinforcement learning agent, and they are only provided as a measure of evaluation.
-
-## Environment Modifications (Additional Section)
-In order to add additional flexibility and generic support to the agents, slight changes were made to the `uofgsocsai.py` file, the one containing the main `LochLomondEnv` class. The changes mentioned below were approved as long as justification was provided. The changes and justifications are as follows:  
-$\bullet$ Parameters `map_name_base`, `reward` and `path_cost` were added to the `LochLomondEnv` constructor. The default values are `8x8-base`, `1.0` and `0` respectively. The default values do not alter the functionality from the original file provided.  
-$\bullet$ Attributes `is_stochastic`, `reward_hole`, `reward` and `path_cost` were added to the `LochLomondEnv` class.  
-
-The reason of the changes for the constructor was to add flexibility to be able to test different scenarios without the need to modify the file every time a different variant was analyzed. The attributes were added to the class in order to be able to access them via the object (e.g. `env.path_cost`) and create a Markov Decision Process out of it. Even though a Markov Decision Process was out of the scope of this project, an inhouse mapper from `Open AI Gym` environment to `Grid MDP` with the only purpose of doing a sanity check between the final U and policy from the Reinforcement Learning agent and the ones that a *Policy Iteration* and *Value Iteration* algorithm would provide.
-
-Finally, the way to assign en environment grid was changed from `MAPS_BASE[map_name_base]` to `copy.deepcopy(MAPS_BASE)[map_name_base]`, with the only purpose of being able to instantiate the `LochLomondEnv` more than once in a single run (e.g. `python run_rl.py 1,2,3,4,5,6,7`), which runs all the variants in a single run.
-
-There may be other better ways of accomplishing the same without code changes, but due to the current lack of experience/knowledge in Python programming, time did not permit to find better ways for it.
 
 # Evaluation
 ```{r, echo = FALSE, eval = FALSE}
@@ -286,12 +271,14 @@ There may be other better ways of accomplishing the same without code changes, b
 # suitable presentation and comparison of the performance of the agent with other agents as evaluated
 # across a suitable number of problem variations (e.g. using graphs/tables).
 ```
+Evaluation can be called through the `run_eval.py {problem_id}` script, where `problem_id` has the same properties as mentioned previously for running single agents.
+
 Every agent produces different evaluation files that will be created inside the `out` folder. The specs for evaluation are as follows:  
-$\bullet$ Total episodes: 10,000  
-$\bullet$ Max iteration per episode: 1000  
+$\bullet$ **Total episodes**: 10,000  
+$\bullet$ **Training phase episodes**: 10,000 *(for reinforcement agent only)*  
+$\bullet$ **Max iterations per episode**: 1,000  
 
-
-
+## Evaluation Tables
 ```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
 columns <- c('id', 'episode', 'iteration', 'reward', 'rewards', 'mean_rewards', 'failures', 'timeouts', 'agent')
 
@@ -371,9 +358,11 @@ successes_mean_iteration %>%
     format = "latex",
     digits = 2, linesep=c('')
   ) %>%
-  kable_styling(font_size = 10, latex_options = "HOLD_position") %>%
+  kable_styling(font_size = 10, latex_options = c("HOLD_position", "striped")) %>%
   add_header_above(c(" ", " ", " ", "Reinforcement Learning Agent" = 2))
+```
 
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
 failures %>% 
   kable(
     col.names = c("Problem ID", "Random Agent", "Training Phase", "Evaluation Phase"),
@@ -382,7 +371,7 @@ failures %>%
     format = "latex",
     digits = 2, linesep=c('')
   ) %>%
-  kable_styling(font_size = 10, latex_options = "HOLD_position") %>%
+  kable_styling(font_size = 10, latex_options = c("HOLD_position", "striped")) %>%
   add_header_above(c(" ", " ", "Reinforcement Learning Agent" = 2)) %>%
   footnote(general = "Simple agent is not added in this table as it never failed.")
 
@@ -394,41 +383,95 @@ failures_mean_iteration %>%
     format = "latex",
     digits = 2, linesep=c('')
   ) %>%
-  kable_styling(font_size = 10, latex_options = "HOLD_position") %>%
+  kable_styling(font_size = 10, latex_options = c("HOLD_position", "striped")) %>%
   add_header_above(c(" ", " ", "Reinforcement Learning Agent" = 2)) %>%
   footnote(general = "Simple agent is not added in this table as it never failed.")
+```
+We can observe in tables above how our reinforcement learning agent tends to stay longer in the environment in the episodes where it reached a hole (comparing the training/evaluation phase to our naive baseline).
 
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
 mean_rewards %>% 
   kable(
     col.names = c("Problem ID", "Random Agent", "Simple Agent", "Training Phase", "Evaluation Phase"),
     caption = '\\label{tab:summary_sucesses} Mean rewards per episode', 
     booktabs = TRUE, 
-    format = "latex"
+    format = "latex",
+    linesep=c('')
   ) %>%
-  kable_styling(font_size = 10, latex_options = "HOLD_position") %>%
-  add_header_above(c(" ", " ", "Reinforcement Learning Agent" = 2))
+  kable_styling(font_size = 10, latex_options = c("HOLD_position", "striped")) %>%
+  add_header_above(c(" ", " ", " ", "Reinforcement Learning Agent" = 2))
 ```
+We can observe in table above how our reinforcement learning agent reaches more than 80% success rate in some of the problems.
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_0} Evaluation Plots for Problem 0 (Training Phase)"}
+## Evaluation Plots
+Plots below show our three different agents performance in problem 0. We show both the training and evaluating phase.
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center"}
 knitr::include_graphics(c("../out/out_all_0_8_training.png", "../out/out_all_0_8_first_1000_training.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_0} Evaluation Plots for Problem 0. The full list of evaluation plots can be found in the appendix D."}
 knitr::include_graphics(c("../out/out_all_0_8_evaluation.png", "../out/out_all_0_8_first_1000_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
-passive_u <- read.csv("../out/out_passive_1_8_u.csv")
-rl_u <- read.csv("../out/out_rl_1_8_u.csv") 
+
+## Evaluating our Reinforcement Learning Agent
+
+We can observe in figure below the grid environment for problem 0, as well as the best policy found by our agent after 10,000 episodes. From our mean reward plot, we can see how the mean reward is increasing at a fast rate during the training phase. During the evaluation phase, we can see that it rapidly converges to the mean reward average of `~0.15` before reaching the 2000 episodes.
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 2, fig.show='hold', fig.width = 4, out.width = '60%', fig.cap = "\\label{fig:appendix_c_0_0} Problem 0 Grid (left) and best policy (right). The full list of grids and best policies can be found in the appendix B."}
+grid.arrange(
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid)), size=2)), size=8),
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid)), key="policy", size=2)), size=8),
+  ncol=2
+)
 ```
 
-# Conclusions {#sec:con}
-Three agents were analyzed for the Loch Lomond Frozen Lake grid. Reinforcement Learning agent was compared to a random/senseless agent as well as a deterministic agent. We saw an important improvement 
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_rl_0_8_train_mr.png", "../out/out_rl_0_8_eval_mr.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation plots for Problem 0. The full list of grids and best policies can be found in the appendix D."}
+knitr::include_graphics(c("../out/out_rl_0_8_train_mr_first_1000.png", "../out/out_rl_0_8_eval_mr_first_1000.png"))
+```
+
+Figure below show the utility table that was got from our reinforcement learning agent.
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.show='hold', fig.height = 4, fig.width = 4, out.width = '45%', fig.cap ="\\label{fig:appendixa} Problem 0 Utility table"}
+fix_caption(u_plot(lakes[[8]][[1]]))
+```
 
 \newpage
+
+# Conclusions {#sec:con}
+Three agents were analyzed for the Loch Lomond Frozen Lake grid. Reinforcement Learning agent was compared to a random/senseless agent as well as a deterministic agent. Our Q-learning agent converges to a best policy in most of the environments in less than 10,000 episodes. However, we noticed that some of the policies are incomplete after this training period, suggesting that more episodes are needed in order to reach convergence. We saw how our model-free agent was able to obtain over 80% success rate in some of the training grid environments. Even though the amount of mean iterations is considerably higher for the q-learning agent than the simple agent, it is important to remember that simple agent is deterministic, while our reinforcement learning agent is stochastic.
+
+Active reinforcement learning using a Q-learning algorithm is an interesting method for solving model-free problems. Further algorithms such as neural networks could be used in order to find a best policy and compare results to our Q-learning algorithm.
+
+\newpage
+
+# Disclaimer: Environment Modifications
+In order to add additional flexibility and generic support to the agents, slight changes were made to the `uofgsocsai.py` file, the one containing the main `LochLomondEnv` class. The changes mentioned below were approved as long as justification was provided. The changes and justifications are as follows:  
+$\bullet$ Parameters `map_name_base`, `reward` and `path_cost` were added to the `LochLomondEnv` constructor. The default values are `8x8-base`, `1.0` and `0` respectively. The default values do not alter the functionality from the original file provided.  
+$\bullet$ Attributes `is_stochastic`, `reward_hole`, `reward` and `path_cost` were added to the `LochLomondEnv` class.  
+
+The reason of the changes for the constructor was to add flexibility to be able to test different scenarios without the need to modify the file every time a different variant was analyzed. The attributes were added to the class in order to be able to access them via the object (e.g. `env.path_cost`) and create a Markov Decision Process out of it. Markov Decision Processes were used in unit testing to compare the performance of our agent and the values generated by *Policy Iteration* and *Value Iteration* algorithms.
+
+Finally, the way to assign en environment grid was changed from `MAPS_BASE[map_name_base]` to `copy.deepcopy(MAPS_BASE)[map_name_base]`, with the only purpose of being able to instantiate the `LochLomondEnv` more than once in a single run (e.g. `python run_rl.py 1,2,3,4,5,6,7`), which runs all the variants in a single run.
+
+There may be other better ways of accomplishing the same without code changes, but due to the current lack of experience/knowledge in Python programming, time did not permit to find better ways for it.
+
+\newpage
+
+# References
+
+$\bullet$ $^1$, $^2$, $^3$ Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print. (p.93, p.844 and p.840)  
+
+\newpage
+
 # Appendices
 
-## Appendix A: Evaluation Plots for 4x4 Grids
+## Appendix A: Evaluation Plots for Loch Lomond Frozen Lake 4x4 Grids
 
 ```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 3, fig.width = 10, out.width = '90%', fig.cap = "\\label{fig:appendixa} Loch Lomond Frozen Lake 4x4 grids"}
 grid.arrange(
@@ -469,140 +512,239 @@ grid.arrange(
 ```
 
 \newpage
-## Appendix B: Evaluation Plots for 8x8 Grids
+## Appendix B: Evaluation Plots for Loch Lomond Frozen Lake 8x8 Grids
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%', fig.cap = "\\label{fig:appendixa} My caption here"}
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 2, fig.width = 8, out.width = '100%'}
 margin = theme(plot.margin = unit(c(2,2,2,2), "cm"))
-
+#  fix_caption(u_plot(lakes[[8]][[1]])) + labs(caption = "8x8 Problem 0 - Utilities Table"),
 grid.arrange(
-  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid))))) + 
-    labs(caption = "8x8 Grid Problem 0"),
-  fix_caption(u_plot(lakes[[8]][[1]])) + labs(caption = "8x8 Problem 0 - Utilities Table"),
-  ncol=2
-)
-```
-
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%', fig.cap = "\\label{fig:appendixa} Policy $\\pi$ found by our agent (left) and by policy iteration algorithm (right) for problem 0"}
-grid.arrange(
-  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid)), key="policy"))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid)), size=3)), size=10) + 
     labs(caption = "Problem 0"),
-  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid)), key="passive_policy"))) + 
-    labs(caption = "Problem 0."),  
-  ncol=2
-)
-```
-
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%', fig.cap = "\\label{fig:appendixa} Policy $\\pi$ found by our agent (left) and by policy iteration algorithm (right) for problem 1"}
-grid.arrange(
-  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="policy"))) + 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), size=3)), size=10) + 
     labs(caption = "Problem 1"),
-  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="passive_policy"))) + 
-    labs(caption = "Problem 1."),  
-  ncol=2
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[3]], aes(x_grid, y_grid)), size=3)), size=10) + 
+    labs(caption = "Problem 2"), 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[4]], aes(x_grid, y_grid)), size=3)), size=10) + 
+    labs(caption = "Problem 3"),   
+  ncol=4
 )
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%', fig.cap = "\\label{fig:appendixa} Policy $\\pi$ found by our agent (left) and by policy iteration algorithm (right) for problem 2"}
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 2, fig.width = 8, out.width = '100%', fig.cap = "\\label{fig:appendixa} Loch Lomond Frozen Lake 8x8 grids"}
 grid.arrange(
-  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[3]], aes(x_grid, y_grid)), key="policy"))) + 
-    labs(caption = "Problem 2"),
-  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[3]], aes(x_grid, y_grid)), key="passive_policy"))) + 
-    labs(caption = "Problem 2."),  
-  ncol=2
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[5]], aes(x_grid, y_grid)), size=3)), size=10) + 
+    labs(caption = "Problem 4"),
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[6]], aes(x_grid, y_grid)), size=3)), size=10) + 
+    labs(caption = "Problem 5"),
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[7]], aes(x_grid, y_grid)), size=3)), size=10) + 
+    labs(caption = "Problem 6"), 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[8]], aes(x_grid, y_grid)), size=3)), size=10) + 
+    labs(caption = "Problem 7"),   
+  ncol=4
 )
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%', fig.cap = "\\label{fig:appendixa} Policy $\\pi$ found by our agent (left) and by policy iteration algorithm (right) for problem 3"}
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 2, fig.width = 8, out.width = '100%'}
 grid.arrange(
-  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[4]], aes(x_grid, y_grid)), key="policy"))) + 
-    labs(caption = "Problem 3"),
-  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[4]], aes(x_grid, y_grid)), key="passive_policy"))) + 
-    labs(caption = "Problem 3."),  
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[1]], aes(x_grid, y_grid)), key="policy", size=3)), size=10) + 
+    labs(caption = "Problem 0"),
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[2]], aes(x_grid, y_grid)), key="policy", size=3)), size=10) + 
+    labs(caption = "Problem 1"),
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[3]], aes(x_grid, y_grid)), key="policy", size=3)), size=10) + 
+    labs(caption = "Problem 2"), 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[4]], aes(x_grid, y_grid)), key="policy", size=3)), size=10) + 
+    labs(caption = "Problem 3"),   
+  ncol=4
+)
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 2, fig.width = 8, out.width = '100%', fig.cap ="\\label{fig:appendixa} Policy $\\pi$ found by our reinforcement learning agent"}
+grid.arrange(
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[5]], aes(x_grid, y_grid)), key="policy", size=3)), size=10) + 
+    labs(caption = "Problem 4"),
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[6]], aes(x_grid, y_grid)), key="policy", size=3)), size=10) + 
+    labs(caption = "Problem 5"),
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[7]], aes(x_grid, y_grid)), key="policy", size=3)), size=10) + 
+    labs(caption = "Problem 6"), 
+  fix_caption(remove_legend(env_plot(ggplot(lakes[[8]][[8]], aes(x_grid, y_grid)), key="policy", size=3)), size=10) + 
+    labs(caption = "Problem 7"),   
+  ncol=4
+)
+```
+
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%'}
+grid.arrange(
+  fix_caption(u_plot(lakes[[8]][[1]])) + labs(caption = "Problem 0"),
+  fix_caption(u_plot(lakes[[8]][[2]])) + labs(caption = "Problem 1"),
+  ncol=2
+)
+```
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%'}
+grid.arrange(
+  fix_caption(u_plot(lakes[[8]][[3]])) + labs(caption = "Problem 2"),
+  fix_caption(u_plot(lakes[[8]][[4]])) + labs(caption = "Problem 3"),
+  ncol=2
+)
+```
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%'}
+grid.arrange(
+  fix_caption(u_plot(lakes[[8]][[5]])) + labs(caption = "Problem 4"),
+  fix_caption(u_plot(lakes[[8]][[6]])) + labs(caption = "Problem 5"),
   ncol=2
 )
 ```
 
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 4, fig.width = 8, out.width = '85%', fig.cap ="\\label{fig:appendixa} Utility tables our reinforcement learning agent"}
+grid.arrange(
+  fix_caption(u_plot(lakes[[8]][[7]])) + labs(caption = "Problem 6"),
+  fix_caption(u_plot(lakes[[8]][[8]])) + labs(caption = "Problem 7"),
+  ncol=2
+)
+```
+
+
+\newpage
 
 ## Appendix C: Evaluation of agents 
 
 The plots with the mean reward vs episodes number are presented below.
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_0} Evaluation Plots for Problem 0 (Training Phase)"}
-knitr::include_graphics(c("../out/out_all_0_8_training.png", "../out/out_all_0_8_first_1000_training.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_0_8_training.png", "../out/out_all_0_8_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 0 (Evaluation Phase)"}
-knitr::include_graphics(c("../out/out_all_0_8_evaluation.png", "../out/out_all_0_8_first_1000_evaluation.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_0_8_first_1000_training.png", "../out/out_all_0_8_first_1000_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_0} Evaluation Plots for Problem 1 (Training Phase)"}
-knitr::include_graphics(c("../out/out_all_1_8_training.png", "../out/out_all_1_8_first_1000_training.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_1_8_training.png", "../out/out_all_1_8_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 1 (Evaluation Phase)"}
-knitr::include_graphics(c("../out/out_all_1_8_evaluation.png", "../out/out_all_1_8_first_1000_evaluation.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_1_8_first_1000_training.png", "../out/out_all_1_8_first_1000_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_0} Evaluation Plots for Problem 2 (Training Phase)"}
-knitr::include_graphics(c("../out/out_all_2_8_training.png", "../out/out_all_2_8_first_1000_training.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_2_8_training.png", "../out/out_all_2_8_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 2 (Evaluation Phase)"}
-knitr::include_graphics(c("../out/out_all_2_8_evaluation.png", "../out/out_all_2_8_first_1000_evaluation.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_2_8_first_1000_training.png", "../out/out_all_2_8_first_1000_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_0} Evaluation Plots for Problem 3 (Training Phase)"}
-knitr::include_graphics(c("../out/out_all_3_8_training.png", "../out/out_all_3_8_first_1000_training.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_3_8_training.png", "../out/out_all_3_8_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 3 (Evaluation Phase)"}
-knitr::include_graphics(c("../out/out_all_3_8_evaluation.png", "../out/out_all_3_8_first_1000_evaluation.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_3_8_first_1000_training.png", "../out/out_all_3_8_first_1000_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_0} Evaluation Plots for Problem 4 (Training Phase)"}
-knitr::include_graphics(c("../out/out_all_4_8_training.png", "../out/out_all_4_8_first_1000_training.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_4_8_training.png", "../out/out_all_4_8_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 4 (Evaluation Phase)"}
-knitr::include_graphics(c("../out/out_all_4_8_evaluation.png", "../out/out_all_4_8_first_1000_evaluation.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_4_8_first_1000_training.png", "../out/out_all_4_8_first_1000_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_0} Evaluation Plots for Problem 5 (Training Phase)"}
-knitr::include_graphics(c("../out/out_all_5_8_training.png", "../out/out_all_5_8_first_1000_training.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_5_8_training.png", "../out/out_all_5_8_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 5 (Evaluation Phase)"}
-knitr::include_graphics(c("../out/out_all_5_8_evaluation.png", "../out/out_all_5_8_first_1000_evaluation.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_5_8_first_1000_training.png", "../out/out_all_5_8_first_1000_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_0} Evaluation Plots for Problem 6 (Training Phase)"}
-knitr::include_graphics(c("../out/out_all_6_8_training.png", "../out/out_all_6_8_first_1000_training.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_6_8_training.png", "../out/out_all_6_8_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 6 (Evaluation Phase)"}
-knitr::include_graphics(c("../out/out_all_6_8_evaluation.png", "../out/out_all_6_8_first_1000_evaluation.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_6_8_first_1000_training.png", "../out/out_all_6_8_first_1000_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_0} Evaluation Plots for Problem 7 (Training Phase)"}
-knitr::include_graphics(c("../out/out_all_7_8_training.png", "../out/out_all_7_8_first_1000_training.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="40%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_7_8_training.png", "../out/out_all_7_8_evaluation.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 7 (Evaluation Phase)"}
-knitr::include_graphics(c("../out/out_all_7_8_evaluation.png", "../out/out_all_7_8_first_1000_evaluation.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_all_7_8_first_1000_training.png", "../out/out_all_7_8_first_1000_evaluation.png"))
 ```
 
-## Appendix C: Evaluation of Reinforcement Learning Agent
+\newpage
+## Appendix D: Evaluation of our Reinforcement Learning Agent
 
-
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 0, Reinforcement Learning Agent (Evaluation Phase)"}
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
 knitr::include_graphics(c("../out/out_rl_0_8_train_mr.png", "../out/out_rl_0_8_eval_mr.png"))
 ```
 
-```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 0, Reinforcement Learning Agent (Evaluation Phase)"}
-knitr::include_graphics(c("../out/out_rl_0_8_train_mr_first_1000.png", "../out/out_rl_0_8_eval_mr_last_1000.png"))
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 0"}
+knitr::include_graphics(c("../out/out_rl_0_8_train_mr_first_1000.png", "../out/out_rl_0_8_eval_mr_first_1000.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_rl_1_8_train_mr.png", "../out/out_rl_1_8_eval_mr.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 1"}
+knitr::include_graphics(c("../out/out_rl_1_8_train_mr_first_1000.png", "../out/out_rl_1_8_eval_mr_first_1000.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_rl_2_8_train_mr.png", "../out/out_rl_2_8_eval_mr.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 2"}
+knitr::include_graphics(c("../out/out_rl_2_8_train_mr_first_1000.png", "../out/out_rl_2_8_eval_mr_first_1000.png"))
 ```
 
 
-[^1]: Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print.
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_rl_3_8_train_mr.png", "../out/out_rl_3_8_eval_mr.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 3"}
+knitr::include_graphics(c("../out/out_rl_3_8_train_mr_first_1000.png", "../out/out_rl_3_8_eval_mr_first_1000.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_rl_4_8_train_mr.png", "../out/out_rl_4_8_eval_mr.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 4"}
+knitr::include_graphics(c("../out/out_rl_4_8_train_mr_first_1000.png", "../out/out_rl_4_8_eval_mr_first_1000.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_rl_5_8_train_mr.png", "../out/out_rl_5_8_eval_mr.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 5"}
+knitr::include_graphics(c("../out/out_rl_5_8_train_mr_first_1000.png", "../out/out_rl_5_8_eval_mr_first_1000.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_rl_6_8_train_mr.png", "../out/out_rl_6_8_eval_mr.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 6"}
+knitr::include_graphics(c("../out/out_rl_6_8_train_mr_first_1000.png", "../out/out_rl_6_8_eval_mr_first_1000.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center"}
+knitr::include_graphics(c("../out/out_rl_7_8_train_mr.png", "../out/out_rl_7_8_eval_mr.png"))
+```
+
+```{r, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, out.width="49%", fig.show='hold', out.height="30%", fig.align = "center", fig.cap = "\\label{fig:appendix_c_1} Evaluation Plots for Problem 4"}
+knitr::include_graphics(c("../out/out_rl_7_8_train_mr_first_1000.png", "../out/out_rl_7_8_eval_mr_first_1000.png"))
+```
+
+
+[^1]: Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print. (p.93)
+[^2]: Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print. (p.844)
+[^3]: Russell, Stuart J, and Peter Norvig. *Artificial Intelligence: A Modern Approach*. Englewood Cliffs, N.J: Prentice Hall, 1995. Print. (p.840)
 
 

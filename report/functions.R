@@ -74,9 +74,9 @@ u_plot <- function(data) {
   return(plot)
 }
 
-env_plot <- function(plot, key="val") {
+env_plot <- function(plot, key="val", size=5) {
   plot <- plot + geom_tile(aes(fill = val), colour = "white") + 
-    geom_text(aes(label = get_label(val, action_grid, action_passive_grid, key)), position = position_dodge(width=0.9), size=5) +
+    geom_text(aes(label = get_label(val, action_grid, action_passive_grid, key)), position = position_dodge(width=0.9), size=size) +
     scale_fill_manual(values=palette, labels = c("Start (safe)", "Frozen (safe)", "Hole", "Goal")) + 
     theme_void() +
     theme(legend.position="right", legend.direction = "horizontal", legend.box = "vertical")
@@ -95,9 +95,9 @@ remove_axis <- function(plot) {
   return(plot)
 }
 
-fix_caption <- function(plot, margin=c(0.2,0.2,0.2,0.2)) {
+fix_caption <- function(plot, margin=c(0.2,0.2,0.2,0.2), size=14) {
   return(plot + theme(plot.margin=unit(margin, "cm")) 
-         + theme(plot.caption = element_text(hjust = 0.5, size = 14)))
+         + theme(plot.caption = element_text(hjust = 0.5, size = size)))
 }
 
 arrow_from_cell <- function(cell, index="action") {

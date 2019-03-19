@@ -20,7 +20,7 @@ from uofgsocsai import LochLomondEnv # load the class defining the custom Open A
 
 class MyAbstractAIAgent():
     """
-    TODO
+    Abstract agent that works as a base for all our agents.
 
 
     """   
@@ -245,9 +245,9 @@ class MyAbstractAIAgent():
         plt.plot(x[rows], y[rows])
         plt.xlabel(labels[0])
         plt.ylabel(labels[1])
-        plt.savefig(filename)
         plt.suptitle(title, fontsize=12)
         plt.title(subtitle, fontsize=10)        
+        plt.savefig(filename)
         plt.close()
 
         print('\tPlot saved: {}'.format(filename))
