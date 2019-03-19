@@ -60,7 +60,7 @@ def random_agent(problem_id):
     x = range(1, len(dataframe) + 1)
     y = dataframe['mean_rewards']
     
-    add_plot('out_random_{}_mean_reward.png'.format(problem_id))
+    add_plot(x, y, 'out_random_{}_mean_reward.png'.format(problem_id))
 
     return dataframe
 
