@@ -25,22 +25,28 @@ class QLearningAgentUofG:
         run_single_trial(q_agent,sequential_decision_environment)
     
     """
-    def __init__(self, terminals, alpha=0.8, gamma=0.8):
+    def __init__(self, terminals, all_act, alpha, gamma, Ne, Rplus):
 
         self.gamma = gamma
-        self.alpha = 0.8
+        self.alpha = alpha
         self.terminals = terminals
-        self.all_act = [0,1,2,3]
+        self.all_act = all_act
         self.Q = defaultdict(float)
+        self.Nsa = defaultdict(float)        
         self.s = None
         self.a = None
         self.r = None
+        self.Ne = Ne
+        self.Rplus = Rplus
 
-    def f(self, u):
+    def f(self, u, n):       
         """ Exploration function. Returns fixed Rplus until
         agent has visited state, action a Ne number of times.
         Same as ADP agent in book."""
         # TODO ---- change comment
+        # if n < self.Ne:
+        #    return self.Rplus
+
         return u
 
     def actions_in_state(self, state):
@@ -51,26 +57,25 @@ class QLearningAgentUofG:
         else:
             return self.all_act
 
-    def __call__(self, percept, episode):
+    def best_action(self, new_state, new_reward, episode):
         alpha, gamma, terminals = self.alpha, self.gamma, self.terminals
-        Q = self.Q
+        Q, Nsa = self.Q, self.Nsa
         s, a, r = self.s, self.a, self.r
-        s1, r1 = self.update_state(percept) # current state and reward;  s' and r'
 
         if a is not None:
-            Q[s, a] += alpha * (r + gamma * max(Q[s1, a1] for a1 in self.actions_in_state(s1)) - Q[s, a])
+            Nsa[s, a] += 1
+            Q[s, a] += alpha * (r + gamma * max(Q[new_state, a1] for a1 in self.actions_in_state(new_state)) - Q[s, a])
 
-        if s1 in terminals:
-            print(terminals)
-            print(s1)
-            self.Q[s1, None] = s1
+        if new_state in terminals:
+            self.Q[new_state, None] = new_reward
             self.s = self.a = self.r = None
-        else:  
-            self.s, self.r = s1, s1            
-            self.a = argmax(self.all_act, key=lambda a1: self.f(Q[s1, a1]))
-
-            if random.uniform(0, 1) < (1 / (episode+1)):
+        else:
+            self.s, self.r = new_state, new_reward            
+            self.a = argmax(self.actions_in_state(new_state), key=lambda a1: self.f(Q[new_state, a1], Nsa[s, a1]))
+            
+            if random.uniform(0, 1) < 1/(episode+1):
                 self.a = random.randint(0, len(self.all_act)-1)
+
 
         # print(Q)
 
@@ -98,40 +103,35 @@ def rl_agent(problem_id):
 
     actions = []
     results = []
+    failures = 0
+    rewards = 0
 
     env = LochLomondEnv(problem_id=problem_id, is_stochastic=True, reward_hole=reward_hole)
-    q_agent = QLearningAgentUofG(terminals=get_terminals(env), alpha=0.8, gamma=0.8)
+    all_act = list(range(env.action_space.n))
+
+    q_agent = QLearningAgentUofG(terminals=get_terminals(env), all_act=all_act, alpha=0.8, gamma=0.8, Rplus=2, Ne=5)
+    #q_agent = QLearningAgentUofG(terminals=get_terminals(env), alpha=lambda n: 60./(59+n), gamma=0.95, Rplus=2, Ne=5)
     
     for e in range(max_episodes): # iterate over episodes
 
         state = env.reset() # reset the state of the env to the starting state     
         reward = 0
-        
+    
         for iter in range(max_iter_per_episode):
-
-            percept = (state, reward)
-            action = q_agent(percept, e)
-
+            action = q_agent.best_action(state, reward, e+1)
+            
             if action is not None:
                 state, reward, done, info = env.step(action) 
-            else:
-                break
             
             if done:
-                percept = (state, reward)
+                q_agent.best_action(state, reward, e+1)
 
-                print("we're done: ", percept)
-                print("we're done: ", q_agent.Q)
-                print("we're done: ", get_terminals(env))
-
-                q_agent(percept, e)
-
-                print("we're done: ", percept)
-                print("we're done: ", q_agent.Q)
-
-                if reward == reward_hole: 
-                    lost_episodes += 1
-                    break
+                if reward == 1.0:
+                    rewards += int(reward)
+                else:
+                    failures += 1                    
+                
+                break
 
         results.append([e, iter, int(reward), lost_episodes])
 
