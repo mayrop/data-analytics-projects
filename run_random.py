@@ -1,47 +1,69 @@
-"""
-  University of Glasgow 
-  Artificial Intelligence 2018-2019
-  Assessed Exercise
-
-  Random Agent
-  Solution for an agent without sensory input which takes random actions. 
-
-  Purpose: This agent should be used as a naive baseline.
-  Requirements:
-  - Sensors: None (/random/full; it doesn’t matter...)
-  - Action: Discrete
-  - State-space: No prior knowledge (i.e. it has not got a map)
-  - Rewards/goal: No prior knowledge (does not know where the goal is located)  
-"""
-import sys
 from helpers import *
-from agents import *
 from utils import print_table
-import numpy as np
+from uofgsocsai import LochLomondEnv
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+import sys
+import itertools  
+import operator  
 
 def main(problem_id):
-    """Write Doc Here"""
-    episodes = 10000
-    seed = True
 
-    print('Running Random Agent')
-    print('Problem: ', problem_id)
+    # should be less than or equal to 0.0 (you can fine tune this  depending on you RL agent choice)
+    reward_hole = 0.0
 
-    agent = RandomAgent(problem_id=problem_id) 
-    agent.solve(episodes=episodes, seed=True)
+    # should be False for A-star (deterministic search) and True for the RL agent
+    is_stochastic = True 
+
+    # you can decide you rerun the problem many times thus generating many episodes... you can learn from them all!
+    max_episodes = 10000   
+
+    # you decide how many iterations/actions can be executed per episode
+    max_iter_per_episode = 1000 
+
+    # TODO - add doc on this
+    lost_episodes = 0
+    cumulative_rewards = 0
+
+    # Generate the specific problem 
+    env = LochLomondEnv(problem_id=problem_id, is_stochastic=True, reward_hole=reward_hole)
+    results = []
+
+    for e in range(max_episodes): # iterate over episodes
+        # Reset the random generator to a known state (for reproducability)
+        np.random.seed(e)
+
+        observation = env.reset() # reset the state of the env to the starting state     
+        
+        for iter in range(max_iter_per_episode):
+            # your agent goes here (the current agent takes random actions)
+            action = env.action_space.sample() 
+
+            # observe what happends when you take the action
+            observation, reward, done, info = env.step(action)
+          
+            # Check if we are done and monitor rewards etc...
+            if (done and reward==reward_hole): 
+                lost_episodes += 1
+                break
+
+            if (done and reward == +1.0):
+                break
+
+        results.append([e, iter, int(reward), lost_episodes])
+
+    columns = ['episode', 'iteration', 'reward', 'lost_episodes']
     
-    agent.env.reset()
-    print("This is the environment: ")
-    print(agent.env.render())
-    agent.write_eval_files()
+    dataframe = pd.DataFrame(data=np.array(results), index=np.array(results)[0:,0], columns=columns)
+    dataframe['cumulative_rewards'] = list(itertools.accumulate(dataframe['reward'], operator.add))
+    dataframe['mean_rewards'] = dataframe.apply(lambda x: mean_rewards(x), axis=1)
 
-    evaluation = np.array(agent.eval)
+    problem_data = dataframe
 
-    # Plotting mean rewards    
-    x = pd.to_numeric(evaluation[:,1])
-    y = pd.to_numeric(evaluation[:,6])
+    # # Plotting mean rewards    
+    x = range(1, len(problem_data) + 1)
+    y = problem_data['mean_rewards']
     
     plt.plot(x, y)
     plt.xlabel('Episodes')
@@ -53,6 +75,9 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("usage: run_rl.py <problem_id>")
         exit()
+    
+    if not (0 <= int(sys.argv[1]) <= 7):
+        raise ValueError("Problem ID must be 0 <= problem_id <= 7")        
 
     main(int(sys.argv[1]))
 

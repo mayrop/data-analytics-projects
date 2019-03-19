@@ -50,32 +50,6 @@ class TestRandomAgent(unittest.TestCase):
         self.assertEqual(['S','F','F','F'], EnvMDP.to_decoded(env)[0].tolist())
 
 
-    def test_env_2_grid(self):
-        env = LochLomondEnv(problem_id=0, is_stochastic=True, 
-                            reward_hole=-0.2)
-
-        mdp = EnvMDP(env)
-        grid = EnvMDP.to_grid_matrix(env)
-        self.assertEqual(0, grid[0,0])
-        self.assertEqual(0, grid[0,1])
-        self.assertEqual(-0.2, grid[1,1])
-        self.assertEqual(env.reward, grid[3,0])
-
-
-    def test_env_2_terminals(self):
-        env = LochLomondEnv(problem_id=1, is_stochastic=True, 
-                            reward_hole=-0.2)
-
-        mdp = EnvMDP(env)
-        terminals = EnvMDP.to_position(env, letter=b'GH')
-
-        self.assertEqual((1, 1), terminals[0])
-        self.assertEqual((3, 1), terminals[1])
-        self.assertEqual((3, 2), terminals[2])
-        self.assertEqual((0, 3), terminals[3])
-        self.assertEqual((1, 3), terminals[4])
-
-
     def test_env_mdp(self):
         env = LochLomondEnv(problem_id=1, is_stochastic=True, 
                             reward_hole=-0.2)
@@ -121,15 +95,6 @@ class TestRandomAgent(unittest.TestCase):
         ## move to the right with 0.333 prob
         self.assertAlmostEqual(transitions[(0, 0)][1][2][0], 0.333, places=3)
         self.assertEqual(transitions[(0, 0)][1][2][1], (1, 0))
-
-
-    def test_env_2_init(self):
-        env = LochLomondEnv(problem_id=1, is_stochastic=True, 
-                            reward_hole=-0.2)
-
-        mdp = EnvMDP(env)
-        initial = EnvMDP.to_position(env, letter=b'S')
-        self.assertEqual((1, 0), initial[0])
 
 
     def test_env_2_init_02(self):

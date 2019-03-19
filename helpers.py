@@ -1,15 +1,14 @@
-import numpy as np
 import sys
 #AIMA_TOOLBOX_ROOT="aima-python"
 sys.path.append("aima")
 from search import *
 from mdp import MDP
-from rl import PassiveTDAgent
+import numpy as np
 import matplotlib.pyplot as plt
 
 
-# ______________________________________________________________________________
-# Random
+def mean_rewards(row):
+    return row.cumulative_rewards / (int(row.episode) + 1)
 
 def pos_to_coord(pos, ncol):
     return (pos % ncol, pos // ncol)
@@ -136,7 +135,7 @@ class EnvMDP(MDP):
                 return env.reward_hole
             if b'G' in state:
                 return env.reward
-            return env.path_cost
+            return 0.0
 
         grid = [state_value(state) for state in matrix]
         return np.array(grid).reshape((env.nrow, env.ncol))
