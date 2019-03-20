@@ -24,6 +24,8 @@ def random_agent(problem_id):
     env = LochLomondEnv(problem_id=problem_id, is_stochastic=True, reward_hole=reward_hole)
     results = []
 
+    print('Running Random Agent')
+
     for e in range(max_episodes): # iterate over episodes
         # Reset the random generator to a known state (for reproducability)
         np.random.seed(e)

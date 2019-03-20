@@ -1,5 +1,6 @@
 from run_random import random_agent
 from run_simple import simple_agent
+from run_rl import rl_agent
 import sys
 import matplotlib.pyplot as plt
 from helpers import *
@@ -7,8 +8,8 @@ from helpers import *
 def main(problem_id):
 
     random_agent_data = random_agent(problem_id)
-    random_agent_data = simple_agent(problem_id)
-
+    simple_agent_data = simple_agent(problem_id)
+    rl_agent_data = rl_agent(problem_id)
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

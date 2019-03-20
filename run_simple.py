@@ -56,6 +56,8 @@ def simple_agent(problem_id):
     node = astar_search(problem=graph_problem, h=None)
     best_path = node.solution()
 
+    print('Running Simple Agent')
+
     for i in range(len(best_path)):
         if i == 0:
             previous = undirected_graph.locations[state_initial_id]
