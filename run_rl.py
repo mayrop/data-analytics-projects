@@ -27,9 +27,7 @@ class QLearningAgentUofG:
         self.Rplus = Rplus
 
     def f(self, u, n, noise):       
-        """ Exploration function. Returns fixed Rplus until
-        agent has visited state, action a Ne number of times.
-        Same as ADP agent in book."""
+        """ Exploration function. """
         # TODO ---- change comment
         # if n < self.Ne:
         #    return self.Rplus
@@ -134,8 +132,12 @@ def rl_agent(problem_id):
     print('Policy: ')
     print_table(to_arrows(policy, 8, 8))
 
-    # Save the results to an npy file
+    # Save the results to a file
     np.save('out_rl_{}.npy'.format(problem_id), np.array(results))
+    # Save the results to a CSV file
+    np.savetxt('out_rl_{}.csv'.format(problem_id), np.array(results), 
+               header="episode,iterations,reward,lost_episodes", delimiter=",", fmt='%s')
+
     np.savetxt('out_rl_{}_policy.txt'.format(problem_id), to_arrows(policy, 8, 8), delimiter="\t", fmt='%s')
 
     # Adding plot for all episodes
@@ -169,7 +171,23 @@ def rl_agent(problem_id):
     
     add_plot(x, y, 'out_rl_{}_after_convergence.png'.format(problem_id), title, subtitle, labels)
 
-    return dataframe
+    # Getting numerical summaries
+    stats = {
+        'all_stats': pd.DataFrame(dataframe.describe(include = 'all')),
+        'successes_stats': dataframe[(dataframe.reward == 1)].describe(include = 'all'),
+        'failures_stats': dataframe[(dataframe.reward != 1)].describe(include = 'all'),
+        'all_stats_ac': pd.DataFrame(dataframe_ac.describe(include = 'all')),
+        'successes_stats_ac': dataframe_ac[(dataframe_ac.reward == 1)].describe(include = 'all'),
+        'failures_stats_ac': dataframe_ac[(dataframe_ac.reward != 1)].describe(include = 'all')                
+    }
+
+    print('Printing stats for rl agent...')
+    for stat, values in stats.items():
+        print(stat)
+        print(values)
+        print("\n\n")
+
+    return dataframe, stats
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

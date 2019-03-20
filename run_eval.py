@@ -7,9 +7,9 @@ from helpers import *
 
 def main(problem_id):
 
-    random_dataframe = random_agent_data = random_agent(problem_id)
-    simple_dataframe = simple_agent_data = simple_agent(problem_id)
-    rl_dataframe = rl_agent_data = rl_agent(problem_id)
+    random_dataframe, random_stats = random_agent_data = random_agent(problem_id)
+    simple_dataframe, simple_stats = simple_agent_data = simple_agent(problem_id)
+    rl_dataframe, rl_stats = rl_agent_data = rl_agent(problem_id)
 
     labels = ['Episodes', 'Mean Reward']
     filename = 'out_{}'.format(problem_id)

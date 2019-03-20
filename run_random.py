@@ -5,6 +5,7 @@ import pandas as pd
 import sys
 import itertools  
 import operator  
+from utils import print_table
 
 def random_agent(problem_id):
 
@@ -50,6 +51,13 @@ def random_agent(problem_id):
         results.append([e, iter, int(reward), lost_episodes])
 
     columns = ['episode', 'iterations', 'reward', 'lost_episodes']
+
+    # Save the results to a npy file
+    np.save('out_random_{}.npy'.format(problem_id), np.array(results))
+
+    # Save the results to a CSV file
+    np.savetxt('out_random_{}.csv'.format(problem_id), np.array(results), 
+               header="episode,iterations,reward,lost_episodes", delimiter=",", fmt='%s')
     
     dataframe = pd.DataFrame(data=np.array(results), index=np.array(results)[0:,0], columns=columns)
     dataframe['cumulative_rewards'] = list(itertools.accumulate(dataframe['reward'], operator.add))
@@ -64,7 +72,20 @@ def random_agent(problem_id):
     
     add_plot(x, y, 'out_random_{}_mean_reward.png'.format(problem_id), title, subtitle, labels)
 
-    return dataframe
+    # Getting numerical summaries
+    stats = {
+        'all_stats': pd.DataFrame(dataframe.describe(include = 'all')),
+        'successes_stats': dataframe[(dataframe.reward == 1)].describe(include = 'all'),
+        'failures_stats': dataframe[(dataframe.reward != 1)].describe(include = 'all')        
+    }
+
+    print('Printing stats for random agent...')
+    for stat, values in stats.items():
+        print(stat)
+        print(values)
+        print("\n\n")
+
+    return dataframe, stats
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
