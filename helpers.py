@@ -1,7 +1,6 @@
 import sys
 sys.path.append("aima")
 from search import *
-from mdp import MDP
 import numpy as np
 import matplotlib.pyplot as plt
 
