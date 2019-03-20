@@ -10,18 +10,23 @@ import matplotlib.pyplot as plt
 def mean_rewards(row):
     return row.cumulative_rewards / (int(row.episode) + 1)
 
-def add_plot(x, y, name):
+
+def add_plot(x, y, name, title, subtitle, labels):
     plt.plot(x, y)
-    plt.xlabel('Episodes')
-    plt.ylabel('Mean Reward')
+    plt.xlabel(labels[0])
+    plt.ylabel(labels[1])
+    plt.suptitle(title)
+    plt.title(subtitle)    
     plt.savefig(name)
     plt.close()
+
 
 def position_to_coordinates(pos, ncol):
     """ 
     TODO
     """       
     return (pos % ncol, pos // ncol)
+
 
 def get_terminals(env):
     """ 
@@ -31,63 +36,26 @@ def get_terminals(env):
     
     return [i for i, val in enumerate(grid) if bytes(val) in b'GH']
 
-def coord_to_pos(x, y, ncol):
-    return x + y * ncol    
 
-def q_to_u(Q):
-    """ Source of this function: 
-        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
-    """
-    U = defaultdict(lambda: -1000.) 
-    
-    for state_action, value in Q.items():
-        state, action = state_action
-        if U[state] < value:
-            U[state] = value
-
-    return U   
-
-# ______________________________________________________________________________
-# Graphs
-
-def graph_utility_estimates(graphs):
-    """ Source of this function: 
-        - Labs from Artifial Intelligence (H), University of Glasgow class 2019
-    """
-    
-    for state, value in graphs.items():
-        state_x, state_y = zip(*value)
-        plt.plot(state_x, state_y, label=str(state))
-
-    plt.ylim([-0.1, 1.2])
-    plt.legend(loc='lower right')
-    plt.xlabel('Iterations')
-    plt.ylabel('U')
-    plt.show(block=True)
-
-
-# ______________________________________________________________________________
-
-# Reinforcement Learning. Policies
-
-def policy_to_grid(mapping, rows, cols):
-    """Convert a mapping from (x, y) to v into a [[..., v, ...]] grid."""
+def to_grid(mapping, rows, cols):
+    """ Inspired in GridMDP(MDP) from AIMA Toolbox """
 
     states = []
     for pos in list(range(rows * cols)):
-        coord = pos_to_coord(pos, cols)
-        if coord in mapping:
-            states.append(mapping[coord])
+        if pos in mapping:
+            states.append(mapping[pos])
         else: 
             states.append('')        
     
     return np.array(states).reshape(rows, cols)
 
-def policy_to_arrows(policy, rows, cols):
-    chars = {2: '>', 3: '^', 0: '<', 1: 'v', None: '.'}
-    return policy_to_grid({s: chars[a] for (s, a) in policy.items()}, rows, cols)
 
-# ______________________________________________________________________________
+def to_arrows(policy, rows, cols):
+    """ Inspired in GridMDP(MDP) from AIMA Toolbox """
+    chars = {2: '>', 3: '^', 0: '<', 1: 'v', None: '.'}
+
+    return to_grid({s: chars[a] for (s, a) in policy.items()}, rows, cols)
+
 
 def env2statespace(env):
     """ 

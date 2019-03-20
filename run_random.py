@@ -47,7 +47,7 @@ def random_agent(problem_id):
 
         results.append([e, iter, int(reward), lost_episodes])
 
-    columns = ['episode', 'iteration', 'reward', 'lost_episodes']
+    columns = ['episode', 'iterations', 'reward', 'lost_episodes']
     
     dataframe = pd.DataFrame(data=np.array(results), index=np.array(results)[0:,0], columns=columns)
     dataframe['cumulative_rewards'] = list(itertools.accumulate(dataframe['reward'], operator.add))
@@ -55,8 +55,12 @@ def random_agent(problem_id):
 
     x = range(1, len(dataframe) + 1)
     y = dataframe['mean_rewards']
+
+    title = 'My title: problem id {}'.format(problem_id)
+    subtitle = 'My subtitle {}'.format(problem_id)
+    labels = ['Episodes', 'Mean Reward']
     
-    add_plot(x, y, 'out_random_{}_mean_reward.png'.format(problem_id))
+    add_plot(x, y, 'out_random_{}_mean_reward.png'.format(problem_id), title, subtitle, labels)
 
     return dataframe
 
