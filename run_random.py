@@ -50,6 +50,8 @@ def random_agent(problem_id):
 
         results.append([e, iter, int(reward), lost_episodes])
 
+    # ------------------------------------------------------------
+
     columns = ['episode', 'iterations', 'reward', 'lost_episodes']
 
     # Save the results to a npy file

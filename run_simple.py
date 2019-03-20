@@ -68,13 +68,15 @@ def simple_agent(problem_id):
 
         results.append([e, iter, int(reward), lost_episodes])
 
+    # ------------------------------------------------------------
+
+    columns = ['episode', 'iterations', 'reward', 'lost_episodes']
+
     # Save the results to a file
     np.save('out_simple_{}.npy'.format(problem_id), np.array(results))
     # Save the results to a CSV file
     np.savetxt('out_simple_{}.csv'.format(problem_id), np.array(results), 
                header="episode,iterations,reward,lost_episodes", delimiter=",", fmt='%s')
-
-    columns = ['episode', 'iterations', 'reward', 'lost_episodes']
     
     dataframe = pd.DataFrame(data=np.array(results), index=np.array(results)[0:,0], columns=columns)
     dataframe['cumulative_rewards'] = list(itertools.accumulate(dataframe['reward'], operator.add))

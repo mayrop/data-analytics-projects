@@ -132,6 +132,10 @@ def rl_agent(problem_id):
     print('Policy: ')
     print_table(to_arrows(policy, 8, 8))
 
+    # ------------------------------------------------------------
+
+    columns = ['episode', 'iterations', 'reward', 'lost_episodes']
+
     # Save the results to a file
     np.save('out_rl_{}.npy'.format(problem_id), np.array(results))
     # Save the results to a CSV file
@@ -141,8 +145,6 @@ def rl_agent(problem_id):
     np.savetxt('out_rl_{}_policy.txt'.format(problem_id), to_arrows(policy, 8, 8), delimiter="\t", fmt='%s')
 
     # Adding plot for all episodes
-    columns = ['episode', 'iterations', 'reward', 'lost_episodes']
-
     dataframe = pd.DataFrame(data=np.array(results), index=np.array(results)[0:,0], columns=columns)
     dataframe['cumulative_rewards'] = list(itertools.accumulate(dataframe['reward'], operator.add))
     dataframe['mean_rewards'] = dataframe.apply(lambda x: mean_rewards(x), axis=1)
