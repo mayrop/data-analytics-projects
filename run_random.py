@@ -33,7 +33,7 @@ def random_agent(problem_id):
         observation = env.reset() # reset the state of the env to the starting state     
         
         for iter in range(max_iter_per_episode):
-            # your agent goes here (the current agent takes random actions)
+            # the current agent takes random actions
             action = env.action_space.sample() 
 
             # observe what happends when you take the action

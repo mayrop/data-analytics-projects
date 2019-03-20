@@ -69,8 +69,6 @@ class QLearningAgentUofG:
             if random.uniform(0, 1) < 0.075:
                 self.a = random.randint(0, len(self.all_act)-1)            
 
-        # print(Q)
-
         return self.a
 
     def update_state(self, percept):

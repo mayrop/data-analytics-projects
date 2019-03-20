@@ -1,5 +1,4 @@
 import sys
-#AIMA_TOOLBOX_ROOT="aima-python"
 sys.path.append("aima")
 from search import *
 from mdp import MDP
