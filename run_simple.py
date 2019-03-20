@@ -7,28 +7,6 @@ import itertools
 import operator  
 from search import *
 
-def get_action_from_location(previous, current):
-    # todo - double check
-
-    # previous[0] = y coordinate of prev value
-    # previous[1] = x coordinate of prev value
-
-    # current[0] = y coordinate of current value
-    # current[1] = x coordinate of current value
-
-    # down
-    if current[0] > previous[0]:
-        return 1
-    # up
-    if current[0] < previous[0]:
-        return 3
-    # right
-    if current[1] > previous[1]:
-        return 2
-    # left
-    if current[1] < previous[1]:
-        return 0
-
 def simple_agent(problem_id):
 
     # should be less than or equal to 0.0 (you can fine tune this  depending on you RL agent choice)

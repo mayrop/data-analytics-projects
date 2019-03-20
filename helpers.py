@@ -6,6 +6,28 @@ from mdp import MDP
 import numpy as np
 import matplotlib.pyplot as plt
 
+def get_action_from_location(previous, current):
+    # todo - double check
+
+    # previous[0] = y coordinate of prev value
+    # previous[1] = x coordinate of prev value
+
+    # current[0] = y coordinate of current value
+    # current[1] = x coordinate of current value
+
+    # down
+    if current[0] > previous[0]:
+        return 1
+    # up
+    if current[0] < previous[0]:
+        return 3
+    # right
+    if current[1] > previous[1]:
+        return 2
+    # left
+    if current[1] < previous[1]:
+        return 0
+
 
 def mean_rewards(row):
     return row.cumulative_rewards / (int(row.episode) + 1)
