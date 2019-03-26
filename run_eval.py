@@ -30,7 +30,6 @@ def main(args):
         passive_agent.evaluate(episodes)
 
         # Adding the plots for evaluation
-
         labels = ['Episodes', 'Mean Reward']
         agents = {
             'random': random_agent,
