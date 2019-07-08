@@ -13,9 +13,10 @@ import json
 import pandas as pd
 from helpers import *
 
-from aima_mdp import policy_iteration
-from aima_mdp import value_iteration
-from aima_search import *
+sys.path.append("aima")
+from mdp import policy_iteration
+from mdp import value_iteration
+from search import *
 from uofgsocsai import LochLomondEnv # load the class defining the custom Open AI Gym problem
 
 class MyAbstractAIAgent():

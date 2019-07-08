@@ -3,9 +3,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from uofgsocsai import LochLomondEnv
-from aima_search import *
-from aima_mdp import MDP
-from aima_rl import PassiveTDAgent
+
+sys.path.append("aima")
+from search import *
+from mdp import MDP
+from rl import PassiveTDAgent
 
 # ______________________________________________________________________________
 # Random

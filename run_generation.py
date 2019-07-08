@@ -16,7 +16,7 @@ def main():
             writer.writerows(grids)
 
     file.close()    
-    #np.savetxt('out/grids.csv', grids, delimiter=",", fmt='%s') 
+    np.savetxt('out/grids.csv', grids, delimiter=",", fmt='%s') 
 
 if __name__ == '__main__':
     main()
