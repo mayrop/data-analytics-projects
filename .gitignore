@@ -1,6 +1,6 @@
 __pycache__/*
+aima/__pycache__/*
 gym/
-aima/
 out/
 .Rhistory
 .RData

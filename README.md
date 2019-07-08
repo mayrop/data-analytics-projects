@@ -1,9 +1,10 @@
 # Artificial Intelligence (H) 2018-2019
-## Assessed Exercise: Individual, 20% of the final grade (∼ 20 hours)
+# Assessed Exercise: Individual, 20% of the final grade (∼ 20 hours)
+
+Final report can be found [here](ai/report/project.pdf).
 
 ## Problem Statement
-Your task is to design, implement, evaluate and document three virtual agents which are (potentially) able to reach a goal in a custom Open AI Gym environment derived from Frozen. Thus, you will need
-to install and understand the workings of the Open AI Gym environment to be able solve the task (hint: see AI (H) Lab 2).
+Your task is to design, implement, evaluate and document three virtual agents which are (potentially) able to reach a goal in a custom Open AI Gym environment derived from Frozen. Thus, you will need to install and understand the workings of the Open AI Gym environment to be able solve the task (hint: see AI (H) Lab 2).
 
 The specific environment/problem under consideration is a grid-world with a starting position (S), obstacles (H) and a final goal (G). The task is to get from S to G. The environment is defined in `uofgsocsai.py`. via the class `LochLomondEnv` including documentation relating to the setting, specific states, parameters etc. An example of how to instantiate the environment and navigate it using random actions is provided in `lochlomond_demo.py`.
 
@@ -21,7 +22,8 @@ You should provide a solution for an agent without sensory input which takes ran
 
 where you can use problem_id ∈ [0:7] to evaluate the performance over different instances of the same problem.
 
-**Purpose**: This agent should be used as a naive baseline. Hint: A basic senseless/random agent is already partly provided in lochlomond_demo.py (albeit with output computation of the performance measure...).
+**Purpose**: This agent should be used as a naive baseline. 
+**Hint**: A basic senseless/random agent is already partly provided in lochlomond_demo.py (albeit with output computation of the performance measure...).
 
 **Requirements**:  
 -**Sensors**: None (/random/full; it doesn’t matter...)  
@@ -31,7 +33,9 @@ where you can use problem_id ∈ [0:7] to evaluate the performance over differen
 
 ### Task II: Simple Agent
 You should provide an agent based on a tree/graph-search and justify its use for solving the particular the problem (e.g. using A* search with a suitable heuristic) assuming that the task environment is fully known and observable. You should initialise the environment as follows:
-env = LochLomondEnv(problem_id=[0-7], is_stochastic=False, reward_hole=0.0)
+
+`env = LochLomondEnv(problem_id=[0-7], is_stochastic=False, reward_hole=0.0)`
+
 where you can use problem_id ∈ [0:7] to evaluate the performance over different instances of the same problem - and to fine-tune your agent to make sure it generalises. We recommend you use existing code (from e.g. the AIMA toolbox) to solve this part).
 
 **Purpose**: This agent is used as an ideal baseline to find the optimal path under ideal circumstances. Hint: if you have attended the Lab sessions you will easily be able to reuse most of the code to solve this part (a parser that maps from env.desc to the lab 3 format will be made available).
