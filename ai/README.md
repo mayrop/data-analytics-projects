@@ -1,7 +1,7 @@
 # Artificial Intelligence (H) 2018-2019
 # Assessed Exercise: Individual, 20% of the final grade (∼ 20 hours)
 
-Final report can be found [here](ai/report/project.pdf). It is generated from a [.Rmd file](ai/report/project.Rmd). In order to generate it:
+Final report can be found [here](report/project.pdf). It is generated from a [.Rmd file](report/project.Rmd). In order to generate it:
 - `python run_generation.py`
 - `python run_eval.py 0,1,2,3,4,5,6,7`
 - `python run_eval.py 0,1,2,3 10000 4` 
