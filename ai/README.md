@@ -1,10 +1,14 @@
 # Artificial Intelligence (H) 2018-2019
 # Assessed Exercise: Individual, 20% of the final grade (∼ 20 hours)
 
-Final report can be found [here](ai/report/project.pdf). It is generated from a [.Rmd file](ai/report/project.Rmd)
+Final report can be found [here](ai/report/project.pdf). It is generated from a [.Rmd file](ai/report/project.Rmd). In order to generate it:
+- `python run_generation.py`
+- `python run_eval.py 0,1,2,3,4,5,6,7`
+- `python run_eval.py 0,1,2,3 10000 4` 
+- Knit the .Rmd file from R Studio
 
 ## Problem Statement
-Your task is to design, implement, evaluate and document three virtual agents which are (potentially) able to reach a goal in a custom Open AI Gym environment derived from Frozen. Thus, you will need to install and understand the workings of the Open AI Gym environment to be able solve the task (hint: see AI (H) Lab 2).
+Your task is to design, implement, evaluate and document three virtual agents which are (potentially) able to reach a goal in a custom Open AI Gym environment derived from [Frozen](https://gym.openai.com/envs/FrozenLake8x8-v0/). Thus, you will need to install and understand the workings of the [Open AI Gym](https://gym.openai.com/) environment to be able solve the task (hint: see AI (H) Lab 2).
 
 The specific environment/problem under consideration is a grid-world with a starting position (S), obstacles (H) and a final goal (G). The task is to get from S to G. The environment is defined in `uofgsocsai.py`. via the class `LochLomondEnv` including documentation relating to the setting, specific states, parameters etc. An example of how to instantiate the environment and navigate it using random actions is provided in `lochlomond_demo.py`.
 
@@ -23,7 +27,7 @@ You should provide a solution for an agent without sensory input which takes ran
 where you can use problem_id ∈ [0:7] to evaluate the performance over different instances of the same problem.
 
 **Purpose**: This agent should be used as a naive baseline. 
-**Hint**: A basic senseless/random agent is already partly provided in lochlomond_demo.py (albeit with output computation of the performance measure...).
+**Hint**: A basic senseless/random agent is already partly provided in `lochlomond_demo.py` (albeit with output computation of the performance measure...).
 
 **Requirements**:  
 -**Sensors**: None (/random/full; it doesn’t matter...)  
@@ -38,7 +42,8 @@ You should provide an agent based on a tree/graph-search and justify its use for
 
 where you can use problem_id ∈ [0:7] to evaluate the performance over different instances of the same problem - and to fine-tune your agent to make sure it generalises. We recommend you use existing code (from e.g. the AIMA toolbox) to solve this part).
 
-**Purpose**: This agent is used as an ideal baseline to find the optimal path under ideal circumstances. Hint: if you have attended the Lab sessions you will easily be able to reuse most of the code to solve this part (a parser that maps from env.desc to the lab 3 format will be made available).
+**Purpose**: This agent is used as an ideal baseline to find the optimal path under ideal circumstances. 
+**Hint**: if you have attended the Lab sessions you will easily be able to reuse most of the code to solve this part (a parser that maps from env.desc to the lab 3 format will be made available).
 
 **Requirements:**  
 -**Sensors**: Oracle (i.e. you’re allowed to read the location of all object in the environment e.g. using env.desc)  
@@ -67,7 +72,8 @@ You should include three items in your submission:
 
 ### Implementation & Code
 Your implementation - containing the three different agents (along with any dependencies, except the Open AI Gym) - should be uploaded to Moodle as a zip-file containing the source code. You must provide three separate and executable python scripts/programs named: `run_random.py`, `run_simple.py`
-and `run_rl.py` which takes as (only required) argument the `problem_id` . Each script/program should include training/learning phases (including possible repetitions/episodes of the problem) and output a text file (named after the agent, e.g. "random") with any relevant information. Hint: A template will be provided via Moodle.
+and `run_rl.py` which takes as (only required) argument the `problem_id` . Each script/program should include training/learning phases (including possible repetitions/episodes of the problem) and output a text file (named after the agent, e.g. "random") with any relevant information. 
+**Hint**: A template will be provided via Moodle.
 
 ### Experiment & Evaluation
 An important aspect of RL is assessing and comparing the performance of agents and different policies.

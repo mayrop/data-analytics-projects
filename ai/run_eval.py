@@ -8,7 +8,7 @@ from helpers import compare_utils, parse_args, plot_eval
 from agents import RandomAgent, ReinforcementLearningAgent, PassiveAgent, SimpleAgent
 
 def main(args):
-
+    print(args)
     problem_ids, episodes, grid = parse_args(args)
 
     for problem_id in problem_ids:

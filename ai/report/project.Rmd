@@ -22,22 +22,32 @@ source("functions.R")
 ```
 
 ```{r libraries, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
-library(plyr)
-library(dplyr)
-library(data.table)
-library(tidyr)
-library(ggplot2)
-library(scales)
-library(Hmisc)
-library(kableExtra)
-library(gridExtra)
-library(grid)
-library(gtable)
-library(gridExtra)
-library(grid)
-library(egg)
-library(reshape2)
-library(grid)
+
+libraries <- c(
+  "plyr", # for %>%
+  "dplyr", 
+  "data.table",
+  "tidyr",
+  "ggplot2",
+  "scales",
+  "Hmisc",
+  "gridExtra",
+  "kableExtra",
+  "grid",
+  "gridExtra",
+  "gtable",
+  "reshape2",
+  "egg",
+  "grid"
+)
+
+for (library in libraries) {
+  if (!require(library, character.only = TRUE)) {
+    install.packages(library)
+  }
+
+  library(library, character.only = TRUE)
+}
 ```
 
 ```{r data, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
