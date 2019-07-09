@@ -1,7 +1,7 @@
 # Artificial Intelligence (H) 2018-2019
 # Assessed Exercise: Individual, 20% of the final grade (∼ 20 hours)
 
-Final report can be found [here](ai/report/project.pdf).
+Final report can be found [here](ai/report/project.pdf). It is generated from a [.Rmd file](ai/report/project.Rmd)
 
 ## Problem Statement
 Your task is to design, implement, evaluate and document three virtual agents which are (potentially) able to reach a goal in a custom Open AI Gym environment derived from Frozen. Thus, you will need to install and understand the workings of the Open AI Gym environment to be able solve the task (hint: see AI (H) Lab 2).
@@ -56,7 +56,7 @@ where you can use problem_id ∈ [0:7] to evaluate the performance over differen
 **Requirements:**  
 -**Sensors**: Perfect information about the current state and thus available actions in that state; no prior  
 knowledge about the state-space in general  
--**Action**: Discrete and noisy. The requested action is only carried out correctly with a certain probability  (as defined by uofgsocsai.py).
+-**Action**: Discrete and noisy. The requested action is only carried out correctly with a certain probability  (as defined by uofgsocsai.py).  
 -**State-space**: No prior knowledge, but partially observable/learn-able via the sensors/actions.  
 -**Rewards**: No prior knowledge, but partially observable via sensors/actions.  
 
@@ -65,36 +65,36 @@ knowledge about the state-space in general
 ## Submission
 You should include three items in your submission:
 
-## Implementation & Code
+### Implementation & Code
 Your implementation - containing the three different agents (along with any dependencies, except the Open AI Gym) - should be uploaded to Moodle as a zip-file containing the source code. You must provide three separate and executable python scripts/programs named: `run_random.py`, `run_simple.py`
 and `run_rl.py` which takes as (only required) argument the `problem_id` . Each script/program should include training/learning phases (including possible repetitions/episodes of the problem) and output a text file (named after the agent, e.g. "random") with any relevant information. Hint: A template will be provided via Moodle.
 
-## Experiment & Evaluation
+### Experiment & Evaluation
 An important aspect of RL is assessing and comparing the performance of agents and different policies.
 
 To document the behavior of your agents you should design a suitable set of (computer) experiments which produces a relevant set of graphs/tables to document the behavior of your RL agent (e.g. average performance measure vs number of episodes, etc) and compares its performance against the baselines. 
 The evaluation strategy should be implemented in a single Python script (a wrapper) run_eval.py which runs you entire evaluation, that is, it should call your agents, collate the results and produce the figures/tables you have included in your report. The `run_eval.py` should be submitted via Moodle alongside your implementation.
 
-## Report
+### Report
 You should document your work and results in a short technical report of (max 1500 words; excluding figures, tables, captions, references and appendices). Appendices may be used to provide extra information to support the data and arguments in the main document, e.g., detailed simulation results but should not provide crucial information required to understand the principle of the solution and the outcome. You can include as many references as you see fit. The report should be submitted via Moodle as a pdf file alongside your implementation and evaluation scripts.
 
 ## Marking Scheme
 The assessment is based on the degree to which your submission (implementation, evaluation script and report) concisely, correctly and completely addresses the following aspects:
 
-#### Analysis [15%]
+### Analysis [15%]
 Introduction/motivation and correct PEAS analysis (including task environment characterisation).
 
-#### Method/design [15%]
+### Method/design [15%]
 Presentation of relevant theory and methods (for all your agents) with proper use of citations and justification for choosing specific methods (referencing your analysis).
 
-#### Implementation [25%]
+### Implementation [25%]
 The code for all the agents (not in the report!) should be well-documented, follow best-practices in software development and follow the outlined naming convention. The report must contain a presentation of relevant aspects of the implementation.
 
-#### Experiments / Evaluation
+### Experiments / Evaluation
 - [20%] Evaluation script/program to reproduce the results (i.e. graphs/tables) adhering to the specified requirements.
 - [20%] Relevant presentation of the evaluation strategy, metrics and the obtained simulation results. A suitable presentation and comparison of the performance of the agent with other agents as evaluated across a suitable number of problem variations (e.g. using graphs/tables).
 
-#### Discussion and conclusion [5%]
+### Discussion and conclusion [5%]
 - Including a critical reflections on the outcome/results. The weighting of the senseless, simple and RL agent - for all marking criterion - is 5,10 and 85%, respectively.
 
 ## Collaboration
