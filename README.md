@@ -6,3 +6,8 @@ Project about reinforcement learning using Python and [Open AI Gym](https://gym.
 
 Source code [here](ai/).
 
+## SAS
+Project about logistic regression using SAS® OnDemand for Academics. 
+
+Source code [here](sas/).
+
