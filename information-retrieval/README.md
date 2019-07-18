@@ -1,7 +1,12 @@
 # Information Retrieval (M) 2018-2019
-## Exercise 2
 
-Final report can be found [here](report/2419105v.pdf). It is generated from a [.Rmd file](report/2419105v.Rmd). Data to generate the report from the `.Rmd` file is not provided because of Copyright. Code to implement the features can be found [here](terrier). 
+Project about how learning-to-rank can improve information retrieval effectiveness. Two proximity features were implemented, tested and analyzed using [Terrier](http://terrier.org/docs/current/learning.html).
+
+Final report can be found [here](2419105v.pdf). It is generated from a [.Rmd file](2419105v.Rmd). Data to generate the report from the `.Rmd` file is not provided because of Copyright. Source code (Java) to implement the features can be found [here](terrier). 
+
+--------------------
+
+# Exercise 2
 
 ## Introduction
 Learning-to-rank is a recent paradigm used by commercial search engines to improve retrieval effectiveness by combining different sources of evidence (aka features). The key point of learningto-rank is that it is easy to incorporate new features and to leverage the amount of potential training data available to Web search engines. In this exercise, you will be trying learning to rank using a number of standard or provided features, and implementing two additional features of your own.
