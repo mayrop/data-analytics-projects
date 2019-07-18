@@ -7,7 +7,7 @@ Project about reinforcement learning using Python and [Open AI Gym](https://gym.
 Details can be found [here](ai/).
 
 ### Information Retrieval
-Project about how learning-to-rank can improve information retrieval effectiveness. Two proximity features were implemented, tested and analyzed using [Terrier](http://terrier.org/docs/current/learning.html)
+Project about how learning-to-rank can improve information retrieval effectiveness. Two pairwise term-term proximity features were implemented, tested and analyzed using [Terrier](http://terrier.org/docs/current/learning.html)
 
 Details can be found [here](information-retrieval/).
 
