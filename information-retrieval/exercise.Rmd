@@ -1,0 +1,365 @@
+---
+title: "Information Retrieval 5M - Exercise 2"
+author: "Mayra A. Valdes Ibarra - 2419105v"
+header-includes: #allows you to add in your own Latex packages
+- \usepackage{float} #use the 'float' package
+- \floatplacement{figure}{H} #make every figure with caption = h    
+output:
+  pdf_document:
+    latex_engine: pdflatex
+    number_sections: yes
+    keep_tex: yes
+    fig_cap: yes
+fontsize: '11pt'
+---
+
+```{r setup, include=FALSE}
+#fig_caption: yes
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE, fig.pos= "h")
+#knitr::opts_chunk$set(fig.pos = 'H')
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+```
+
+
+```{r libraries, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+library(RCurl)
+library(plyr)
+library(dplyr)
+library(data.table)
+library(tidyr)
+library(ggplot2)
+library(scales)
+library(Hmisc)
+library(kableExtra)
+library(gridExtra)
+library(grid)
+library(gtable)
+```
+
+```{r r_setup, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+source("funcs.R")
+specify_decimal <- function(x, k) trimws(format(round(x, k), nsmall=k))
+```
+
+```{r data, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+myconfs <- c("LTR", "MIN_DIST", "AVG_DIST", "AVG_DIST_AND_MIN_DIST")
+myconfs_labels <- c("LTR (baseline)", "LTR + DSM1", "LTR + DSM2", "LTR + DSM1 + DSM2")
+
+all_myconfs <- c("PL2", "LTR", "MIN_DIST", "AVG_DIST", "AVG_MIN", "AVG_DIST_AND_MIN_DIST",  "AVG_MIN_AND_MIN_DIST", "AVG_DIST_AND_AVG_MIN")
+
+results <- read.csv("results.csv", header = FALSE)
+colnames(results) <- c("measurement", "query", "result", "configuration")
+
+results$configuration_ordered <- factor(results$configuration, 
+  levels=rev(myconfs),
+  labels=rev(myconfs_labels), ordered = TRUE)
+combination <- "AVG_DIST_AND_MIN_DIST"
+combination_map <- results[results$query=="all" & results$measurement=="map" & results$configuration==combination,"result"]
+
+recalls <- read.csv("sheets/recall.csv", header = FALSE)
+colnames(recalls) <- c("measurement", "recall", "query", "precision")
+recalls$configuration_ordered <- factor(recalls$measurement, 
+  levels=myconfs, labels=myconfs_labels, ordered = TRUE)
+recalls <- recalls[!is.na(recalls$configuration_ordered),]
+
+stats <- read.csv("sheets/results.csv", header = FALSE)
+colnames(stats) <- c("measurement", "query", "map")
+stats$configuration_ordered <- factor(stats$measurement, 
+  levels=myconfs,
+  labels=myconfs_labels, ordered = TRUE)
+stats <- stats[!is.na(stats$configuration_ordered), ]
+
+queries <- read.csv("topics.txt", header = FALSE, sep="|")
+colnames(queries) <- c("query", "text")
+queries$query <- as.numeric(as.character(queries$query))
+```
+
+# Deployment and evaluation of a baseline LTR approach
+Learning-to-rank is a recent paradigm used by commercial search engines to improve retrieval
+effectiveness by combining different sources of evidence. The goal of this report is to analyze, test and evaluate learning-to-rank features described in the article `Ronan Cummins and Colm O'Riordan, 2009`[^1] to see how pairwise term-term proximity can boost the scores of documents using Terrier’s support for learning-to-rank (LTR) and the Jforests LambdaMART LTR technique.
+
+We first analyze the effectiveness performance of two system configurations: `LTR (using PL2 to generate the sample)` vs. `PL2` on `HP04 Topic Set`. Table 1 below shows the results of the analysis for two different metrics, `MAP` and `P@5` (Performance at Rank 5).
+
+```{r question1, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+results %>% 
+  filter(query=="all" & configuration %in% c("PL2", "LTR")) %>% 
+  mutate(configuration = ifelse(configuration == "LTR", "LTR (PL2 sample)", as.character(configuration))) %>%  
+  group_by(configuration) %>% 
+  spread(measurement, result) %>% 
+  select(configuration, map, P_5) %>%
+  arrange(map) %>%
+  dplyr::rename("MAP" = map, "P@5" = P_5, "Configuration" = configuration) %>%
+  kable("latex", caption = '\\label{tab:summary1a} Performances of LTR vs PL2 on HP04 Topic Set', booktabs = T) %>% 
+    kable_styling(font_size = 10, latex_options = c("hold_position")) %>% 
+    add_header_above(c(" ", "Metric" = 2))
+```
+
+```{r question1a, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+confs <- c("PL2", "LTR")
+ttests <- list()
+
+for (i in c("map", "P_5")) {
+  x <- results[results$query!="all" & results$configuration==confs[1] & results$measurement == i, "result"]
+  y <- results[results$query!="all" & results$configuration==confs[2] & results$measurement == i, "result"]
+  
+  ttests[[i]] <- t.test(x, y, conf.level = 0.95)
+}
+```
+
+We proceed to perform t-test significance tests to conclude if the performance of `LTR` is on average significantly better than `PL2` for any of the metrics. Our null hypothesis is that the mean performance of `LTR` is the same as the mean of `PL2` for both metrics. After running the t-tests, the following results were obtained:
+
+`LRT` vs `PL2` on `Metric MAP`: The t-value is `r sprintf(ttests[["map"]][["statistic"]], fmt='%#.4f')`. The p-value is $`r sprintf(ttests[["map"]][["p.value"]], fmt = '%#.6f')`$. The result is `r ifelse(ttests[["map"]][["p.value"]] >= 0.05, 'not', '')` **significant** at p < 0.05.
+
+`LRT` vs `PL2` on `Metric P@5`: The t-value is `r sprintf(ttests[["P_5"]][["statistic"]], fmt='%#.4f')`. The p-value is $`r sprintf(ttests[["P_5"]][["p.value"]], fmt = '%#.6f')`$. The result is `r ifelse(ttests[["P_5"]][["p.value"]] >= 0.05, 'not', '')` **significant** at p < 0.05.
+
+Since the p-value is < 0.05 for both metrics, we reject the null hypothesis and conclude that there is statistically significant evidence that on average `LTR (PL2 sample)` is better than `PL2` on both, `MAP` and `P@5` metrics. 
+
+# Proximity Search Features
+
+## Choosing which Proximity Features to Implement (Question 2a)
+```{r eval=FALSE, echo=FALSE}
+Name the two proximity features you have chosen to implement and provide a brief rationale
+for your choice of these two particular features, especially in terms of how they might affect the performance of the deployed LTR baseline approach of Q1.
+
+### Difference between the Average Positions Proximity Feature
+After implementing this feature, we expect to see a boost in documents where terms appear consistently in the same parts of the document. It is expected to see a penalty (decrease in performance) on documents where one of the query terms appears further away than other terms, as it will increase the distance.
+```
+
+Based on the proposed paper `Ronan Cummins and Colm O'Riordan. 2009`, two proximity features were implemented and analyzed. 
+
+The proximity features that are implemented are `min_dist` *(Minimum Distance Proximity Feature)* and `avg_distance` *(Average Distance Proximity Feature)*. These features are analyzed individually and in combination on `HP04 Topic Set`.
+
+**Minimum Distance Proximity Feature**. One of the reasons for choosing `min_dist` is that it appears to be very efficient even though it requires less computation complexity than the rest of the possible features to implement. With the implementation of this feature, we expect to see a boost on documents where two of the query terms appear next to each other (or very close).  
+
+**Average Distance Proximity Feature**. After implementing this feature, we expect to see a boost in documents where query terms appear in approximately the same locations in the document. It is expected to see a penalty (decrease on performance) on documents where one of the query terms appears further away than other terms, as it will increase the average distance.
+
+## Implementation of the Proximity Search Features (Question 2b)
+```{r eval=FALSE, echo=FALSE}
+Along with the submission of your source code, discuss briefly your implementation of the two features, highlighting in particular any assumptions or design choices you made, any difficulties that you had to overcome to implement the two features, and how these difficulties were reflected in the unit testing you conducted. 
+```
+
+Source code is provided with the implementation for both features. It was quite of a challenge to decide what was the best approach to implement the features as well as the aggregating function for both features. The following assumptions were made when implementing the features:
+
+* The weights for each term is not taken in mind
+* The absence of key terms in a document is not penalized
+* We iterate through all possible combinations of the terms in the query, which in theory is Full Dependency (compared to Sequence Dependency used for baseline)
+
+The biggest challenge faced was the absense of a query term. We made sure to make proper use of `okToUse` by implementing some unit tests with different values. We think that the absense of a term is key, and should be further evaluated and considered.
+
+**Minimum Distance Implementation**. It was decided that the best possible aggregating function was to get the $min(min\_dist_{i,j \in D \cap Q, \forall i \ne j}(i, j))$, where $i$ and $j$ denote the $i^{th}$ and $j^{th}$ term respectively, $D$ denotes Document and $Q$ denotes Query. The reason for this choice is that the goal is to boost documents where the distance between query terms is small.
+
+**Average Distance Implementation**. After testing different algorithms, it was decided that the best possible aggregating function for this feature was to get the $sum(avg\_dist_{i,j \in D \cap Q, i<j}(i, j))$. Other aggregating functions were tested, but it was concluded that `sum` had the best performance.
+
+One of the difficulties faced when implementing this features was to make sure that the algorithm detects the right score in any order and for all combinations of each query term. The unit tests reflect different possible combinations on queries with `n` terms and different distances. 
+
+## Testing of the Implementation of Proximity Search Features (Question 2c)
+```{r eval=FALSE, echo=FALSE}
+Along with the submission of the source code of your unit tests, describe the unit tests that
+you have conducted to test that your implemented features behaved as expected. In particular,
+highlight any specific cases you tested your code for, and whether you identified and corrected any error in your code.
+```
+
+Unit tests were implemented for different combinations of documents and query terms. Queries were tested for 2 or more terms. Different terms combinations were tested. For example for query "a b", documents with terms "a" term before "b", "b" before "a", "a" missing terms in document, as well as other combinations were taking in mind. One of the special thigns to test was the complexity computation by not doing extra loops in the `min_dist` feature, where many errors were found and fixed when implementing the algorithm. 
+
+# Evaluation of the Proximity Search Features
+```{r eval=FALSE, echo=FALSE}
+Once you have created and tested your two DSMs, you should experiment with LTR, including
+your new features, and comparing to your LTR baseline with the 3 initial provided features. As per best evaluation practices, when determining the benefits of your added features, you should add them separately to the list of provided features, then in combination to see if they provide different sources of evidence to the learner. This gives you 4 settings to compare and discuss (LTR baseline, LTR Baseline + DSM 1, LTR Baseline + DSM 2, LTR Baseline + DSM 1 + DSM 2). Report the obtained performances of your 4 LTR system variants in a table as follows (Report all your performances to 4 decimal places):
+```
+
+We proceed now to evaluate the proximity features implemented in Terrier. The implementations are called `Dependency Score Modifiers (DSM)`. Let `DSM1` denote the configuration of first feature implemented, in this case $min\_dist(a, b, D)$, let `DSM2` denote the second feature implemented, in this case $avg\_dist(a, b, D)$. These features were evaluated individually and in combination along with `LTR baseline` on HP04 Topic Set. Table below shows the results of the analysis.
+
+```{r question3a, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+confs <- myconfs
+
+results %>% 
+  filter(query=="all" & configuration %in% confs) %>% 
+  group_by(measurement) %>% 
+  spread(measurement, result) %>% 
+  select(configuration_ordered, map, P_5) %>%
+  arrange(desc(configuration_ordered)) %>%
+  dplyr::rename("MAP" = "map", "P@5" = "P_5", "Configuration" = "configuration_ordered") %>%
+  kable("latex", caption = '\\label{tab:summary3a} Performances of DSM1, DSM2 with LTR baseline on HP04 Topic Set', booktabs = T) %>% 
+    kable_styling(font_size = 10, latex_options = c("hold_position","striped")) %>% 
+    add_header_above(c(" ", "Metric" = 2))
+```
+
+```{r question3a_ttests, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+ttests <- list()
+
+for (metric in c("map")) {
+  x <- results[results$query!="all" & results$configuration==confs[1] & results$measurement == metric, "result"]
+  ttests[[metric]] <- list()
+  
+  for (conf in confs) {
+    y <- results[results$query!="all" & results$configuration==conf & results$measurement == metric, "result"]  
+    ttests[[metric]][[conf]] <- t.test(x, y, conf.level = 0.95)
+  }
+}
+```
+
+`LRT (baseline)` vs `LTR + DSM1` on Metric MAP: The t-value is `r sprintf(ttests[["map"]][[confs[2]]][["statistic"]], fmt='%#.4f')`. The p-value is $`r sprintf(ttests[["map"]][[confs[2]]][["p.value"]], fmt = '%#.4f')`$. The result is `r ifelse(ttests[["map"]][[confs[2]]][["p.value"]] >= 0.05, '**not**', '')` **significant** at p < 0.05.
+
+`LRT (baseline)` vs `LTR + DSM1` on Metric MAP: The t-value is `r sprintf(ttests[["map"]][[confs[3]]][["statistic"]], fmt='%#.4f')`. The p-value is $`r sprintf(ttests[["map"]][[confs[3]]][["p.value"]], fmt = '%#.4f')`$. The result is `r ifelse(ttests[["map"]][[confs[3]]][["p.value"]] >= 0.05, '**not**', '')` **significant** at p < 0.05.
+
+`LRT (baseline)` vs `LTR + DSM1 + DSM2` on Metric MAP: The t-value is `r sprintf(ttests[["map"]][[confs[4]]][["statistic"]], fmt='%#.4f')`. The p-value is $`r sprintf(ttests[["map"]][[confs[4]]][["p.value"]], fmt = '%#.4f')`$. The result is `r ifelse(ttests[["map"]][[confs[4]]][["p.value"]] >= 0.05, '**not**', '')` **significant** at p < 0.05.
+
+We see an improvement on all combinations for both metrics with respect to the baseline. However, the improvement is not statistically significant.
+
+# Performance of the learned model
+```{r eval=FALSE, echo=FALSE}
+Using MAP as the main evaluation metric, provide a concise, yet informative, discussion on the performance of the learned model with and without your additional features. In particular, comment on why your features did/did not help (individually or in combination), and what queries benefitted (their numbers, their nature and characteristics, etc.).
+As part of your discussion, you will need to provide and use the following:
+a) A recall-precision graph summarising the results of your 4 LTR system variants,
+```
+Using MAP as the main evaluation metric, below we provide a summary of the performance of the learned model with and without the additional proximity features. 
+
+```{r question4_a, echo = FALSE, fig.height = 2, fig.width = 4, out.width = '100%', fig.align = "center", eval = TRUE, warning = FALSE, message = FALSE, fig.cap="Recall-Precision Plot of the 4 system variants used", fig.pos="H"}
+data <- recalls[recalls$query=="all" & recalls$measurement!="PL2",]
+
+plot<-ggplot(data, aes(x=recall, y=precision, group=configuration_ordered, colour=configuration_ordered)) + 
+  geom_line(size=0.5) + 
+  theme_light() +
+  labs(y = "Precision", x="Recall", colour="", legend.position="right") +
+  theme(plot.title = element_text(size = 9, face="plain"))
+
+#+
+ # options(repr.plot.width=800, repr.plot.height=500)
+
+grid_arrange_shared_legend_2(
+  plot + ylim(0, 1) + labs(title = "Recall-Precision Plot") + theme(plot.margin=unit(c(0,1,0,0),"cm")),
+  plot + labs(title = "Scaled Recall-Precision Plot")+ theme(plot.margin=unit(c(0,1,0,0),"cm"))
+)
+
+```
+
+Figure 1 above shows a Recall-Precision graph where we can observe how any combination of proximity feature (either individually or in combination) outperforms the LTR baseline. In particular the combination `LTR + DSM1 + DSM2` outperforms `LTR (baseline)` by 0.07.
+ 
+```{r question_4b, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE, fig.cap="Histogram with a query-by-query performance analysis of the 4 system variants used."}
+# A histogram with a query-by-query performance analysis of the 4 system variants used.
+
+stats_by_query <- stats[stats$query != "all",]
+stats_by_query$query_num <- as.numeric(as.character(stats_by_query$query))
+stats_ordered <- stats_by_query[order(stats_by_query$query_num),]
+
+data <- stats_ordered[stats_ordered$measurement %in% myconfs,]
+
+data$group <- as.numeric(sort(rep_len(1:3, length(data$query_num))))
+data$group_label <- apply(data, 1, function(row) {
+  paste(
+    "Queries from",
+    min(data[data$group==row['group'],"query_num"]),
+    "to",
+    max(data[data$group==row['group'],"query_num"])
+  )
+})
+data$group_label = factor(data$group_label, levels=unique(data$group_label))
+
+ggplot(
+    data = data, 
+    mapping = aes(x=factor(query_num), y = map, fill=configuration_ordered)) + 
+    labs(fill="", x="Query Number") + 
+    geom_bar(width = 0.8, stat="identity", position = "dodge2") + 
+    theme_light() +
+    facet_wrap(~group_label, ncol = 1, scales = "free_x")+
+    scale_x_discrete(breaks = unique(data$query_num)[c(TRUE,TRUE,TRUE)]) +
+    theme(legend.position="bottom", legend.key.size = unit(0.4, "cm"), axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+    xlab("Query") +
+    ylab("MAP")
+```
+
+Figure 2 above shows a histogram of query-by-query performance analysis of the 4 system variants used. It is interesting to see how in different queries the combination of both proximity features improves the performance of the query, but in some other queries it does not. It seems that this does not depend to whether each proximity feature improved the performance by itself.  
+
+We now proceed to summarize the amount of the number of queries that have been improved, degraded or remained unaffected with the introduction of any variant of the implemented features with respect to the `LTR baseline`. Table below shows a summary of all variants and their respective performance scores. It is important to mention that even though the variant of `LTR + DSM1 + DMS2` had the best `MAP score` (`r combination_map`), as mentioned in Table 2, we can also see in Table 3 that it also degraded a higher amount of queries than `LTR + DSM1` and `LTR + DSM1` variants.
+
+```{r question4_c, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+#c) A suitable table summarising the number of queries that have been
+#improved/degraded/unaffected with the introduction of either (or both) of your proximity
+#features with respect to the LTR baseline.
+
+summary_results <- results[results$query != "all",-5]
+summary_results$query <- as.numeric(as.character(summary_results$query))
+
+summary <- summary_results %>% 
+  filter(measurement == "map") %>% 
+  group_by(query) %>% 
+  spread(configuration, result) %>% 
+  mutate(
+    dsm1_diff = LTR-!!rlang::sym(myconfs[2]),
+    dsm2_diff = LTR-!!rlang::sym(myconfs[3]),
+    dsm3_diff = LTR-!!rlang::sym(myconfs[4]),
+    dsm1_result = ifelse(LTR-!!rlang::sym(myconfs[2]) < 0, "Improved", ifelse(LTR-!!rlang::sym(confs[2]) == 0, "Unaffected", "Degraded")),
+    dsm2_result = ifelse(LTR-!!rlang::sym(myconfs[3]) < 0, "Improved", ifelse(LTR-!!rlang::sym(confs[3]) == 0, "Unaffected", "Degraded")),
+    dsm3_result = ifelse(LTR-!!rlang::sym(myconfs[4]) < 0, "Improved", ifelse(LTR-!!rlang::sym(confs[4]) == 0, "Unaffected", "Degraded"))
+  ) %>% 
+  inner_join(., queries, by="query")
+
+summary %>% 
+  select(measurement, query, dsm1_diff, dsm2_diff, dsm3_diff) %>% 
+  gather("type", "value", 3:5) %>% 
+  group_by(type) %>% 
+  summarise(
+    Total = n(), 
+    Improved = sum(value < 0),
+    Unaffected = sum(value == 0),
+    Degraded = sum(value > 0)
+  ) %>%
+  arrange(type) %>% 
+  mutate(
+    type = ifelse(type == "dsm1_diff", "LTR + DSM1", as.character(type)),
+    type = ifelse(type == "dsm2_diff", "LTR + DSM2", as.character(type)),
+    type = ifelse(type == "dsm3_diff", "LTR + DSM1 + DSM2", as.character(type))
+  ) %>%   
+  dplyr::rename("Configuration" = "type") %>%
+  kable("latex", caption = '\\label{tab:summary4c} Performance summary of the implemented proximity
+features', booktabs = T) %>% 
+    kable_styling(font_size = 10, latex_options = c("hold_position", "striped"))
+```
+
+Tables below show examples of queries that have been particularly improved or
+harmed with the introduction of the implemented proximity search features.
+
+```{r question4_d, echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+
+#d) A suitable table showing examples of queries that have been particularly improved or
+#harmed with the introduction of your proximity search features.
+# https://stackoverflow.com/questions/49015578/space-after-every-five-rows-in-kable-output-with-booktabs-option-in-r-markdown
+colorfunc <- colorRampPalette(c("red", "white"))
+reds <- colorfunc(15)
+colorfunc <- colorRampPalette(c("green", "white"))
+greens <- colorfunc(15)
+tables <- list()
+
+   summary %>% 
+    select(measurement, query, LTR, dsm1_diff, dsm2_diff, dsm3_diff, dsm1_result, dsm2_result, dsm3_result, text) %>%
+    filter(abs(dsm1_diff) >= 0.5 | abs(dsm2_diff) >= 0.5 | abs(dsm1_diff) >= 0.5) %>% 
+    arrange(query) %>% 
+    select(query, text, LTR, dsm1_diff, dsm2_diff, dsm3_diff) %>% 
+    top_n(3) %>%   
+    dplyr::rename("#" = "query", "Baseline" = LTR, "Query Terms" = "text") %>%
+    mutate(dsm1_diff = dsm1_diff * -1) %>%
+    mutate(dsm1_diff = ifelse(dsm1_diff < 0, paste("-", sprintf(abs(dsm1_diff), fmt='%#.4f')), ifelse(dsm1_diff == 0, "", paste("+", sprintf(abs(dsm1_diff), fmt='%#.4f'))))) %>%
+    mutate(dsm2_diff = dsm2_diff * -1) %>%
+    mutate(dsm2_diff = ifelse(dsm2_diff < 0, paste("-", sprintf(abs(dsm2_diff), fmt='%#.4f')), ifelse(dsm2_diff == 0, "", paste("+", sprintf(abs(dsm2_diff), fmt='%#.4f'))))) %>%  
+    mutate(dsm3_diff = dsm3_diff * -1) %>%
+    mutate(dsm3_diff = ifelse(dsm3_diff < 0, paste("-", sprintf(abs(dsm3_diff), fmt='%#.4f')), ifelse(dsm3_diff == 0, "", paste("+", sprintf(abs(dsm3_diff), fmt='%#.4f'))))) %>%     
+    dplyr::rename("DSM1" = "dsm1_diff", "DSM2" = "dsm2_diff", "DSM1 + DSM2" = "dsm3_diff") %>%
+    kable("latex", align=c('r', 'l', 'r', 'r', 'r', 'r'), caption = paste('\\label{tab:summary4d} ', "Summary of query terms that improved/degraded in MAP score by 0.5 or more."), booktabs = T, linesep=c('')) %>% 
+      kable_styling(font_size = 10, latex_options = c("hold_position", "striped")) %>% 
+      add_header_above(c(" ", " ", "MAP Score" = 4)) %>% 
+   column_spec(2, width = "15em")
+
+```
+
+We can see in table above how some terms improved individually, while others degraded individually but were not degraded while using a combination of features. Further evaluation needs to be performed to see if there is any term missing that could have penalized the relevant documents. We can see that query 128 *(Planetary balloon program)* is one of the queries that got the highest penalty with both features when they were evaluated individually, but it was unnafected when evaluating it with both features combined. Queries like *FEMA for kids hurricane facts*, *NODC coastal water temp* and *Fermilab Flora Fauna* were improved by both features individually and in combinations, which could mean that queries with uncommon words are improved.
+
+# Conclusions {#sec:con}
+Given the results, we can conclude that even though we did not achieve statistically significant improvements in MAP performance after the implementation of proximity features with respect to the LTR baseline, we can still see that they do help to boost relevant documents.
+
+Further improvements could be done to the algorithms to the implementation by taking in mind the weights of the terms and a possible penalization of absense of query terms in a document, and possibly changing the aggregating function by normalizing the score based on the number query terms used.
+
+[^1]:  Ronan Cummins and Colm O’Riordan. Learning in a
+pairwise term-term proximity framework for
+information retrieval. In SIGIR 2009, pages 251–258,
+Boston, MA, USA, 2009. ACM. https://dl.acm.org/citation.cfm?doid=1571941.1571986

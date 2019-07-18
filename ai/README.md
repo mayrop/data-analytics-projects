@@ -1,11 +1,11 @@
 # Artificial Intelligence (H) 2018-2019
-# Assessed Exercise: Individual, 20% of the final grade (∼ 20 hours)
+## Assessed Exercise: Individual, 20% of the final grade (∼ 20 hours)
 
 Final report can be found [here](report/project.pdf). It is generated from a [.Rmd file](report/project.Rmd). In order to generate it:
 - `python run_generation.py`
 - `python run_eval.py 0,1,2,3,4,5,6,7`
 - `python run_eval.py 0,1,2,3 10000 4` 
-- Knit the .Rmd file from R Studio
+- Knit the `.Rmd` file from R Studio
 
 ## Problem Statement
 Your task is to design, implement, evaluate and document three virtual agents which are (potentially) able to reach a goal in a custom Open AI Gym environment derived from [Frozen](https://gym.openai.com/envs/FrozenLake8x8-v0/). Thus, you will need to install and understand the workings of the [Open AI Gym](https://gym.openai.com/) environment to be able solve the task (hint: see AI (H) Lab 2).
